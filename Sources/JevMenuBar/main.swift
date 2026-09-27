@@ -102,7 +102,7 @@ final class ServiceController: NSObject, ObservableObject {
     private var gatewayProcess: Process?
     private var runningModelID: String?
     private let appleProviderServer = AppleFoundationModelsServer()
-    private let root = URL(fileURLWithPath: "/Volumes/Seagate/workspace/jev-llm-prefill")
+    private let root = URL(fileURLWithPath: "/Volumes/Seagate/workspace/jev-mark")
     private let gatewayPort = 8096
     private let localPort = 8097
 
