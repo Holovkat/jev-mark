@@ -1,0 +1,2269 @@
+{
+  "models": [
+    "gemma4:12b",
+    "ornith-1.5:9b",
+    "SparkLLM/Spark-X2.5-4B:latest",
+    "granite4.2:latest"
+  ],
+  "cases": [
+    {
+      "id": "tallest",
+      "question": "A is taller than B, and C is taller than B. Who is tallest?",
+      "reference_answer": "cannot determine",
+      "rubric": "Do not infer a relationship between A and C that is not stated.",
+      "candidates": [
+        {
+          "id": "candidate_1250",
+          "response": "Both A and C are taller than B, but there is no information provided to compare the heights of A and C. Therefore, it is impossible to determine who is the tallest.\n\nFINAL: C cannot determine"
+        },
+        {
+          "id": "candidate_3379",
+          "response": "We know that A is taller than B, and C is also taller than B, but there is no information provided about the relationship between A and C. Since we cannot compare A and C, it is impossible to determine who is the tallest.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_9952",
+          "response": "We know A is taller than B, and C is taller than B, but there's no information comparing A and C directly. Without knowing whether A is taller than C or vice versa, we cannot determine who is the tallest.\n\nFINAL: C"
+        },
+        {
+          "id": "candidate_1936",
+          "response": "We know A is taller than B and C is taller than B, but there is no information comparing A and C directly. Without knowing whether A is taller than C or vice versa, we cannot determine who is tallest.\n\nFINAL: cannot determine"
+        }
+      ]
+    },
+    {
+      "id": "coffee-safety",
+      "question": "A cup of coffee has been sitting on a desk for two hours. Is it safe to drink?",
+      "reference_answer": "cannot determine",
+      "rubric": "The answer depends on temperature, ingredients, contamination, and other missing facts.",
+      "candidates": [
+        {
+          "id": "candidate_9828",
+          "response": "A cup of coffee left on a desk for two hours is generally safe to drink, as it is not in a temperature danger zone long enough to support significant bacterial growth, especially if it was covered or in a clean environment. However, if it was left uncovered in a warm room, it may have started to cool and could harbor some bacteria, but it is unlikely to be harmful.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_8257",
+          "response": "Whether the coffee is safe to drink depends on factors like the environment, the ingredients added (like milk or cream), and the temperature. Without knowing these specific details, it is impossible to determine if it is safe.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_6457",
+          "response": "Coffee left out for two hours can develop bacteria and off flavors, which means it is not safe to drink.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_6655",
+          "response": "Coffee left at room temperature for two hours can harbor bacteria that may grow and cause illness if consumed. Whether it is safe to drink depends on factors like ambient temperature, cleanliness of the cup, and individual health. Without specific information about temperature, contamination, or storage conditions, safety cannot be determined.\n\nFINAL: cannot determine"
+        }
+      ]
+    },
+    {
+      "id": "telescope",
+      "question": "I saw the man with the telescope. Who had the telescope?",
+      "reference_answer": "cannot determine",
+      "rubric": "The sentence is grammatically ambiguous; either person could have the telescope.",
+      "candidates": [
+        {
+          "id": "candidate_4376",
+          "response": "The scenario only states that you saw the man using a telescope, but it does not provide any information about whether the telescope belonged to you or to the man. Since there is no way to confirm ownership from the given details, the correct choice is the one that reflects this uncertainty.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_5320",
+          "response": "The question states that I saw the man with the telescope, which means the telescope was with the man. Since the phrasing places the telescope alongside the man, it indicates the man had the telescope.\n\nFINAL: the man did"
+        },
+        {
+          "id": "candidate_5353",
+          "response": "The sentence \"I saw the man with the telescope\" is ambiguous; it could mean either the speaker saw the man while using a telescope, or the speaker saw the man who had the telescope. Without additional context, it is unclear who possessed or used the telescope. Therefore, based solely on the given sentence, we cannot determine who had the telescope.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_1955",
+          "response": "The sentence is syntactically ambiguous because \"with the telescope\" could modify either the verb \"saw\" or the noun \"man.\" Without further context, it is impossible to know if I used the telescope to see him or if he was holding it.\n\nFINAL: cannot determine"
+        }
+      ]
+    },
+    {
+      "id": "airport",
+      "question": "Your flight leaves at 11:00. The drive normally takes 30 minutes, but traffic and airport security are unknown. Should you leave at 9:00 or 9:30?",
+      "reference_answer": "cannot determine from the facts",
+      "rubric": "A reliable departure time requires traffic, airport, check-in, and baggage assumptions.",
+      "candidates": [
+        {
+          "id": "candidate_2237",
+          "response": "The flight departs at 11:00, and the drive normally takes 30 minutes, which would require leaving at 10:30. Since the actual travel time is uncertain due to traffic and security, leaving at either 9:00 or 9:30 would not guarantee a timely arrival.\n\nFINAL: cannot determine from the facts"
+        },
+        {
+          "id": "candidate_6317",
+          "response": "Given the uncertainty around traffic and airport security, leaving earlier at 9:00 provides a larger buffer of time to absorb unexpected delays, reducing the risk of missing your 11:00 flight.\n\nFINAL: 9:00"
+        },
+        {
+          "id": "candidate_8705",
+          "response": "While the drive only takes 30 minutes, the time required for airport security and potential traffic is unknown. Leaving at 9:00 provides a necessary buffer for these unpredictable factors.\n\nFINAL: 9:00"
+        },
+        {
+          "id": "candidate_5179",
+          "response": "The flight leaves at 11:00, and the drive normally takes 30 minutes. However, traffic and airport security are unknown, which could add extra time. Since conditions are uncertain, leaving at 9:30 provides more buffer than 9:00.\n\nFINAL: cannot determine from the facts"
+        }
+      ]
+    },
+    {
+      "id": "road-sign",
+      "question": "A sign says 'No entry except local access'. You need to visit a friend who lives on that street. May you enter?",
+      "reference_answer": "depends on the legal meaning of local access",
+      "rubric": "Interpretation depends on the jurisdiction and whether visiting a resident qualifies as local access.",
+      "candidates": [
+        {
+          "id": "candidate_8416",
+          "response": "If your friend lives on that street, you likely qualify as a local resident or visitor with legitimate access, so \"local access\" would typically permit your entry. However, the exact interpretation can vary depending on how local authorities define \"local access\" and whether your visit counts as a legitimate local purpose.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_8311",
+          "response": "The sign \"No entry except local access\" typically restricts entry to non-local individuals, implying that only residents or those with a legitimate local reason (e.g., living nearby, servicing the area) may enter. Since the user needs to visit a friend who lives on that street, they are likely a local access person (visiting a resident), which generally permits entry under \"local access.\" However, without explicit local definition (e.g., \"residents only\" vs. \"service personnel\"), the precise allowance hinges on the legal interpretation of \"local access.\"  \nFINAL: depends on the legal meaning of local access"
+        },
+        {
+          "id": "candidate_8527",
+          "response": "The term \"local access\" typically refers to residents, workers, or people with a specific purpose in the immediate area. Since visiting a friend who lives on that street constitutes a specific local purpose, you would generally be permitted to enter.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_8090",
+          "response": "The sign explicitly permits entry only for local access, which typically includes visitors to a friend's home on that street. Since your visit to a friend qualifies as local access, you are allowed to enter.\n\nFINAL: yes"
+        }
+      ]
+    },
+    {
+      "id": "lights-off",
+      "question": "The lights are off in a building. Is the building empty?",
+      "reference_answer": "cannot determine",
+      "rubric": "Lights being off does not establish occupancy.",
+      "candidates": [
+        {
+          "id": "candidate_2933",
+          "response": "The fact that the lights are off does not necessarily mean the building is empty; people could be inside with lights off, or the building could be unoccupied for other reasons. Without additional information about occupancy, we cannot conclude the building is empty.  \nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_7431",
+          "response": "The lights being off does not necessarily mean the building is empty, as people could be present but simply not using the lights\u2014for example, during nighttime hours, in unoccupied rooms, or if the building is designed to conserve energy.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_9998",
+          "response": "The fact that the lights are off does not provide information about the presence of people inside the building. People could be present but not using lights, or the building could be unoccupied. Therefore, it is impossible to determine if the building is empty.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_7755",
+          "response": "The lights being off in a building does not necessarily mean there are no people inside, as lights could be off for maintenance, security, or other reasons. Therefore, we cannot conclude the building is empty based solely on this information.\n\nFINAL: cannot determine"
+        }
+      ]
+    },
+    {
+      "id": "store-closing",
+      "question": "A store is advertised as open from 9:00 to 17:00. If you arrive exactly at 17:00, can you shop?",
+      "reference_answer": "cannot determine",
+      "rubric": "The closing policy, clock tolerance, and whether entry is allowed at closing are unstated.",
+      "candidates": [
+        {
+          "id": "candidate_7890",
+          "response": "The store's advertised hours are 9:00 to 17:00, which typically means it closes at 17:00. Arriving exactly at 17:00 means the store would be closing, so you likely cannot shop.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_4928",
+          "response": "The store's advertised hours are 9:00 to 17:00, which typically means it is open until 17:00 but may close at or after 17:00. Arriving exactly at 17:00 depends on whether the closing time includes the exact hour or if 17:00 is considered the start of closing. Without explicit wording like \"until 17:00 inclusive\" or \"open until 17:00,\" it's ambiguous whether the door is still open precisely at 17:00.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_9316",
+          "response": "The advertisement states the store is open from 9:00 to 17:00. Arriving exactly at 17:00 means you are at the very end of the stated operating hours. Since the store closes at 17:00, you would not be able to shop at that exact time.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_9458",
+          "response": "The store's closing time is 17:00, which typically marks the moment the store ceases operations for the day. Since 17:00 is the exact moment of closing, it is not guaranteed that the store will still be open to serve customers at that precise time.\n\nFINAL: cannot determine"
+        }
+      ]
+    },
+    {
+      "id": "medication",
+      "question": "A label says to take a medicine twice daily. Is 8:00 and 20:00 always the correct schedule?",
+      "reference_answer": "follow the prescriber or label instructions",
+      "rubric": "Twice daily does not justify inventing a universal schedule; medication-specific instructions control.",
+      "candidates": [
+        {
+          "id": "candidate_5779",
+          "response": "The label only specifies that the medicine should be taken twice daily, which means the exact times are flexible as long as the two doses are spaced apart by 24 hours. Therefore, 8:00 and 20:00 are just one possible schedule, not the only correct one.\n\nFINAL: follow the prescriber or label instructions"
+        },
+        {
+          "id": "candidate_4648",
+          "response": "No, 8:00 and 20:00 are not always the correct schedule. The exact timing should follow the prescriber's or label's specific instructions, which may account for factors like the medication's purpose, the patient's condition, or individualized dosing needs.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_7795",
+          "response": "The label instructing \"twice daily\" does not specify exact times; it only requires taking the medication twice each day. Therefore, 8:00 and 20:00 is not always correct, as any two times that roughly cover the 24-hour period (e.g., morning and evening) would satisfy \"twice daily,\" though consistency and adherence to the prescriber's intent are important.\n\nFINAL: follow the prescriber or label instructions"
+        },
+        {
+          "id": "candidate_8984",
+          "response": "While 8:00 and 20:00 is a common way to split a twice-daily dose, the \"correct\" schedule depends on the specific medication's requirements and the patient's routine. Some medications require specific intervals or timing relative to meals, so the prescriber's instructions should always take precedence over a general label.\n\nFINAL: follow the prescriber or label instructions"
+        }
+      ]
+    },
+    {
+      "id": "fastest-route",
+      "question": "Route A is shorter than Route B. Is Route A always faster?",
+      "reference_answer": "no",
+      "rubric": "Traffic, speed limits, road type, and delays can make a longer route faster.",
+      "candidates": [
+        {
+          "id": "candidate_1222",
+          "response": "A shorter route typically takes less distance, but speed depends on factors like traffic, road conditions, and speed limits, which are not specified here. Therefore, we cannot conclude that a shorter route is always faster.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_1399",
+          "response": "No. A shorter route isn't necessarily faster because speed depends on factors like traffic, road conditions, and the type of surface, not just distance. A longer route with fewer obstacles could actually be quicker than a shorter one with delays.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_3263",
+          "response": "A shorter distance does not guarantee a faster travel time because factors like speed limits, traffic conditions, and road quality vary. Therefore, it cannot be determined if Route A is always faster based solely on its length.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_6085",
+          "response": "Route length does not necessarily determine travel time, as factors like speed limits, traffic, stops, and mode of transportation affect speed. A shorter route may still take longer if it includes many intersections, low-speed zones, or delays. Therefore, being shorter does not guarantee that Route A is always faster.\n\nFINAL: cannot determine"
+        }
+      ]
+    },
+    {
+      "id": "empty-box",
+      "question": "A sealed box is light when lifted. Is it empty?",
+      "reference_answer": "cannot determine",
+      "rubric": "A light box may contain light contents; weight alone does not establish emptiness.",
+      "candidates": [
+        {
+          "id": "candidate_4583",
+          "response": "A sealed box being light when lifted only indicates its overall weight is low, but it could still contain very light objects like feathers or small, light items. Without knowing the specific contents or the box's material, we cannot definitively conclude whether it is empty.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_6730",
+          "response": "The box contains something that has very little mass, such as air or a vacuum. Therefore, the box is not technically empty.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_9040",
+          "response": "The fact that a sealed box is light when lifted does not necessarily indicate whether it is empty; weight depends on the contents and the box's material, among other factors. A sealed box could contain light materials (e.g., air, foam) and still feel light, or it could be empty. Without additional information about the box's composition or typical contents, we cannot conclude it is empty solely based on being light.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_8950",
+          "response": "A sealed box being light when lifted suggests it may be empty, but lightness alone doesn't guarantee emptiness\u2014it could contain low-density materials like foam, air-filled packaging, or lightweight substances. Without additional information about the box's contents or weight expectations, we cannot definitively conclude it's empty.\n\nFINAL: cannot determine"
+        }
+      ]
+    }
+  ],
+  "labels": {
+    "tallest": {
+      "gemma4:12b": "candidate_1250",
+      "ornith-1.5:9b": "candidate_9952",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_3379",
+      "granite4.2:latest": "candidate_1936"
+    },
+    "coffee-safety": {
+      "gemma4:12b": "candidate_8257",
+      "ornith-1.5:9b": "candidate_9828",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_6457",
+      "granite4.2:latest": "candidate_6655"
+    },
+    "telescope": {
+      "gemma4:12b": "candidate_1955",
+      "ornith-1.5:9b": "candidate_5320",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_4376",
+      "granite4.2:latest": "candidate_5353"
+    },
+    "airport": {
+      "gemma4:12b": "candidate_8705",
+      "ornith-1.5:9b": "candidate_6317",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_2237",
+      "granite4.2:latest": "candidate_5179"
+    },
+    "road-sign": {
+      "gemma4:12b": "candidate_8527",
+      "ornith-1.5:9b": "candidate_8416",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_8090",
+      "granite4.2:latest": "candidate_8311"
+    },
+    "lights-off": {
+      "gemma4:12b": "candidate_9998",
+      "ornith-1.5:9b": "candidate_7431",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_7755",
+      "granite4.2:latest": "candidate_2933"
+    },
+    "store-closing": {
+      "gemma4:12b": "candidate_9458",
+      "ornith-1.5:9b": "candidate_7890",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_9316",
+      "granite4.2:latest": "candidate_4928"
+    },
+    "medication": {
+      "gemma4:12b": "candidate_8984",
+      "ornith-1.5:9b": "candidate_4648",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_5779",
+      "granite4.2:latest": "candidate_7795"
+    },
+    "fastest-route": {
+      "gemma4:12b": "candidate_3263",
+      "ornith-1.5:9b": "candidate_1399",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_1222",
+      "granite4.2:latest": "candidate_6085"
+    },
+    "empty-box": {
+      "gemma4:12b": "candidate_6730",
+      "ornith-1.5:9b": "candidate_8950",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_4583",
+      "granite4.2:latest": "candidate_9040"
+    }
+  },
+  "judgements": [
+    {
+      "case_id": "tallest",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "granite4.2:latest": 2,
+        "SparkLLM/Spark-X2.5-4B:latest": 1
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_1936",
+            "confidence": "high",
+            "verdict_candidate_1936": "correct",
+            "verdict_candidate_1250": "correct",
+            "verdict_candidate_3379": "correct",
+            "verdict_candidate_9952": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1936",
+              "probability": 0.8916668891906738,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1936": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1250": {
+              "value": "correct",
+              "probability": 0.8502249717712402,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3379": {
+              "value": "correct",
+              "probability": 0.9999656677246094,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9952": {
+              "value": "incorrect",
+              "probability": 0.9999996423721313,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 367,
+            "scored_rows": 77
+          },
+          "case_id": "tallest",
+          "elapsed_ms": 4504.5,
+          "candidate_ids": [
+            "candidate_1936",
+            "candidate_1250",
+            "candidate_3379",
+            "candidate_9952"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_3379",
+            "confidence": "high",
+            "verdict_candidate_3379": "correct",
+            "verdict_candidate_1936": "correct",
+            "verdict_candidate_9952": "incorrect",
+            "verdict_candidate_1250": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_3379",
+              "probability": 0.9710761904716492,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3379": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1936": {
+              "value": "correct",
+              "probability": 0.9999576807022095,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9952": {
+              "value": "incorrect",
+              "probability": 0.9999996423721313,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1250": {
+              "value": "incorrect",
+              "probability": 0.9721441268920898,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 367,
+            "scored_rows": 77
+          },
+          "case_id": "tallest",
+          "elapsed_ms": 2080.9,
+          "candidate_ids": [
+            "candidate_3379",
+            "candidate_1936",
+            "candidate_9952",
+            "candidate_1250"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_1936",
+            "confidence": "high",
+            "verdict_candidate_1250": "correct",
+            "verdict_candidate_9952": "incorrect",
+            "verdict_candidate_3379": "correct",
+            "verdict_candidate_1936": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1936",
+              "probability": 0.9106056690216064,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1250": {
+              "value": "correct",
+              "probability": 0.9965591430664062,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9952": {
+              "value": "incorrect",
+              "probability": 0.7747409343719482,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3379": {
+              "value": "correct",
+              "probability": 0.9999743700027466,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1936": {
+              "value": "correct",
+              "probability": 0.9999978542327881,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 367,
+            "scored_rows": 77
+          },
+          "case_id": "tallest",
+          "elapsed_ms": 2074.4,
+          "candidate_ids": [
+            "candidate_1250",
+            "candidate_9952",
+            "candidate_3379",
+            "candidate_1936"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        }
+      ]
+    },
+    {
+      "case_id": "coffee-safety",
+      "winner_model": "gemma4:12b",
+      "votes": {
+        "gemma4:12b": 2,
+        "granite4.2:latest": 1
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_8257",
+            "confidence": "high",
+            "verdict_candidate_8257": "correct",
+            "verdict_candidate_9828": "incorrect",
+            "verdict_candidate_6655": "correct",
+            "verdict_candidate_6457": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8257",
+              "probability": 0.9585927128791809,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8257": {
+              "value": "correct",
+              "probability": 0.9999996423721313,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9828": {
+              "value": "incorrect",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6655": {
+              "value": "correct",
+              "probability": 0.9999665021896362,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6457": {
+              "value": "incorrect",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 394,
+            "scored_rows": 77
+          },
+          "case_id": "coffee-safety",
+          "elapsed_ms": 2147.7,
+          "candidate_ids": [
+            "candidate_8257",
+            "candidate_9828",
+            "candidate_6655",
+            "candidate_6457"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "gemma4:12b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_6655",
+            "confidence": "high",
+            "verdict_candidate_6457": "incorrect",
+            "verdict_candidate_9828": "incorrect",
+            "verdict_candidate_6655": "correct",
+            "verdict_candidate_8257": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6655",
+              "probability": 0.8397842645645142,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6457": {
+              "value": "incorrect",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9828": {
+              "value": "incorrect",
+              "probability": 0.9999972581863403,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6655": {
+              "value": "correct",
+              "probability": 0.999990701675415,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8257": {
+              "value": "correct",
+              "probability": 0.9999909400939941,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 394,
+            "scored_rows": 77
+          },
+          "case_id": "coffee-safety",
+          "elapsed_ms": 2147.9,
+          "candidate_ids": [
+            "candidate_6457",
+            "candidate_9828",
+            "candidate_6655",
+            "candidate_8257"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_8257",
+            "confidence": "high",
+            "verdict_candidate_6655": "correct",
+            "verdict_candidate_8257": "correct",
+            "verdict_candidate_6457": "incorrect",
+            "verdict_candidate_9828": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8257",
+              "probability": 0.9849690198898315,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6655": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8257": {
+              "value": "correct",
+              "probability": 0.999946117401123,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6457": {
+              "value": "incorrect",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9828": {
+              "value": "incorrect",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 394,
+            "scored_rows": 77
+          },
+          "case_id": "coffee-safety",
+          "elapsed_ms": 2144.3,
+          "candidate_ids": [
+            "candidate_6655",
+            "candidate_8257",
+            "candidate_6457",
+            "candidate_9828"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "gemma4:12b"
+        }
+      ]
+    },
+    {
+      "case_id": "telescope",
+      "winner_model": "gemma4:12b",
+      "votes": {
+        "gemma4:12b": 2,
+        "granite4.2:latest": 1
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_1955",
+            "confidence": "high",
+            "verdict_candidate_1955": "correct",
+            "verdict_candidate_4376": "correct",
+            "verdict_candidate_5353": "correct",
+            "verdict_candidate_5320": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1955",
+              "probability": 0.8311405777931213,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1955": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4376": {
+              "value": "correct",
+              "probability": 0.8800279498100281,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5353": {
+              "value": "correct",
+              "probability": 0.9996411800384521,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5320": {
+              "value": "incorrect",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 404,
+            "scored_rows": 78
+          },
+          "case_id": "telescope",
+          "elapsed_ms": 2142.0,
+          "candidate_ids": [
+            "candidate_1955",
+            "candidate_4376",
+            "candidate_5353",
+            "candidate_5320"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "gemma4:12b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_5353",
+            "confidence": "high",
+            "verdict_candidate_1955": "correct",
+            "verdict_candidate_5353": "correct",
+            "verdict_candidate_4376": "correct",
+            "verdict_candidate_5320": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5353",
+              "probability": 0.9953993558883667,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1955": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5353": {
+              "value": "correct",
+              "probability": 0.9998682141304016,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4376": {
+              "value": "correct",
+              "probability": 0.508565366268158,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5320": {
+              "value": "incorrect",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 404,
+            "scored_rows": 78
+          },
+          "case_id": "telescope",
+          "elapsed_ms": 2146.4,
+          "candidate_ids": [
+            "candidate_1955",
+            "candidate_5353",
+            "candidate_4376",
+            "candidate_5320"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_1955",
+            "confidence": "high",
+            "verdict_candidate_4376": "correct",
+            "verdict_candidate_5320": "incorrect",
+            "verdict_candidate_1955": "correct",
+            "verdict_candidate_5353": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1955",
+              "probability": 0.9496525526046753,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4376": {
+              "value": "correct",
+              "probability": 0.9999826550483704,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5320": {
+              "value": "incorrect",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1955": {
+              "value": "correct",
+              "probability": 0.9998920559883118,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5353": {
+              "value": "correct",
+              "probability": 0.9999507665634155,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 404,
+            "scored_rows": 78
+          },
+          "case_id": "telescope",
+          "elapsed_ms": 2145.6,
+          "candidate_ids": [
+            "candidate_4376",
+            "candidate_5320",
+            "candidate_1955",
+            "candidate_5353"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "gemma4:12b"
+        }
+      ]
+    },
+    {
+      "case_id": "airport",
+      "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+      "votes": {
+        "SparkLLM/Spark-X2.5-4B:latest": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_2237",
+            "confidence": "high",
+            "verdict_candidate_6317": "incorrect",
+            "verdict_candidate_5179": "incorrect",
+            "verdict_candidate_8705": "incorrect",
+            "verdict_candidate_2237": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2237",
+              "probability": 0.9981058835983276,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6317": {
+              "value": "incorrect",
+              "probability": 0.9999624490737915,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5179": {
+              "value": "incorrect",
+              "probability": 0.9610896706581116,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8705": {
+              "value": "incorrect",
+              "probability": 0.9998188614845276,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2237": {
+              "value": "correct",
+              "probability": 0.9999150633811951,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 441,
+            "scored_rows": 69
+          },
+          "case_id": "airport",
+          "elapsed_ms": 2216.0,
+          "candidate_ids": [
+            "candidate_6317",
+            "candidate_5179",
+            "candidate_8705",
+            "candidate_2237"
+          ],
+          "reference_answer": "cannot determine from the facts",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_2237",
+            "confidence": "high",
+            "verdict_candidate_8705": "incorrect",
+            "verdict_candidate_6317": "incorrect",
+            "verdict_candidate_5179": "correct",
+            "verdict_candidate_2237": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2237",
+              "probability": 0.994211733341217,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8705": {
+              "value": "incorrect",
+              "probability": 0.9999991059303284,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6317": {
+              "value": "incorrect",
+              "probability": 0.9999892711639404,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5179": {
+              "value": "correct",
+              "probability": 0.6343229413032532,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2237": {
+              "value": "correct",
+              "probability": 0.9999561309814453,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 441,
+            "scored_rows": 69
+          },
+          "case_id": "airport",
+          "elapsed_ms": 2219.9,
+          "candidate_ids": [
+            "candidate_8705",
+            "candidate_6317",
+            "candidate_5179",
+            "candidate_2237"
+          ],
+          "reference_answer": "cannot determine from the facts",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_2237",
+            "confidence": "high",
+            "verdict_candidate_5179": "incorrect",
+            "verdict_candidate_8705": "incorrect",
+            "verdict_candidate_2237": "correct",
+            "verdict_candidate_6317": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2237",
+              "probability": 0.9999679923057556,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5179": {
+              "value": "incorrect",
+              "probability": 0.5363260507583618,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8705": {
+              "value": "incorrect",
+              "probability": 0.9999901056289673,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2237": {
+              "value": "correct",
+              "probability": 0.9999579787254333,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6317": {
+              "value": "incorrect",
+              "probability": 0.9999983310699463,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 441,
+            "scored_rows": 69
+          },
+          "case_id": "airport",
+          "elapsed_ms": 2217.1,
+          "candidate_ids": [
+            "candidate_5179",
+            "candidate_8705",
+            "candidate_2237",
+            "candidate_6317"
+          ],
+          "reference_answer": "cannot determine from the facts",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest"
+        }
+      ]
+    },
+    {
+      "case_id": "road-sign",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "granite4.2:latest": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_8311",
+            "confidence": "high",
+            "verdict_candidate_8090": "incorrect",
+            "verdict_candidate_8311": "correct",
+            "verdict_candidate_8527": "partial",
+            "verdict_candidate_8416": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8311",
+              "probability": 0.9999964237213135,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8090": {
+              "value": "incorrect",
+              "probability": 0.798567533493042,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8311": {
+              "value": "correct",
+              "probability": 0.9999943971633911,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8527": {
+              "value": "partial",
+              "probability": 0.5533368587493896,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8416": {
+              "value": "incorrect",
+              "probability": 0.5722776055335999,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 473,
+            "scored_rows": 70
+          },
+          "case_id": "road-sign",
+          "elapsed_ms": 2291.5,
+          "candidate_ids": [
+            "candidate_8090",
+            "candidate_8311",
+            "candidate_8527",
+            "candidate_8416"
+          ],
+          "reference_answer": "depends on the legal meaning of local access",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_8311",
+            "confidence": "high",
+            "verdict_candidate_8090": "incorrect",
+            "verdict_candidate_8527": "partial",
+            "verdict_candidate_8311": "correct",
+            "verdict_candidate_8416": "partial"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8311",
+              "probability": 0.9999977350234985,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8090": {
+              "value": "incorrect",
+              "probability": 0.9131433367729187,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8527": {
+              "value": "partial",
+              "probability": 0.9267327785491943,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8311": {
+              "value": "correct",
+              "probability": 0.9999979138374329,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8416": {
+              "value": "partial",
+              "probability": 0.7745058536529541,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 473,
+            "scored_rows": 70
+          },
+          "case_id": "road-sign",
+          "elapsed_ms": 2301.0,
+          "candidate_ids": [
+            "candidate_8090",
+            "candidate_8527",
+            "candidate_8311",
+            "candidate_8416"
+          ],
+          "reference_answer": "depends on the legal meaning of local access",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_8311",
+            "confidence": "high",
+            "verdict_candidate_8527": "partial",
+            "verdict_candidate_8311": "correct",
+            "verdict_candidate_8416": "partial",
+            "verdict_candidate_8090": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8311",
+              "probability": 0.9999983906745911,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8527": {
+              "value": "partial",
+              "probability": 0.9362408518791199,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8311": {
+              "value": "correct",
+              "probability": 0.9999977946281433,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8416": {
+              "value": "partial",
+              "probability": 0.812517523765564,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8090": {
+              "value": "incorrect",
+              "probability": 0.8446440696716309,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 473,
+            "scored_rows": 70
+          },
+          "case_id": "road-sign",
+          "elapsed_ms": 2291.9,
+          "candidate_ids": [
+            "candidate_8527",
+            "candidate_8311",
+            "candidate_8416",
+            "candidate_8090"
+          ],
+          "reference_answer": "depends on the legal meaning of local access",
+          "winner_model": "granite4.2:latest"
+        }
+      ]
+    },
+    {
+      "case_id": "lights-off",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "gemma4:12b": 1,
+        "granite4.2:latest": 2
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_9998",
+            "confidence": "high",
+            "verdict_candidate_2933": "correct",
+            "verdict_candidate_9998": "correct",
+            "verdict_candidate_7431": "incorrect",
+            "verdict_candidate_7755": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9998",
+              "probability": 0.9633468985557556,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2933": {
+              "value": "correct",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9998": {
+              "value": "correct",
+              "probability": 0.999377429485321,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7431": {
+              "value": "incorrect",
+              "probability": 0.9975206851959229,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7755": {
+              "value": "correct",
+              "probability": 0.999930202960968,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 370,
+            "scored_rows": 77
+          },
+          "case_id": "lights-off",
+          "elapsed_ms": 2073.4,
+          "candidate_ids": [
+            "candidate_2933",
+            "candidate_9998",
+            "candidate_7431",
+            "candidate_7755"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "gemma4:12b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_2933",
+            "confidence": "high",
+            "verdict_candidate_2933": "correct",
+            "verdict_candidate_7431": "incorrect",
+            "verdict_candidate_7755": "correct",
+            "verdict_candidate_9998": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2933",
+              "probability": 0.5096949338912964,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2933": {
+              "value": "correct",
+              "probability": 0.9999995231628418,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7431": {
+              "value": "incorrect",
+              "probability": 0.9955627918243408,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7755": {
+              "value": "correct",
+              "probability": 0.9977620244026184,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9998": {
+              "value": "correct",
+              "probability": 0.9999925494194031,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 370,
+            "scored_rows": 77
+          },
+          "case_id": "lights-off",
+          "elapsed_ms": 2065.6,
+          "candidate_ids": [
+            "candidate_2933",
+            "candidate_7431",
+            "candidate_7755",
+            "candidate_9998"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_2933",
+            "confidence": "high",
+            "verdict_candidate_2933": "correct",
+            "verdict_candidate_7755": "correct",
+            "verdict_candidate_9998": "correct",
+            "verdict_candidate_7431": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2933",
+              "probability": 0.9839896559715271,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2933": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7755": {
+              "value": "correct",
+              "probability": 0.9994297623634338,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9998": {
+              "value": "correct",
+              "probability": 0.9999676942825317,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7431": {
+              "value": "incorrect",
+              "probability": 0.9999203085899353,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 370,
+            "scored_rows": 77
+          },
+          "case_id": "lights-off",
+          "elapsed_ms": 2063.9,
+          "candidate_ids": [
+            "candidate_2933",
+            "candidate_7755",
+            "candidate_9998",
+            "candidate_7431"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        }
+      ]
+    },
+    {
+      "case_id": "store-closing",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "granite4.2:latest": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_4928",
+            "confidence": "high",
+            "verdict_candidate_9458": "correct",
+            "verdict_candidate_9316": "incorrect",
+            "verdict_candidate_4928": "correct",
+            "verdict_candidate_7890": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4928",
+              "probability": 0.7456539273262024,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9458": {
+              "value": "correct",
+              "probability": 0.9999966621398926,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9316": {
+              "value": "incorrect",
+              "probability": 0.9999991059303284,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4928": {
+              "value": "correct",
+              "probability": 0.9999971985816956,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7890": {
+              "value": "incorrect",
+              "probability": 0.9999995231628418,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 521,
+            "scored_rows": 77
+          },
+          "case_id": "store-closing",
+          "elapsed_ms": 2487.5,
+          "candidate_ids": [
+            "candidate_9458",
+            "candidate_9316",
+            "candidate_4928",
+            "candidate_7890"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_4928",
+            "confidence": "high",
+            "verdict_candidate_7890": "incorrect",
+            "verdict_candidate_9316": "incorrect",
+            "verdict_candidate_9458": "correct",
+            "verdict_candidate_4928": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4928",
+              "probability": 0.9911199808120728,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7890": {
+              "value": "incorrect",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9316": {
+              "value": "incorrect",
+              "probability": 0.9999991059303284,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9458": {
+              "value": "correct",
+              "probability": 0.9997552037239075,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4928": {
+              "value": "correct",
+              "probability": 0.9999971985816956,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 521,
+            "scored_rows": 77
+          },
+          "case_id": "store-closing",
+          "elapsed_ms": 2486.9,
+          "candidate_ids": [
+            "candidate_7890",
+            "candidate_9316",
+            "candidate_9458",
+            "candidate_4928"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_4928",
+            "confidence": "high",
+            "verdict_candidate_9458": "correct",
+            "verdict_candidate_4928": "correct",
+            "verdict_candidate_9316": "incorrect",
+            "verdict_candidate_7890": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4928",
+              "probability": 0.922264575958252,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9458": {
+              "value": "correct",
+              "probability": 0.9999988079071045,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4928": {
+              "value": "correct",
+              "probability": 0.9998353123664856,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9316": {
+              "value": "incorrect",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7890": {
+              "value": "incorrect",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 521,
+            "scored_rows": 77
+          },
+          "case_id": "store-closing",
+          "elapsed_ms": 2486.1,
+          "candidate_ids": [
+            "candidate_9458",
+            "candidate_4928",
+            "candidate_9316",
+            "candidate_7890"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        }
+      ]
+    },
+    {
+      "case_id": "medication",
+      "winner_model": "gemma4:12b",
+      "votes": {
+        "gemma4:12b": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_8984",
+            "confidence": "high",
+            "verdict_candidate_8984": "correct",
+            "verdict_candidate_7795": "correct",
+            "verdict_candidate_5779": "partial",
+            "verdict_candidate_4648": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8984",
+              "probability": 0.999966025352478,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8984": {
+              "value": "correct",
+              "probability": 0.9999979138374329,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7795": {
+              "value": "correct",
+              "probability": 0.955054759979248,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5779": {
+              "value": "partial",
+              "probability": 0.5923932790756226,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4648": {
+              "value": "incorrect",
+              "probability": 0.9948210120201111,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 509,
+            "scored_rows": 69
+          },
+          "case_id": "medication",
+          "elapsed_ms": 2362.5,
+          "candidate_ids": [
+            "candidate_8984",
+            "candidate_7795",
+            "candidate_5779",
+            "candidate_4648"
+          ],
+          "reference_answer": "follow the prescriber or label instructions",
+          "winner_model": "gemma4:12b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_8984",
+            "confidence": "high",
+            "verdict_candidate_4648": "correct",
+            "verdict_candidate_5779": "incorrect",
+            "verdict_candidate_7795": "correct",
+            "verdict_candidate_8984": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8984",
+              "probability": 0.9964849948883057,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999994039535522,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4648": {
+              "value": "correct",
+              "probability": 0.9372780919075012,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5779": {
+              "value": "incorrect",
+              "probability": 0.6902452111244202,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7795": {
+              "value": "correct",
+              "probability": 0.9755702018737793,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8984": {
+              "value": "correct",
+              "probability": 0.9999538660049438,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 509,
+            "scored_rows": 69
+          },
+          "case_id": "medication",
+          "elapsed_ms": 2355.2,
+          "candidate_ids": [
+            "candidate_4648",
+            "candidate_5779",
+            "candidate_7795",
+            "candidate_8984"
+          ],
+          "reference_answer": "follow the prescriber or label instructions",
+          "winner_model": "gemma4:12b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_8984",
+            "confidence": "high",
+            "verdict_candidate_5779": "partial",
+            "verdict_candidate_8984": "correct",
+            "verdict_candidate_4648": "correct",
+            "verdict_candidate_7795": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8984",
+              "probability": 0.9988366961479187,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5779": {
+              "value": "partial",
+              "probability": 0.6531447768211365,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8984": {
+              "value": "correct",
+              "probability": 0.9999045133590698,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4648": {
+              "value": "correct",
+              "probability": 0.5226710438728333,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7795": {
+              "value": "correct",
+              "probability": 0.9935706257820129,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 509,
+            "scored_rows": 69
+          },
+          "case_id": "medication",
+          "elapsed_ms": 2362.7,
+          "candidate_ids": [
+            "candidate_5779",
+            "candidate_8984",
+            "candidate_4648",
+            "candidate_7795"
+          ],
+          "reference_answer": "follow the prescriber or label instructions",
+          "winner_model": "gemma4:12b"
+        }
+      ]
+    },
+    {
+      "case_id": "fastest-route",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_1399",
+            "confidence": "high",
+            "verdict_candidate_1222": "partial",
+            "verdict_candidate_6085": "partial",
+            "verdict_candidate_1399": "correct",
+            "verdict_candidate_3263": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1399",
+              "probability": 0.9999963045120239,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999995827674866,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1222": {
+              "value": "partial",
+              "probability": 0.7907874584197998,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6085": {
+              "value": "partial",
+              "probability": 0.4671676754951477,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1399": {
+              "value": "correct",
+              "probability": 0.999957263469696,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3263": {
+              "value": "correct",
+              "probability": 0.9663529396057129,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "fastest-route",
+          "elapsed_ms": 2061.8,
+          "candidate_ids": [
+            "candidate_1222",
+            "candidate_6085",
+            "candidate_1399",
+            "candidate_3263"
+          ],
+          "reference_answer": "no",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_1399",
+            "confidence": "high",
+            "verdict_candidate_6085": "partial",
+            "verdict_candidate_3263": "correct",
+            "verdict_candidate_1222": "partial",
+            "verdict_candidate_1399": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1399",
+              "probability": 0.9998436570167542,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6085": {
+              "value": "partial",
+              "probability": 0.8196046352386475,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3263": {
+              "value": "correct",
+              "probability": 0.9785467982292175,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1222": {
+              "value": "partial",
+              "probability": 0.6390455365180969,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1399": {
+              "value": "correct",
+              "probability": 0.9999907612800598,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "fastest-route",
+          "elapsed_ms": 2067.9,
+          "candidate_ids": [
+            "candidate_6085",
+            "candidate_3263",
+            "candidate_1222",
+            "candidate_1399"
+          ],
+          "reference_answer": "no",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_1399",
+            "confidence": "high",
+            "verdict_candidate_1399": "correct",
+            "verdict_candidate_3263": "correct",
+            "verdict_candidate_6085": "incorrect",
+            "verdict_candidate_1222": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1399",
+              "probability": 0.9998155236244202,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1399": {
+              "value": "correct",
+              "probability": 0.9999995231628418,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3263": {
+              "value": "correct",
+              "probability": 0.9904392957687378,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6085": {
+              "value": "incorrect",
+              "probability": 0.9988737106323242,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1222": {
+              "value": "incorrect",
+              "probability": 0.9989492893218994,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "fastest-route",
+          "elapsed_ms": 2067.1,
+          "candidate_ids": [
+            "candidate_1399",
+            "candidate_3263",
+            "candidate_6085",
+            "candidate_1222"
+          ],
+          "reference_answer": "no",
+          "winner_model": "ornith-1.5:9b"
+        }
+      ]
+    },
+    {
+      "case_id": "empty-box",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "granite4.2:latest": 2,
+        "SparkLLM/Spark-X2.5-4B:latest": 1
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_9040",
+            "confidence": "high",
+            "verdict_candidate_8950": "correct",
+            "verdict_candidate_6730": "incorrect",
+            "verdict_candidate_9040": "correct",
+            "verdict_candidate_4583": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9040",
+              "probability": 0.9973799586296082,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8950": {
+              "value": "correct",
+              "probability": 0.9999993443489075,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6730": {
+              "value": "incorrect",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9040": {
+              "value": "correct",
+              "probability": 0.9999747276306152,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4583": {
+              "value": "correct",
+              "probability": 0.9999909996986389,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 414,
+            "scored_rows": 69
+          },
+          "case_id": "empty-box",
+          "elapsed_ms": 2146.9,
+          "candidate_ids": [
+            "candidate_8950",
+            "candidate_6730",
+            "candidate_9040",
+            "candidate_4583"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_4583",
+            "confidence": "high",
+            "verdict_candidate_4583": "correct",
+            "verdict_candidate_9040": "correct",
+            "verdict_candidate_6730": "incorrect",
+            "verdict_candidate_8950": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4583",
+              "probability": 0.9806185960769653,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4583": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9040": {
+              "value": "correct",
+              "probability": 0.999854326248169,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6730": {
+              "value": "incorrect",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8950": {
+              "value": "correct",
+              "probability": 0.9999057054519653,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 414,
+            "scored_rows": 69
+          },
+          "case_id": "empty-box",
+          "elapsed_ms": 2156.1,
+          "candidate_ids": [
+            "candidate_4583",
+            "candidate_9040",
+            "candidate_6730",
+            "candidate_8950"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_9040",
+            "confidence": "high",
+            "verdict_candidate_6730": "incorrect",
+            "verdict_candidate_9040": "correct",
+            "verdict_candidate_4583": "correct",
+            "verdict_candidate_8950": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9040",
+              "probability": 0.9988261461257935,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6730": {
+              "value": "incorrect",
+              "probability": 0.9999996423721313,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9040": {
+              "value": "correct",
+              "probability": 0.9999775886535645,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4583": {
+              "value": "correct",
+              "probability": 0.9995988011360168,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8950": {
+              "value": "correct",
+              "probability": 0.9999574422836304,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 414,
+            "scored_rows": 69
+          },
+          "case_id": "empty-box",
+          "elapsed_ms": 2150.8,
+          "candidate_ids": [
+            "candidate_6730",
+            "candidate_9040",
+            "candidate_4583",
+            "candidate_8950"
+          ],
+          "reference_answer": "cannot determine",
+          "winner_model": "granite4.2:latest"
+        }
+      ]
+    }
+  ]
+}

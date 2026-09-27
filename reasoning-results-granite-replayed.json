@@ -1,0 +1,1962 @@
+{
+  "source": "reasoning-results.json",
+  "judge_model": "granite4.2:latest",
+  "judgements": [
+    {
+      "case_id": "dead-battery",
+      "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+      "votes": {
+        "SparkLLM/Spark-X2.5-4B:latest": 2,
+        "ornith-1.5:9b": 1
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_9358",
+            "confidence": "high",
+            "verdict_candidate_6397": "correct",
+            "verdict_candidate_9358": "correct",
+            "verdict_candidate_2921": "partial",
+            "verdict_candidate_3129": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9358",
+              "probability": 0.9750492572784424,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9995825290679932,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6397": {
+              "value": "correct",
+              "probability": 0.9999667406082153,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9358": {
+              "value": "correct",
+              "probability": 0.9999182820320129,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2921": {
+              "value": "partial",
+              "probability": 0.7642652988433838,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3129": {
+              "value": "correct",
+              "probability": 0.999955952167511,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 471,
+            "scored_rows": 61
+          },
+          "case_id": "dead-battery",
+          "elapsed_ms": 1505.0,
+          "candidate_ids": [
+            "candidate_6397",
+            "candidate_9358",
+            "candidate_2921",
+            "candidate_3129"
+          ],
+          "reference_answer": "jump-start or recharge the battery",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_3129",
+            "confidence": "high",
+            "verdict_candidate_2921": "correct",
+            "verdict_candidate_3129": "correct",
+            "verdict_candidate_9358": "correct",
+            "verdict_candidate_6397": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_3129",
+              "probability": 0.9953963160514832,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9994787573814392,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2921": {
+              "value": "correct",
+              "probability": 0.9994624853134155,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3129": {
+              "value": "correct",
+              "probability": 0.9984974265098572,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9358": {
+              "value": "correct",
+              "probability": 0.9985834360122681,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6397": {
+              "value": "correct",
+              "probability": 0.8338956832885742,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 471,
+            "scored_rows": 61
+          },
+          "case_id": "dead-battery",
+          "elapsed_ms": 1462.2,
+          "candidate_ids": [
+            "candidate_2921",
+            "candidate_3129",
+            "candidate_9358",
+            "candidate_6397"
+          ],
+          "reference_answer": "jump-start or recharge the battery",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_9358",
+            "confidence": "high",
+            "verdict_candidate_9358": "correct",
+            "verdict_candidate_6397": "correct",
+            "verdict_candidate_2921": "partial",
+            "verdict_candidate_3129": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9358",
+              "probability": 0.9982967376708984,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.99928879737854,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9358": {
+              "value": "correct",
+              "probability": 0.9999915361404419,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6397": {
+              "value": "correct",
+              "probability": 0.9892736673355103,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2921": {
+              "value": "partial",
+              "probability": 0.9254817366600037,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3129": {
+              "value": "correct",
+              "probability": 0.999969482421875,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 471,
+            "scored_rows": 61
+          },
+          "case_id": "dead-battery",
+          "elapsed_ms": 1453.7,
+          "candidate_ids": [
+            "candidate_9358",
+            "candidate_6397",
+            "candidate_2921",
+            "candidate_3129"
+          ],
+          "reference_answer": "jump-start or recharge the battery",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest"
+        }
+      ]
+    },
+    {
+      "case_id": "sealed-balloon",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 1,
+        "granite4.2:latest": 1,
+        "abstain": 1
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_7432",
+            "confidence": "high",
+            "verdict_candidate_7432": "correct",
+            "verdict_candidate_8973": "correct",
+            "verdict_candidate_9476": "correct",
+            "verdict_candidate_2372": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_7432",
+              "probability": 0.9706898331642151,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998971223831177,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7432": {
+              "value": "correct",
+              "probability": 0.9999955296516418,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8973": {
+              "value": "correct",
+              "probability": 0.9948743581771851,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9476": {
+              "value": "correct",
+              "probability": 0.99968022108078,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2372": {
+              "value": "correct",
+              "probability": 0.9982553720474243,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 428,
+            "scored_rows": 61
+          },
+          "case_id": "sealed-balloon",
+          "elapsed_ms": 1412.9,
+          "candidate_ids": [
+            "candidate_7432",
+            "candidate_8973",
+            "candidate_9476",
+            "candidate_2372"
+          ],
+          "reference_answer": "the trapped air expanded when warmed",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_9476",
+            "confidence": "high",
+            "verdict_candidate_9476": "correct",
+            "verdict_candidate_2372": "correct",
+            "verdict_candidate_8973": "correct",
+            "verdict_candidate_7432": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9476",
+              "probability": 0.6600973606109619,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998868107795715,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9476": {
+              "value": "correct",
+              "probability": 0.9999935626983643,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2372": {
+              "value": "correct",
+              "probability": 0.998670220375061,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8973": {
+              "value": "correct",
+              "probability": 0.885551929473877,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7432": {
+              "value": "correct",
+              "probability": 0.9959463477134705,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 428,
+            "scored_rows": 61
+          },
+          "case_id": "sealed-balloon",
+          "elapsed_ms": 1410.3,
+          "candidate_ids": [
+            "candidate_9476",
+            "candidate_2372",
+            "candidate_8973",
+            "candidate_7432"
+          ],
+          "reference_answer": "the trapped air expanded when warmed",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_2372": "correct",
+            "verdict_candidate_7432": "correct",
+            "verdict_candidate_8973": "correct",
+            "verdict_candidate_9476": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.6201916337013245,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999070763587952,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2372": {
+              "value": "correct",
+              "probability": 0.9999958276748657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7432": {
+              "value": "correct",
+              "probability": 0.9992907047271729,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8973": {
+              "value": "correct",
+              "probability": 0.6971303224563599,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9476": {
+              "value": "correct",
+              "probability": 0.9979758262634277,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 428,
+            "scored_rows": 61
+          },
+          "case_id": "sealed-balloon",
+          "elapsed_ms": 1406.6,
+          "candidate_ids": [
+            "candidate_2372",
+            "candidate_7432",
+            "candidate_8973",
+            "candidate_9476"
+          ],
+          "reference_answer": "the trapped air expanded when warmed",
+          "winner_model": "abstain"
+        }
+      ]
+    },
+    {
+      "case_id": "wet-towel",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 2,
+        "granite4.2:latest": 1
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_6624",
+            "confidence": "high",
+            "verdict_candidate_6624": "correct",
+            "verdict_candidate_4662": "correct",
+            "verdict_candidate_4882": "correct",
+            "verdict_candidate_1153": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6624",
+              "probability": 0.9968239665031433,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997867941856384,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6624": {
+              "value": "correct",
+              "probability": 0.9999585151672363,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4662": {
+              "value": "correct",
+              "probability": 0.9975056052207947,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4882": {
+              "value": "correct",
+              "probability": 0.9854714274406433,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1153": {
+              "value": "correct",
+              "probability": 0.9930513501167297,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 478,
+            "scored_rows": 61
+          },
+          "case_id": "wet-towel",
+          "elapsed_ms": 1460.5,
+          "candidate_ids": [
+            "candidate_6624",
+            "candidate_4662",
+            "candidate_4882",
+            "candidate_1153"
+          ],
+          "reference_answer": "the spread towel because more water is exposed to moving warm air",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_4662",
+            "confidence": "high",
+            "verdict_candidate_4662": "correct",
+            "verdict_candidate_4882": "correct",
+            "verdict_candidate_6624": "correct",
+            "verdict_candidate_1153": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4662",
+              "probability": 0.9245826601982117,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997038245201111,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4662": {
+              "value": "correct",
+              "probability": 0.9999529123306274,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4882": {
+              "value": "correct",
+              "probability": 0.9933815002441406,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6624": {
+              "value": "correct",
+              "probability": 0.9972043633460999,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1153": {
+              "value": "correct",
+              "probability": 0.9882521033287048,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 478,
+            "scored_rows": 61
+          },
+          "case_id": "wet-towel",
+          "elapsed_ms": 1458.0,
+          "candidate_ids": [
+            "candidate_4662",
+            "candidate_4882",
+            "candidate_6624",
+            "candidate_1153"
+          ],
+          "reference_answer": "the spread towel because more water is exposed to moving warm air",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_6624",
+            "confidence": "high",
+            "verdict_candidate_6624": "correct",
+            "verdict_candidate_4662": "correct",
+            "verdict_candidate_1153": "correct",
+            "verdict_candidate_4882": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6624",
+              "probability": 0.9505622982978821,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997316598892212,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6624": {
+              "value": "correct",
+              "probability": 0.9999545812606812,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4662": {
+              "value": "correct",
+              "probability": 0.9982630610466003,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1153": {
+              "value": "correct",
+              "probability": 0.9834109544754028,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4882": {
+              "value": "correct",
+              "probability": 0.9376274347305298,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 478,
+            "scored_rows": 61
+          },
+          "case_id": "wet-towel",
+          "elapsed_ms": 1463.8,
+          "candidate_ids": [
+            "candidate_6624",
+            "candidate_4662",
+            "candidate_1153",
+            "candidate_4882"
+          ],
+          "reference_answer": "the spread towel because more water is exposed to moving warm air",
+          "winner_model": "ornith-1.5:9b"
+        }
+      ]
+    },
+    {
+      "case_id": "ice-salt",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_4115",
+            "confidence": "high",
+            "verdict_candidate_4115": "correct",
+            "verdict_candidate_9231": "correct",
+            "verdict_candidate_5170": "correct",
+            "verdict_candidate_2810": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4115",
+              "probability": 0.9924839735031128,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.999612033367157,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4115": {
+              "value": "correct",
+              "probability": 0.9999620914459229,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9231": {
+              "value": "correct",
+              "probability": 0.9979225397109985,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5170": {
+              "value": "correct",
+              "probability": 0.9987980723381042,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2810": {
+              "value": "correct",
+              "probability": 0.9591920375823975,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 450,
+            "scored_rows": 61
+          },
+          "case_id": "ice-salt",
+          "elapsed_ms": 1458.1,
+          "candidate_ids": [
+            "candidate_4115",
+            "candidate_9231",
+            "candidate_5170",
+            "candidate_2810"
+          ],
+          "reference_answer": "salt lowers the freezing point, so melting absorbs heat",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_4115",
+            "confidence": "high",
+            "verdict_candidate_9231": "correct",
+            "verdict_candidate_4115": "correct",
+            "verdict_candidate_2810": "correct",
+            "verdict_candidate_5170": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4115",
+              "probability": 0.9228149652481079,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9995055198669434,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9231": {
+              "value": "correct",
+              "probability": 0.9994117617607117,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4115": {
+              "value": "correct",
+              "probability": 0.9997536540031433,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2810": {
+              "value": "correct",
+              "probability": 0.9099764227867126,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5170": {
+              "value": "correct",
+              "probability": 0.9979498982429504,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 450,
+            "scored_rows": 61
+          },
+          "case_id": "ice-salt",
+          "elapsed_ms": 1451.7,
+          "candidate_ids": [
+            "candidate_9231",
+            "candidate_4115",
+            "candidate_2810",
+            "candidate_5170"
+          ],
+          "reference_answer": "salt lowers the freezing point, so melting absorbs heat",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_4115",
+            "confidence": "high",
+            "verdict_candidate_2810": "correct",
+            "verdict_candidate_4115": "correct",
+            "verdict_candidate_5170": "correct",
+            "verdict_candidate_9231": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4115",
+              "probability": 0.9893434047698975,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.999539852142334,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2810": {
+              "value": "correct",
+              "probability": 0.9995784163475037,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4115": {
+              "value": "correct",
+              "probability": 0.9998449683189392,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5170": {
+              "value": "correct",
+              "probability": 0.9980361461639404,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9231": {
+              "value": "correct",
+              "probability": 0.7377086877822876,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 450,
+            "scored_rows": 61
+          },
+          "case_id": "ice-salt",
+          "elapsed_ms": 1453.5,
+          "candidate_ids": [
+            "candidate_2810",
+            "candidate_4115",
+            "candidate_5170",
+            "candidate_9231"
+          ],
+          "reference_answer": "salt lowers the freezing point, so melting absorbs heat",
+          "winner_model": "ornith-1.5:9b"
+        }
+      ]
+    },
+    {
+      "case_id": "blocked-laptop",
+      "winner_model": "abstain",
+      "votes": {
+        "abstain": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_4802": "correct",
+            "verdict_candidate_7982": "correct",
+            "verdict_candidate_4793": "correct",
+            "verdict_candidate_9139": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.5947654843330383,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.999916672706604,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4802": {
+              "value": "correct",
+              "probability": 0.9999961853027344,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7982": {
+              "value": "correct",
+              "probability": 0.9953227639198303,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4793": {
+              "value": "correct",
+              "probability": 0.967503011226654,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9139": {
+              "value": "correct",
+              "probability": 0.9986652731895447,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 481,
+            "scored_rows": 61
+          },
+          "case_id": "blocked-laptop",
+          "elapsed_ms": 1510.9,
+          "candidate_ids": [
+            "candidate_4802",
+            "candidate_7982",
+            "candidate_4793",
+            "candidate_9139"
+          ],
+          "reference_answer": "move it to a hard surface and clear its ventilation",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_4793": "correct",
+            "verdict_candidate_4802": "correct",
+            "verdict_candidate_9139": "correct",
+            "verdict_candidate_7982": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.7081304788589478,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998733401298523,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4793": {
+              "value": "correct",
+              "probability": 0.9999702572822571,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4802": {
+              "value": "correct",
+              "probability": 0.9988981485366821,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9139": {
+              "value": "correct",
+              "probability": 0.9994103908538818,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7982": {
+              "value": "correct",
+              "probability": 0.44535723328590393,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 481,
+            "scored_rows": 61
+          },
+          "case_id": "blocked-laptop",
+          "elapsed_ms": 1509.7,
+          "candidate_ids": [
+            "candidate_4793",
+            "candidate_4802",
+            "candidate_9139",
+            "candidate_7982"
+          ],
+          "reference_answer": "move it to a hard surface and clear its ventilation",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_4793": "correct",
+            "verdict_candidate_4802": "correct",
+            "verdict_candidate_9139": "correct",
+            "verdict_candidate_7982": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.7081304788589478,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998733401298523,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4793": {
+              "value": "correct",
+              "probability": 0.9999702572822571,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4802": {
+              "value": "correct",
+              "probability": 0.9988981485366821,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9139": {
+              "value": "correct",
+              "probability": 0.9994103908538818,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7982": {
+              "value": "correct",
+              "probability": 0.44535723328590393,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 481,
+            "scored_rows": 61
+          },
+          "case_id": "blocked-laptop",
+          "elapsed_ms": 972.3,
+          "candidate_ids": [
+            "candidate_4793",
+            "candidate_4802",
+            "candidate_9139",
+            "candidate_7982"
+          ],
+          "reference_answer": "move it to a hard surface and clear its ventilation",
+          "winner_model": "abstain"
+        }
+      ]
+    },
+    {
+      "case_id": "smoke-alarm",
+      "winner_model": "abstain",
+      "votes": {
+        "abstain": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_8539": "correct",
+            "verdict_candidate_2449": "correct",
+            "verdict_candidate_3524": "correct",
+            "verdict_candidate_5709": "incorrect"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.8538713455200195,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.999799370765686,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8539": {
+              "value": "correct",
+              "probability": 0.9999743700027466,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2449": {
+              "value": "correct",
+              "probability": 0.9966138601303101,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3524": {
+              "value": "correct",
+              "probability": 0.999252200126648,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5709": {
+              "value": "incorrect",
+              "probability": 0.5827902555465698,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 491,
+            "scored_rows": 61
+          },
+          "case_id": "smoke-alarm",
+          "elapsed_ms": 1512.1,
+          "candidate_ids": [
+            "candidate_8539",
+            "candidate_2449",
+            "candidate_3524",
+            "candidate_5709"
+          ],
+          "reference_answer": "the alarm battery and its maintenance state",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_2449": "correct",
+            "verdict_candidate_8539": "correct",
+            "verdict_candidate_5709": "partial",
+            "verdict_candidate_3524": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.9768128991127014,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997996687889099,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2449": {
+              "value": "correct",
+              "probability": 0.9999806880950928,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8539": {
+              "value": "correct",
+              "probability": 0.9990437626838684,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5709": {
+              "value": "partial",
+              "probability": 0.44422289729118347,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3524": {
+              "value": "correct",
+              "probability": 0.9995160102844238,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 491,
+            "scored_rows": 61
+          },
+          "case_id": "smoke-alarm",
+          "elapsed_ms": 1512.8,
+          "candidate_ids": [
+            "candidate_2449",
+            "candidate_8539",
+            "candidate_5709",
+            "candidate_3524"
+          ],
+          "reference_answer": "the alarm battery and its maintenance state",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_2449": "correct",
+            "verdict_candidate_8539": "correct",
+            "verdict_candidate_5709": "partial",
+            "verdict_candidate_3524": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.9768128991127014,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997996687889099,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2449": {
+              "value": "correct",
+              "probability": 0.9999806880950928,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8539": {
+              "value": "correct",
+              "probability": 0.9990437626838684,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5709": {
+              "value": "partial",
+              "probability": 0.44422289729118347,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3524": {
+              "value": "correct",
+              "probability": 0.9995160102844238,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 491,
+            "scored_rows": 61
+          },
+          "case_id": "smoke-alarm",
+          "elapsed_ms": 975.0,
+          "candidate_ids": [
+            "candidate_2449",
+            "candidate_8539",
+            "candidate_5709",
+            "candidate_3524"
+          ],
+          "reference_answer": "the alarm battery and its maintenance state",
+          "winner_model": "abstain"
+        }
+      ]
+    },
+    {
+      "case_id": "plant-window",
+      "winner_model": "abstain",
+      "votes": {
+        "abstain": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_7945": "correct",
+            "verdict_candidate_8111": "correct",
+            "verdict_candidate_6924": "correct",
+            "verdict_candidate_3219": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.9524258375167847,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999018907546997,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7945": {
+              "value": "correct",
+              "probability": 0.9999958276748657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8111": {
+              "value": "correct",
+              "probability": 0.9995801448822021,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6924": {
+              "value": "correct",
+              "probability": 0.9995835423469543,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3219": {
+              "value": "correct",
+              "probability": 0.995792806148529,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 494,
+            "scored_rows": 61
+          },
+          "case_id": "plant-window",
+          "elapsed_ms": 1510.5,
+          "candidate_ids": [
+            "candidate_7945",
+            "candidate_8111",
+            "candidate_6924",
+            "candidate_3219"
+          ],
+          "reference_answer": "provide suitable light",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_6924": "correct",
+            "verdict_candidate_8111": "correct",
+            "verdict_candidate_3219": "correct",
+            "verdict_candidate_7945": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.7981659770011902,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999034404754639,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6924": {
+              "value": "correct",
+              "probability": 0.9999967813491821,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8111": {
+              "value": "correct",
+              "probability": 0.9991070628166199,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3219": {
+              "value": "correct",
+              "probability": 0.9989264607429504,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7945": {
+              "value": "correct",
+              "probability": 0.993407666683197,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 494,
+            "scored_rows": 61
+          },
+          "case_id": "plant-window",
+          "elapsed_ms": 1510.7,
+          "candidate_ids": [
+            "candidate_6924",
+            "candidate_8111",
+            "candidate_3219",
+            "candidate_7945"
+          ],
+          "reference_answer": "provide suitable light",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_3219": "correct",
+            "verdict_candidate_7945": "correct",
+            "verdict_candidate_8111": "correct",
+            "verdict_candidate_6924": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.8649154901504517,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999029040336609,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3219": {
+              "value": "correct",
+              "probability": 0.9999954700469971,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7945": {
+              "value": "correct",
+              "probability": 0.9985178709030151,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8111": {
+              "value": "correct",
+              "probability": 0.999177098274231,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6924": {
+              "value": "correct",
+              "probability": 0.9964200258255005,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 494,
+            "scored_rows": 61
+          },
+          "case_id": "plant-window",
+          "elapsed_ms": 1512.7,
+          "candidate_ids": [
+            "candidate_3219",
+            "candidate_7945",
+            "candidate_8111",
+            "candidate_6924"
+          ],
+          "reference_answer": "provide suitable light",
+          "winner_model": "abstain"
+        }
+      ]
+    },
+    {
+      "case_id": "short-route-delay",
+      "winner_model": "abstain",
+      "votes": {
+        "abstain": 3
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_1812": "correct",
+            "verdict_candidate_9003": "correct",
+            "verdict_candidate_9920": "correct",
+            "verdict_candidate_9716": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.828538715839386,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997469782829285,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1812": {
+              "value": "correct",
+              "probability": 0.9999937415122986,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9003": {
+              "value": "correct",
+              "probability": 0.9992823600769043,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9920": {
+              "value": "correct",
+              "probability": 0.9984830021858215,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9716": {
+              "value": "correct",
+              "probability": 0.9966076612472534,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 440,
+            "scored_rows": 61
+          },
+          "case_id": "short-route-delay",
+          "elapsed_ms": 1408.8,
+          "candidate_ids": [
+            "candidate_1812",
+            "candidate_9003",
+            "candidate_9920",
+            "candidate_9716"
+          ],
+          "reference_answer": "shorter distance does not guarantee shorter travel time",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_9920": "correct",
+            "verdict_candidate_9003": "correct",
+            "verdict_candidate_9716": "correct",
+            "verdict_candidate_1812": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.9061794281005859,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997700452804565,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9920": {
+              "value": "correct",
+              "probability": 0.9999900460243225,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9003": {
+              "value": "correct",
+              "probability": 0.9997599124908447,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9716": {
+              "value": "correct",
+              "probability": 0.9997857213020325,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1812": {
+              "value": "correct",
+              "probability": 0.9998673796653748,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 440,
+            "scored_rows": 61
+          },
+          "case_id": "short-route-delay",
+          "elapsed_ms": 1410.0,
+          "candidate_ids": [
+            "candidate_9920",
+            "candidate_9003",
+            "candidate_9716",
+            "candidate_1812"
+          ],
+          "reference_answer": "shorter distance does not guarantee shorter travel time",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_1812": "correct",
+            "verdict_candidate_9920": "correct",
+            "verdict_candidate_9716": "correct",
+            "verdict_candidate_9003": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.7952229976654053,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9997674822807312,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1812": {
+              "value": "correct",
+              "probability": 0.9999972581863403,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9920": {
+              "value": "correct",
+              "probability": 0.9995887279510498,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9716": {
+              "value": "correct",
+              "probability": 0.9996446967124939,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9003": {
+              "value": "correct",
+              "probability": 0.9983675479888916,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 440,
+            "scored_rows": 61
+          },
+          "case_id": "short-route-delay",
+          "elapsed_ms": 1415.9,
+          "candidate_ids": [
+            "candidate_1812",
+            "candidate_9920",
+            "candidate_9716",
+            "candidate_9003"
+          ],
+          "reference_answer": "shorter distance does not guarantee shorter travel time",
+          "winner_model": "abstain"
+        }
+      ]
+    },
+    {
+      "case_id": "thermos-choice",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "gemma4:12b": 1,
+        "granite4.2:latest": 2
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_3740",
+            "confidence": "high",
+            "verdict_candidate_3740": "correct",
+            "verdict_candidate_2945": "correct",
+            "verdict_candidate_1666": "correct",
+            "verdict_candidate_6791": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_3740",
+              "probability": 0.9999855756759644,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998863339424133,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3740": {
+              "value": "correct",
+              "probability": 0.9999955296516418,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2945": {
+              "value": "correct",
+              "probability": 0.9989985823631287,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1666": {
+              "value": "correct",
+              "probability": 0.9966186285018921,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6791": {
+              "value": "correct",
+              "probability": 0.9973180890083313,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 427,
+            "scored_rows": 61
+          },
+          "case_id": "thermos-choice",
+          "elapsed_ms": 1416.5,
+          "candidate_ids": [
+            "candidate_3740",
+            "candidate_2945",
+            "candidate_1666",
+            "candidate_6791"
+          ],
+          "reference_answer": "the sealed vacuum flask",
+          "winner_model": "gemma4:12b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_6791",
+            "confidence": "high",
+            "verdict_candidate_6791": "correct",
+            "verdict_candidate_1666": "correct",
+            "verdict_candidate_3740": "correct",
+            "verdict_candidate_2945": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6791",
+              "probability": 0.9999974370002747,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998896718025208,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6791": {
+              "value": "correct",
+              "probability": 0.9999968409538269,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1666": {
+              "value": "correct",
+              "probability": 0.9996041059494019,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3740": {
+              "value": "correct",
+              "probability": 0.9989848136901855,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2945": {
+              "value": "correct",
+              "probability": 0.9893792867660522,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 427,
+            "scored_rows": 61
+          },
+          "case_id": "thermos-choice",
+          "elapsed_ms": 1408.2,
+          "candidate_ids": [
+            "candidate_6791",
+            "candidate_1666",
+            "candidate_3740",
+            "candidate_2945"
+          ],
+          "reference_answer": "the sealed vacuum flask",
+          "winner_model": "granite4.2:latest"
+        },
+        {
+          "decision": {
+            "winner": "candidate_6791",
+            "confidence": "high",
+            "verdict_candidate_6791": "correct",
+            "verdict_candidate_3740": "correct",
+            "verdict_candidate_1666": "correct",
+            "verdict_candidate_2945": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6791",
+              "probability": 0.9999814033508301,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998986124992371,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6791": {
+              "value": "correct",
+              "probability": 0.9999951720237732,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3740": {
+              "value": "correct",
+              "probability": 0.9990237951278687,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1666": {
+              "value": "correct",
+              "probability": 0.9979981780052185,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2945": {
+              "value": "correct",
+              "probability": 0.9897079467773438,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 427,
+            "scored_rows": 61
+          },
+          "case_id": "thermos-choice",
+          "elapsed_ms": 1405.8,
+          "candidate_ids": [
+            "candidate_6791",
+            "candidate_3740",
+            "candidate_1666",
+            "candidate_2945"
+          ],
+          "reference_answer": "the sealed vacuum flask",
+          "winner_model": "granite4.2:latest"
+        }
+      ]
+    },
+    {
+      "case_id": "shadow-sun",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "abstain": 1,
+        "ornith-1.5:9b": 2
+      },
+      "passes": [
+        {
+          "decision": {
+            "winner": "abstain",
+            "confidence": "high",
+            "verdict_candidate_5719": "correct",
+            "verdict_candidate_2360": "correct",
+            "verdict_candidate_5765": "correct",
+            "verdict_candidate_9293": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "abstain",
+              "probability": 0.6414311528205872,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998125433921814,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5719": {
+              "value": "correct",
+              "probability": 0.9999714493751526,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2360": {
+              "value": "correct",
+              "probability": 0.99273681640625,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5765": {
+              "value": "correct",
+              "probability": 0.984586775302887,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9293": {
+              "value": "correct",
+              "probability": 0.9997972249984741,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 444,
+            "scored_rows": 69
+          },
+          "case_id": "shadow-sun",
+          "elapsed_ms": 1456.8,
+          "candidate_ids": [
+            "candidate_5719",
+            "candidate_2360",
+            "candidate_5765",
+            "candidate_9293"
+          ],
+          "reference_answer": "the Sun's apparent position changed as Earth rotated",
+          "winner_model": "abstain"
+        },
+        {
+          "decision": {
+            "winner": "candidate_9293",
+            "confidence": "high",
+            "verdict_candidate_9293": "correct",
+            "verdict_candidate_2360": "correct",
+            "verdict_candidate_5765": "correct",
+            "verdict_candidate_5719": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9293",
+              "probability": 0.5188097953796387,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.999841034412384,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9293": {
+              "value": "correct",
+              "probability": 0.9999861717224121,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2360": {
+              "value": "correct",
+              "probability": 0.9972499012947083,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5765": {
+              "value": "correct",
+              "probability": 0.9968206286430359,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5719": {
+              "value": "correct",
+              "probability": 0.951807975769043,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 444,
+            "scored_rows": 69
+          },
+          "case_id": "shadow-sun",
+          "elapsed_ms": 1455.0,
+          "candidate_ids": [
+            "candidate_9293",
+            "candidate_2360",
+            "candidate_5765",
+            "candidate_5719"
+          ],
+          "reference_answer": "the Sun's apparent position changed as Earth rotated",
+          "winner_model": "ornith-1.5:9b"
+        },
+        {
+          "decision": {
+            "winner": "candidate_9293",
+            "confidence": "high",
+            "verdict_candidate_9293": "correct",
+            "verdict_candidate_2360": "correct",
+            "verdict_candidate_5719": "correct",
+            "verdict_candidate_5765": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9293",
+              "probability": 0.5888896584510803,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9998651742935181,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9293": {
+              "value": "correct",
+              "probability": 0.9999889731407166,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2360": {
+              "value": "correct",
+              "probability": 0.9976373910903931,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5719": {
+              "value": "correct",
+              "probability": 0.9740798473358154,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5765": {
+              "value": "correct",
+              "probability": 0.9916892051696777,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 444,
+            "scored_rows": 69
+          },
+          "case_id": "shadow-sun",
+          "elapsed_ms": 1457.3,
+          "candidate_ids": [
+            "candidate_9293",
+            "candidate_2360",
+            "candidate_5719",
+            "candidate_5765"
+          ],
+          "reference_answer": "the Sun's apparent position changed as Earth rotated",
+          "winner_model": "ornith-1.5:9b"
+        }
+      ]
+    }
+  ]
+}

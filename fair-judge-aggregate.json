@@ -1,0 +1,3662 @@
+{
+  "passes": 5,
+  "cases": [
+    {
+      "case_id": "car-wash",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 4,
+        "gemma4:12b": 1
+      },
+      "winner_positions": [
+        4,
+        4,
+        2,
+        2,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_9292",
+            "confidence": "high",
+            "verdict_candidate_2676": "correct",
+            "verdict_candidate_1126": "correct",
+            "verdict_candidate_6916": "correct",
+            "verdict_candidate_9292": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9292",
+              "probability": 0.905250608921051,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2676": {
+              "value": "correct",
+              "probability": 0.9999943375587463,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1126": {
+              "value": "correct",
+              "probability": 0.9942023754119873,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6916": {
+              "value": "correct",
+              "probability": 0.9995155334472656,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9292": {
+              "value": "correct",
+              "probability": 0.9999698996543884,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 677,
+            "scored_rows": 69
+          },
+          "case_id": "car-wash",
+          "elapsed_ms": 3029.9,
+          "candidate_ids": [
+            "candidate_2676",
+            "candidate_1126",
+            "candidate_6916",
+            "candidate_9292"
+          ],
+          "reference_answer": "drive",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 4
+        },
+        {
+          "decision": {
+            "winner": "candidate_9292",
+            "confidence": "high",
+            "verdict_candidate_2676": "correct",
+            "verdict_candidate_1126": "correct",
+            "verdict_candidate_6916": "correct",
+            "verdict_candidate_9292": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9292",
+              "probability": 0.905250608921051,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2676": {
+              "value": "correct",
+              "probability": 0.9999943375587463,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1126": {
+              "value": "correct",
+              "probability": 0.9942023754119873,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6916": {
+              "value": "correct",
+              "probability": 0.9995155334472656,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9292": {
+              "value": "correct",
+              "probability": 0.9999698996543884,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 677,
+            "scored_rows": 69
+          },
+          "case_id": "car-wash",
+          "elapsed_ms": 2015.3,
+          "candidate_ids": [
+            "candidate_2676",
+            "candidate_1126",
+            "candidate_6916",
+            "candidate_9292"
+          ],
+          "reference_answer": "drive",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 4
+        },
+        {
+          "decision": {
+            "winner": "candidate_9292",
+            "confidence": "high",
+            "verdict_candidate_1126": "correct",
+            "verdict_candidate_9292": "correct",
+            "verdict_candidate_6916": "correct",
+            "verdict_candidate_2676": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9292",
+              "probability": 0.7175204753875732,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999936819076538,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1126": {
+              "value": "correct",
+              "probability": 0.9984917640686035,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9292": {
+              "value": "correct",
+              "probability": 0.9608086943626404,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6916": {
+              "value": "correct",
+              "probability": 0.994819164276123,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2676": {
+              "value": "correct",
+              "probability": 0.9996578097343445,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 677,
+            "scored_rows": 69
+          },
+          "case_id": "car-wash",
+          "elapsed_ms": 2841.4,
+          "candidate_ids": [
+            "candidate_1126",
+            "candidate_9292",
+            "candidate_6916",
+            "candidate_2676"
+          ],
+          "reference_answer": "drive",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_2676",
+            "confidence": "high",
+            "verdict_candidate_1126": "correct",
+            "verdict_candidate_2676": "correct",
+            "verdict_candidate_9292": "correct",
+            "verdict_candidate_6916": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2676",
+              "probability": 0.9725255966186523,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999987483024597,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1126": {
+              "value": "correct",
+              "probability": 0.9992815852165222,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2676": {
+              "value": "correct",
+              "probability": 0.9707849025726318,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9292": {
+              "value": "correct",
+              "probability": 0.9974965453147888,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6916": {
+              "value": "correct",
+              "probability": 0.9999661445617676,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 677,
+            "scored_rows": 69
+          },
+          "case_id": "car-wash",
+          "elapsed_ms": 2887.2,
+          "candidate_ids": [
+            "candidate_1126",
+            "candidate_2676",
+            "candidate_9292",
+            "candidate_6916"
+          ],
+          "reference_answer": "drive",
+          "winner_model": "gemma4:12b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_9292",
+            "confidence": "high",
+            "verdict_candidate_9292": "correct",
+            "verdict_candidate_2676": "correct",
+            "verdict_candidate_1126": "correct",
+            "verdict_candidate_6916": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9292",
+              "probability": 0.7670310139656067,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9292": {
+              "value": "correct",
+              "probability": 0.9999953508377075,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2676": {
+              "value": "correct",
+              "probability": 0.9907262325286865,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1126": {
+              "value": "correct",
+              "probability": 0.793705403804779,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6916": {
+              "value": "correct",
+              "probability": 0.9999391436576843,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 677,
+            "scored_rows": 69
+          },
+          "case_id": "car-wash",
+          "elapsed_ms": 2888.5,
+          "candidate_ids": [
+            "candidate_9292",
+            "candidate_2676",
+            "candidate_1126",
+            "candidate_6916"
+          ],
+          "reference_answer": "drive",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "penguin-wings",
+      "winner_model": "gemma4:12b",
+      "votes": {
+        "SparkLLM/Spark-X2.5-4B:latest": 1,
+        "gemma4:12b": 4
+      },
+      "winner_positions": [
+        1,
+        2,
+        1,
+        2,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_1988",
+            "confidence": "high",
+            "verdict_candidate_1988": "correct",
+            "verdict_candidate_7793": "correct",
+            "verdict_candidate_4540": "correct",
+            "verdict_candidate_9440": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1988",
+              "probability": 0.9673728346824646,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1988": {
+              "value": "correct",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7793": {
+              "value": "correct",
+              "probability": 0.9999101161956787,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4540": {
+              "value": "correct",
+              "probability": 0.9999050498008728,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9440": {
+              "value": "correct",
+              "probability": 0.9999777674674988,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 321,
+            "scored_rows": 69
+          },
+          "case_id": "penguin-wings",
+          "elapsed_ms": 1951.0,
+          "candidate_ids": [
+            "candidate_1988",
+            "candidate_7793",
+            "candidate_4540",
+            "candidate_9440"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_4540",
+            "confidence": "high",
+            "verdict_candidate_7793": "correct",
+            "verdict_candidate_4540": "correct",
+            "verdict_candidate_1988": "correct",
+            "verdict_candidate_9440": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4540",
+              "probability": 0.9951642751693726,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7793": {
+              "value": "correct",
+              "probability": 0.9999993443489075,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4540": {
+              "value": "correct",
+              "probability": 0.999975323677063,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1988": {
+              "value": "correct",
+              "probability": 0.9997928142547607,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9440": {
+              "value": "correct",
+              "probability": 0.999993622303009,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 321,
+            "scored_rows": 69
+          },
+          "case_id": "penguin-wings",
+          "elapsed_ms": 1981.2,
+          "candidate_ids": [
+            "candidate_7793",
+            "candidate_4540",
+            "candidate_1988",
+            "candidate_9440"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "gemma4:12b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_4540",
+            "confidence": "high",
+            "verdict_candidate_4540": "correct",
+            "verdict_candidate_7793": "correct",
+            "verdict_candidate_9440": "correct",
+            "verdict_candidate_1988": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4540",
+              "probability": 0.989179790019989,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4540": {
+              "value": "correct",
+              "probability": 0.9999996423721313,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7793": {
+              "value": "correct",
+              "probability": 0.9997378587722778,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9440": {
+              "value": "correct",
+              "probability": 0.9998522400856018,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1988": {
+              "value": "correct",
+              "probability": 0.9999526143074036,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 321,
+            "scored_rows": 69
+          },
+          "case_id": "penguin-wings",
+          "elapsed_ms": 1967.4,
+          "candidate_ids": [
+            "candidate_4540",
+            "candidate_7793",
+            "candidate_9440",
+            "candidate_1988"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_4540",
+            "confidence": "high",
+            "verdict_candidate_9440": "correct",
+            "verdict_candidate_4540": "correct",
+            "verdict_candidate_1988": "correct",
+            "verdict_candidate_7793": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4540",
+              "probability": 0.8763781189918518,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9440": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4540": {
+              "value": "correct",
+              "probability": 0.9999749660491943,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1988": {
+              "value": "correct",
+              "probability": 0.9999605417251587,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7793": {
+              "value": "correct",
+              "probability": 0.9999474883079529,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 321,
+            "scored_rows": 69
+          },
+          "case_id": "penguin-wings",
+          "elapsed_ms": 1997.2,
+          "candidate_ids": [
+            "candidate_9440",
+            "candidate_4540",
+            "candidate_1988",
+            "candidate_7793"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "gemma4:12b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_4540",
+            "confidence": "high",
+            "verdict_candidate_4540": "correct",
+            "verdict_candidate_9440": "correct",
+            "verdict_candidate_1988": "correct",
+            "verdict_candidate_7793": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4540",
+              "probability": 0.5134155750274658,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4540": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9440": {
+              "value": "correct",
+              "probability": 0.9999504089355469,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1988": {
+              "value": "correct",
+              "probability": 0.9995405077934265,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7793": {
+              "value": "correct",
+              "probability": 0.999952495098114,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 321,
+            "scored_rows": 69
+          },
+          "case_id": "penguin-wings",
+          "elapsed_ms": 1974.2,
+          "candidate_ids": [
+            "candidate_4540",
+            "candidate_9440",
+            "candidate_1988",
+            "candidate_7793"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "transport-distance",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 5
+      },
+      "winner_positions": [
+        2,
+        1,
+        1,
+        2,
+        3
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_6093",
+            "confidence": "high",
+            "verdict_candidate_5747": "correct",
+            "verdict_candidate_6093": "correct",
+            "verdict_candidate_5203": "correct",
+            "verdict_candidate_2658": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6093",
+              "probability": 0.9997823238372803,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5747": {
+              "value": "correct",
+              "probability": 0.9999992847442627,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6093": {
+              "value": "correct",
+              "probability": 0.9999736547470093,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5203": {
+              "value": "correct",
+              "probability": 0.9995362758636475,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2658": {
+              "value": "correct",
+              "probability": 0.9999405145645142,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "transport-distance",
+          "elapsed_ms": 2070.7,
+          "candidate_ids": [
+            "candidate_5747",
+            "candidate_6093",
+            "candidate_5203",
+            "candidate_2658"
+          ],
+          "reference_answer": "cycle",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_6093",
+            "confidence": "high",
+            "verdict_candidate_6093": "correct",
+            "verdict_candidate_5203": "correct",
+            "verdict_candidate_5747": "correct",
+            "verdict_candidate_2658": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6093",
+              "probability": 0.9998618364334106,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6093": {
+              "value": "correct",
+              "probability": 0.9999990463256836,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5203": {
+              "value": "correct",
+              "probability": 0.999369204044342,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5747": {
+              "value": "correct",
+              "probability": 0.9995899796485901,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2658": {
+              "value": "correct",
+              "probability": 0.9999591708183289,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "transport-distance",
+          "elapsed_ms": 2036.5,
+          "candidate_ids": [
+            "candidate_6093",
+            "candidate_5203",
+            "candidate_5747",
+            "candidate_2658"
+          ],
+          "reference_answer": "cycle",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6093",
+            "confidence": "high",
+            "verdict_candidate_6093": "correct",
+            "verdict_candidate_5747": "correct",
+            "verdict_candidate_5203": "correct",
+            "verdict_candidate_2658": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6093",
+              "probability": 0.9996408820152283,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6093": {
+              "value": "correct",
+              "probability": 0.9999994039535522,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5747": {
+              "value": "correct",
+              "probability": 0.999584436416626,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5203": {
+              "value": "correct",
+              "probability": 0.9946818947792053,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2658": {
+              "value": "correct",
+              "probability": 0.9999337196350098,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "transport-distance",
+          "elapsed_ms": 2070.4,
+          "candidate_ids": [
+            "candidate_6093",
+            "candidate_5747",
+            "candidate_5203",
+            "candidate_2658"
+          ],
+          "reference_answer": "cycle",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6093",
+            "confidence": "high",
+            "verdict_candidate_5203": "correct",
+            "verdict_candidate_6093": "correct",
+            "verdict_candidate_2658": "correct",
+            "verdict_candidate_5747": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6093",
+              "probability": 0.9999018311500549,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5203": {
+              "value": "correct",
+              "probability": 0.9999993443489075,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6093": {
+              "value": "correct",
+              "probability": 0.999984085559845,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2658": {
+              "value": "correct",
+              "probability": 0.9998854994773865,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5747": {
+              "value": "correct",
+              "probability": 0.9999905824661255,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "transport-distance",
+          "elapsed_ms": 2037.7,
+          "candidate_ids": [
+            "candidate_5203",
+            "candidate_6093",
+            "candidate_2658",
+            "candidate_5747"
+          ],
+          "reference_answer": "cycle",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_6093",
+            "confidence": "high",
+            "verdict_candidate_2658": "correct",
+            "verdict_candidate_5747": "correct",
+            "verdict_candidate_6093": "correct",
+            "verdict_candidate_5203": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6093",
+              "probability": 0.9999255537986755,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2658": {
+              "value": "correct",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5747": {
+              "value": "correct",
+              "probability": 0.9992480278015137,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6093": {
+              "value": "correct",
+              "probability": 0.9999842643737793,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5203": {
+              "value": "correct",
+              "probability": 0.9991769790649414,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 381,
+            "scored_rows": 77
+          },
+          "case_id": "transport-distance",
+          "elapsed_ms": 2070.8,
+          "candidate_ids": [
+            "candidate_2658",
+            "candidate_5747",
+            "candidate_6093",
+            "candidate_5203"
+          ],
+          "reference_answer": "cycle",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 3
+        }
+      ]
+    },
+    {
+      "case_id": "ice-warm-room",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 5
+      },
+      "winner_positions": [
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_7739",
+            "confidence": "high",
+            "verdict_candidate_4369": "correct",
+            "verdict_candidate_7739": "correct",
+            "verdict_candidate_6108": "incorrect",
+            "verdict_candidate_9147": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_7739",
+              "probability": 0.950262188911438,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4369": {
+              "value": "correct",
+              "probability": 0.9999977946281433,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7739": {
+              "value": "correct",
+              "probability": 0.9994800686836243,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6108": {
+              "value": "incorrect",
+              "probability": 0.620837390422821,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9147": {
+              "value": "correct",
+              "probability": 0.9999626278877258,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 349,
+            "scored_rows": 69
+          },
+          "case_id": "ice-warm-room",
+          "elapsed_ms": 1976.5,
+          "candidate_ids": [
+            "candidate_4369",
+            "candidate_7739",
+            "candidate_6108",
+            "candidate_9147"
+          ],
+          "reference_answer": "melt",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_7739",
+            "confidence": "high",
+            "verdict_candidate_4369": "correct",
+            "verdict_candidate_7739": "correct",
+            "verdict_candidate_6108": "incorrect",
+            "verdict_candidate_9147": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_7739",
+              "probability": 0.950262188911438,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 0.9999999403953552,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4369": {
+              "value": "correct",
+              "probability": 0.9999977946281433,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7739": {
+              "value": "correct",
+              "probability": 0.9994800686836243,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6108": {
+              "value": "incorrect",
+              "probability": 0.620837390422821,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9147": {
+              "value": "correct",
+              "probability": 0.9999626278877258,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 349,
+            "scored_rows": 69
+          },
+          "case_id": "ice-warm-room",
+          "elapsed_ms": 1144.9,
+          "candidate_ids": [
+            "candidate_4369",
+            "candidate_7739",
+            "candidate_6108",
+            "candidate_9147"
+          ],
+          "reference_answer": "melt",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 2
+        },
+        {
+          "decision": {
+            "winner": "candidate_7739",
+            "confidence": "high",
+            "verdict_candidate_7739": "correct",
+            "verdict_candidate_6108": "incorrect",
+            "verdict_candidate_4369": "correct",
+            "verdict_candidate_9147": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_7739",
+              "probability": 0.9909985661506653,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7739": {
+              "value": "correct",
+              "probability": 0.9999966621398926,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6108": {
+              "value": "incorrect",
+              "probability": 0.8383697867393494,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4369": {
+              "value": "correct",
+              "probability": 0.9968894720077515,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9147": {
+              "value": "correct",
+              "probability": 0.9999628663063049,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 349,
+            "scored_rows": 69
+          },
+          "case_id": "ice-warm-room",
+          "elapsed_ms": 1985.5,
+          "candidate_ids": [
+            "candidate_7739",
+            "candidate_6108",
+            "candidate_4369",
+            "candidate_9147"
+          ],
+          "reference_answer": "melt",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_7739",
+            "confidence": "high",
+            "verdict_candidate_7739": "correct",
+            "verdict_candidate_9147": "correct",
+            "verdict_candidate_6108": "correct",
+            "verdict_candidate_4369": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_7739",
+              "probability": 0.9984597563743591,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7739": {
+              "value": "correct",
+              "probability": 0.9999991655349731,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9147": {
+              "value": "correct",
+              "probability": 0.9996253252029419,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6108": {
+              "value": "correct",
+              "probability": 0.8544216752052307,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4369": {
+              "value": "correct",
+              "probability": 0.9999606609344482,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 349,
+            "scored_rows": 69
+          },
+          "case_id": "ice-warm-room",
+          "elapsed_ms": 1970.1,
+          "candidate_ids": [
+            "candidate_7739",
+            "candidate_9147",
+            "candidate_6108",
+            "candidate_4369"
+          ],
+          "reference_answer": "melt",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_7739",
+            "confidence": "high",
+            "verdict_candidate_7739": "correct",
+            "verdict_candidate_4369": "correct",
+            "verdict_candidate_9147": "correct",
+            "verdict_candidate_6108": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_7739",
+              "probability": 0.9884588718414307,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_7739": {
+              "value": "correct",
+              "probability": 0.999998927116394,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4369": {
+              "value": "correct",
+              "probability": 0.9988387823104858,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9147": {
+              "value": "correct",
+              "probability": 0.9999731183052063,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6108": {
+              "value": "correct",
+              "probability": 0.9675840139389038,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 349,
+            "scored_rows": 69
+          },
+          "case_id": "ice-warm-room",
+          "elapsed_ms": 1984.5,
+          "candidate_ids": [
+            "candidate_7739",
+            "candidate_4369",
+            "candidate_9147",
+            "candidate_6108"
+          ],
+          "reference_answer": "melt",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "dead-phone",
+      "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+      "votes": {
+        "SparkLLM/Spark-X2.5-4B:latest": 2,
+        "gemma4:12b": 1,
+        "granite4.2:latest": 1,
+        "ornith-1.5:9b": 1
+      },
+      "winner_positions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_3557",
+            "confidence": "high",
+            "verdict_candidate_3557": "correct",
+            "verdict_candidate_3980": "correct",
+            "verdict_candidate_9744": "correct",
+            "verdict_candidate_1343": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_3557",
+              "probability": 0.9964794516563416,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3557": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3980": {
+              "value": "correct",
+              "probability": 0.9997799396514893,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9744": {
+              "value": "correct",
+              "probability": 0.999236524105072,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1343": {
+              "value": "correct",
+              "probability": 0.9999838471412659,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 77
+          },
+          "case_id": "dead-phone",
+          "elapsed_ms": 1970.7,
+          "candidate_ids": [
+            "candidate_3557",
+            "candidate_3980",
+            "candidate_9744",
+            "candidate_1343"
+          ],
+          "reference_answer": "plug it in",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_1343",
+            "confidence": "high",
+            "verdict_candidate_1343": "correct",
+            "verdict_candidate_9744": "correct",
+            "verdict_candidate_3557": "correct",
+            "verdict_candidate_3980": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1343",
+              "probability": 0.9974262118339539,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1343": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9744": {
+              "value": "correct",
+              "probability": 0.9996371269226074,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3557": {
+              "value": "correct",
+              "probability": 0.9996922612190247,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3980": {
+              "value": "correct",
+              "probability": 0.9999340176582336,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 77
+          },
+          "case_id": "dead-phone",
+          "elapsed_ms": 1997.6,
+          "candidate_ids": [
+            "candidate_1343",
+            "candidate_9744",
+            "candidate_3557",
+            "candidate_3980"
+          ],
+          "reference_answer": "plug it in",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_9744",
+            "confidence": "high",
+            "verdict_candidate_9744": "correct",
+            "verdict_candidate_3980": "correct",
+            "verdict_candidate_1343": "correct",
+            "verdict_candidate_3557": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9744",
+              "probability": 0.9921414852142334,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9744": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3980": {
+              "value": "correct",
+              "probability": 0.999839723110199,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1343": {
+              "value": "correct",
+              "probability": 0.9993637800216675,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3557": {
+              "value": "correct",
+              "probability": 0.9999301433563232,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 77
+          },
+          "case_id": "dead-phone",
+          "elapsed_ms": 1980.4,
+          "candidate_ids": [
+            "candidate_9744",
+            "candidate_3980",
+            "candidate_1343",
+            "candidate_3557"
+          ],
+          "reference_answer": "plug it in",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_3557",
+            "confidence": "high",
+            "verdict_candidate_3557": "correct",
+            "verdict_candidate_3980": "correct",
+            "verdict_candidate_1343": "correct",
+            "verdict_candidate_9744": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_3557",
+              "probability": 0.9984244704246521,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3557": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3980": {
+              "value": "correct",
+              "probability": 0.9999129176139832,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1343": {
+              "value": "correct",
+              "probability": 0.9999146461486816,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9744": {
+              "value": "correct",
+              "probability": 0.9999940395355225,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 77
+          },
+          "case_id": "dead-phone",
+          "elapsed_ms": 1991.1,
+          "candidate_ids": [
+            "candidate_3557",
+            "candidate_3980",
+            "candidate_1343",
+            "candidate_9744"
+          ],
+          "reference_answer": "plug it in",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_3980",
+            "confidence": "high",
+            "verdict_candidate_3980": "correct",
+            "verdict_candidate_9744": "correct",
+            "verdict_candidate_1343": "correct",
+            "verdict_candidate_3557": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_3980",
+              "probability": 0.9979910850524902,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3980": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9744": {
+              "value": "correct",
+              "probability": 0.998879611492157,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1343": {
+              "value": "correct",
+              "probability": 0.9992908239364624,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3557": {
+              "value": "correct",
+              "probability": 0.9999785423278809,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 77
+          },
+          "case_id": "dead-phone",
+          "elapsed_ms": 1979.9,
+          "candidate_ids": [
+            "candidate_3980",
+            "candidate_9744",
+            "candidate_1343",
+            "candidate_3557"
+          ],
+          "reference_answer": "plug it in",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "square-rectangle",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "granite4.2:latest": 4,
+        "gemma4:12b": 1
+      },
+      "winner_positions": [
+        1,
+        3,
+        3,
+        3,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_5321",
+            "confidence": "high",
+            "verdict_candidate_5321": "correct",
+            "verdict_candidate_4344": "correct",
+            "verdict_candidate_2602": "correct",
+            "verdict_candidate_1376": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5321",
+              "probability": 0.9987286925315857,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5321": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4344": {
+              "value": "correct",
+              "probability": 0.9997546076774597,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2602": {
+              "value": "correct",
+              "probability": 0.9999868273735046,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1376": {
+              "value": "correct",
+              "probability": 0.9999967813491821,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 315,
+            "scored_rows": 69
+          },
+          "case_id": "square-rectangle",
+          "elapsed_ms": 1908.2,
+          "candidate_ids": [
+            "candidate_5321",
+            "candidate_4344",
+            "candidate_2602",
+            "candidate_1376"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_5321",
+            "confidence": "high",
+            "verdict_candidate_4344": "correct",
+            "verdict_candidate_2602": "correct",
+            "verdict_candidate_5321": "correct",
+            "verdict_candidate_1376": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5321",
+              "probability": 0.9619936943054199,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4344": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2602": {
+              "value": "correct",
+              "probability": 0.9998504519462585,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5321": {
+              "value": "correct",
+              "probability": 0.9999955296516418,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1376": {
+              "value": "correct",
+              "probability": 0.9999964833259583,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 315,
+            "scored_rows": 69
+          },
+          "case_id": "square-rectangle",
+          "elapsed_ms": 1894.8,
+          "candidate_ids": [
+            "candidate_4344",
+            "candidate_2602",
+            "candidate_5321",
+            "candidate_1376"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 3
+        },
+        {
+          "decision": {
+            "winner": "candidate_5321",
+            "confidence": "high",
+            "verdict_candidate_4344": "correct",
+            "verdict_candidate_2602": "correct",
+            "verdict_candidate_5321": "correct",
+            "verdict_candidate_1376": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5321",
+              "probability": 0.9619936943054199,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4344": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2602": {
+              "value": "correct",
+              "probability": 0.9998504519462585,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5321": {
+              "value": "correct",
+              "probability": 0.9999955296516418,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1376": {
+              "value": "correct",
+              "probability": 0.9999964833259583,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 315,
+            "scored_rows": 69
+          },
+          "case_id": "square-rectangle",
+          "elapsed_ms": 1079.0,
+          "candidate_ids": [
+            "candidate_4344",
+            "candidate_2602",
+            "candidate_5321",
+            "candidate_1376"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 3
+        },
+        {
+          "decision": {
+            "winner": "candidate_5321",
+            "confidence": "high",
+            "verdict_candidate_4344": "correct",
+            "verdict_candidate_1376": "correct",
+            "verdict_candidate_5321": "correct",
+            "verdict_candidate_2602": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5321",
+              "probability": 0.9913623929023743,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4344": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1376": {
+              "value": "correct",
+              "probability": 0.9998972415924072,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5321": {
+              "value": "correct",
+              "probability": 0.9999971985816956,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2602": {
+              "value": "correct",
+              "probability": 0.9999895691871643,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 315,
+            "scored_rows": 69
+          },
+          "case_id": "square-rectangle",
+          "elapsed_ms": 1893.2,
+          "candidate_ids": [
+            "candidate_4344",
+            "candidate_1376",
+            "candidate_5321",
+            "candidate_2602"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 3
+        },
+        {
+          "decision": {
+            "winner": "candidate_4344",
+            "confidence": "high",
+            "verdict_candidate_4344": "correct",
+            "verdict_candidate_5321": "correct",
+            "verdict_candidate_1376": "correct",
+            "verdict_candidate_2602": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_4344",
+              "probability": 0.8125333189964294,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4344": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5321": {
+              "value": "correct",
+              "probability": 0.9995941519737244,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1376": {
+              "value": "correct",
+              "probability": 0.9999812841415405,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2602": {
+              "value": "correct",
+              "probability": 0.9999831914901733,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 315,
+            "scored_rows": 69
+          },
+          "case_id": "square-rectangle",
+          "elapsed_ms": 1914.7,
+          "candidate_ids": [
+            "candidate_4344",
+            "candidate_5321",
+            "candidate_1376",
+            "candidate_2602"
+          ],
+          "reference_answer": "yes",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "rain-arrival",
+      "winner_model": "gemma4:12b",
+      "votes": {
+        "gemma4:12b": 2,
+        "SparkLLM/Spark-X2.5-4B:latest": 2,
+        "ornith-1.5:9b": 1
+      },
+      "winner_positions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_9620",
+            "confidence": "high",
+            "verdict_candidate_9620": "correct",
+            "verdict_candidate_6565": "correct",
+            "verdict_candidate_2958": "correct",
+            "verdict_candidate_5243": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9620",
+              "probability": 0.9999727010726929,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9620": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6565": {
+              "value": "correct",
+              "probability": 0.9997239708900452,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2958": {
+              "value": "correct",
+              "probability": 0.9990807175636292,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5243": {
+              "value": "correct",
+              "probability": 0.9999918937683105,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 341,
+            "scored_rows": 69
+          },
+          "case_id": "rain-arrival",
+          "elapsed_ms": 1976.1,
+          "candidate_ids": [
+            "candidate_9620",
+            "candidate_6565",
+            "candidate_2958",
+            "candidate_5243"
+          ],
+          "reference_answer": "take an umbrella",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6565",
+            "confidence": "high",
+            "verdict_candidate_6565": "correct",
+            "verdict_candidate_2958": "correct",
+            "verdict_candidate_9620": "correct",
+            "verdict_candidate_5243": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6565",
+              "probability": 0.9999995827674866,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6565": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2958": {
+              "value": "correct",
+              "probability": 0.9991187453269958,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9620": {
+              "value": "correct",
+              "probability": 0.9996296763420105,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5243": {
+              "value": "correct",
+              "probability": 0.999995768070221,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 341,
+            "scored_rows": 69
+          },
+          "case_id": "rain-arrival",
+          "elapsed_ms": 1995.0,
+          "candidate_ids": [
+            "candidate_6565",
+            "candidate_2958",
+            "candidate_9620",
+            "candidate_5243"
+          ],
+          "reference_answer": "take an umbrella",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6565",
+            "confidence": "high",
+            "verdict_candidate_6565": "correct",
+            "verdict_candidate_9620": "correct",
+            "verdict_candidate_2958": "correct",
+            "verdict_candidate_5243": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6565",
+              "probability": 0.999999463558197,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6565": {
+              "value": "correct",
+              "probability": 0.9999998807907104,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9620": {
+              "value": "correct",
+              "probability": 0.9994149804115295,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2958": {
+              "value": "correct",
+              "probability": 0.9991411566734314,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5243": {
+              "value": "correct",
+              "probability": 0.9999946355819702,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 341,
+            "scored_rows": 69
+          },
+          "case_id": "rain-arrival",
+          "elapsed_ms": 1975.6,
+          "candidate_ids": [
+            "candidate_6565",
+            "candidate_9620",
+            "candidate_2958",
+            "candidate_5243"
+          ],
+          "reference_answer": "take an umbrella",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_5243",
+            "confidence": "high",
+            "verdict_candidate_5243": "correct",
+            "verdict_candidate_2958": "correct",
+            "verdict_candidate_6565": "correct",
+            "verdict_candidate_9620": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5243",
+              "probability": 0.9999797344207764,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5243": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2958": {
+              "value": "correct",
+              "probability": 0.9989519119262695,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6565": {
+              "value": "correct",
+              "probability": 0.9998484253883362,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9620": {
+              "value": "correct",
+              "probability": 0.9999913573265076,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 341,
+            "scored_rows": 69
+          },
+          "case_id": "rain-arrival",
+          "elapsed_ms": 1997.6,
+          "candidate_ids": [
+            "candidate_5243",
+            "candidate_2958",
+            "candidate_6565",
+            "candidate_9620"
+          ],
+          "reference_answer": "take an umbrella",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_9620",
+            "confidence": "high",
+            "verdict_candidate_9620": "correct",
+            "verdict_candidate_2958": "correct",
+            "verdict_candidate_5243": "correct",
+            "verdict_candidate_6565": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9620",
+              "probability": 0.9999886751174927,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9620": {
+              "value": "correct",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2958": {
+              "value": "correct",
+              "probability": 0.9977728724479675,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5243": {
+              "value": "correct",
+              "probability": 0.9995692372322083,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6565": {
+              "value": "correct",
+              "probability": 0.9999976754188538,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 341,
+            "scored_rows": 69
+          },
+          "case_id": "rain-arrival",
+          "elapsed_ms": 2013.3,
+          "candidate_ids": [
+            "candidate_9620",
+            "candidate_2958",
+            "candidate_5243",
+            "candidate_6565"
+          ],
+          "reference_answer": "take an umbrella",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "boiling-water",
+      "winner_model": "granite4.2:latest",
+      "votes": {
+        "gemma4:12b": 1,
+        "granite4.2:latest": 3,
+        "ornith-1.5:9b": 1
+      },
+      "winner_positions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_9375",
+            "confidence": "high",
+            "verdict_candidate_9375": "correct",
+            "verdict_candidate_2530": "correct",
+            "verdict_candidate_4452": "correct",
+            "verdict_candidate_6960": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_9375",
+              "probability": 0.9949535131454468,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9375": {
+              "value": "correct",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2530": {
+              "value": "correct",
+              "probability": 0.9994794726371765,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4452": {
+              "value": "correct",
+              "probability": 0.9994862675666809,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6960": {
+              "value": "correct",
+              "probability": 0.9999960064888,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 356,
+            "scored_rows": 69
+          },
+          "case_id": "boiling-water",
+          "elapsed_ms": 2064.9,
+          "candidate_ids": [
+            "candidate_9375",
+            "candidate_2530",
+            "candidate_4452",
+            "candidate_6960"
+          ],
+          "reference_answer": "heat it",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6960",
+            "confidence": "high",
+            "verdict_candidate_6960": "correct",
+            "verdict_candidate_4452": "correct",
+            "verdict_candidate_9375": "correct",
+            "verdict_candidate_2530": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6960",
+              "probability": 0.9999788999557495,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6960": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4452": {
+              "value": "correct",
+              "probability": 0.9995009303092957,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9375": {
+              "value": "correct",
+              "probability": 0.999563455581665,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2530": {
+              "value": "correct",
+              "probability": 0.9999890923500061,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 356,
+            "scored_rows": 69
+          },
+          "case_id": "boiling-water",
+          "elapsed_ms": 2064.8,
+          "candidate_ids": [
+            "candidate_6960",
+            "candidate_4452",
+            "candidate_9375",
+            "candidate_2530"
+          ],
+          "reference_answer": "heat it",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6960",
+            "confidence": "high",
+            "verdict_candidate_6960": "correct",
+            "verdict_candidate_9375": "correct",
+            "verdict_candidate_4452": "correct",
+            "verdict_candidate_2530": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6960",
+              "probability": 0.9999756813049316,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6960": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9375": {
+              "value": "correct",
+              "probability": 0.9988642930984497,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4452": {
+              "value": "correct",
+              "probability": 0.999459981918335,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2530": {
+              "value": "correct",
+              "probability": 0.9999911785125732,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 356,
+            "scored_rows": 69
+          },
+          "case_id": "boiling-water",
+          "elapsed_ms": 2045.4,
+          "candidate_ids": [
+            "candidate_6960",
+            "candidate_9375",
+            "candidate_4452",
+            "candidate_2530"
+          ],
+          "reference_answer": "heat it",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6960",
+            "confidence": "high",
+            "verdict_candidate_6960": "correct",
+            "verdict_candidate_9375": "correct",
+            "verdict_candidate_4452": "correct",
+            "verdict_candidate_2530": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6960",
+              "probability": 0.9999756813049316,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6960": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9375": {
+              "value": "correct",
+              "probability": 0.9988642930984497,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4452": {
+              "value": "correct",
+              "probability": 0.999459981918335,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2530": {
+              "value": "correct",
+              "probability": 0.9999911785125732,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 356,
+            "scored_rows": 69
+          },
+          "case_id": "boiling-water",
+          "elapsed_ms": 1215.4,
+          "candidate_ids": [
+            "candidate_6960",
+            "candidate_9375",
+            "candidate_4452",
+            "candidate_2530"
+          ],
+          "reference_answer": "heat it",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_2530",
+            "confidence": "high",
+            "verdict_candidate_2530": "correct",
+            "verdict_candidate_9375": "correct",
+            "verdict_candidate_4452": "correct",
+            "verdict_candidate_6960": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2530",
+              "probability": 0.9999555349349976,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2530": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9375": {
+              "value": "correct",
+              "probability": 0.9986490607261658,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_4452": {
+              "value": "correct",
+              "probability": 0.999049961566925,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6960": {
+              "value": "correct",
+              "probability": 0.9999968409538269,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 356,
+            "scored_rows": 69
+          },
+          "case_id": "boiling-water",
+          "elapsed_ms": 2049.5,
+          "candidate_ids": [
+            "candidate_2530",
+            "candidate_9375",
+            "candidate_4452",
+            "candidate_6960"
+          ],
+          "reference_answer": "heat it",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "equal-mass",
+      "winner_model": "ornith-1.5:9b",
+      "votes": {
+        "ornith-1.5:9b": 3,
+        "SparkLLM/Spark-X2.5-4B:latest": 1,
+        "gemma4:12b": 1
+      },
+      "winner_positions": [
+        1,
+        3,
+        1,
+        1,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_1606",
+            "confidence": "high",
+            "verdict_candidate_1606": "correct",
+            "verdict_candidate_8737": "correct",
+            "verdict_candidate_9388": "correct",
+            "verdict_candidate_2719": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1606",
+              "probability": 0.9997196793556213,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1606": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8737": {
+              "value": "correct",
+              "probability": 0.9996644258499146,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9388": {
+              "value": "correct",
+              "probability": 0.9996916055679321,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2719": {
+              "value": "correct",
+              "probability": 0.9997328519821167,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 339,
+            "scored_rows": 69
+          },
+          "case_id": "equal-mass",
+          "elapsed_ms": 1987.4,
+          "candidate_ids": [
+            "candidate_1606",
+            "candidate_8737",
+            "candidate_9388",
+            "candidate_2719"
+          ],
+          "reference_answer": "they weigh the same",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_1606",
+            "confidence": "high",
+            "verdict_candidate_2719": "correct",
+            "verdict_candidate_8737": "correct",
+            "verdict_candidate_1606": "correct",
+            "verdict_candidate_9388": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1606",
+              "probability": 0.9424276351928711,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2719": {
+              "value": "correct",
+              "probability": 0.9999992847442627,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8737": {
+              "value": "correct",
+              "probability": 0.9988966584205627,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1606": {
+              "value": "correct",
+              "probability": 0.9997203946113586,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9388": {
+              "value": "correct",
+              "probability": 0.9999811053276062,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 339,
+            "scored_rows": 69
+          },
+          "case_id": "equal-mass",
+          "elapsed_ms": 1987.5,
+          "candidate_ids": [
+            "candidate_2719",
+            "candidate_8737",
+            "candidate_1606",
+            "candidate_9388"
+          ],
+          "reference_answer": "they weigh the same",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 3
+        },
+        {
+          "decision": {
+            "winner": "candidate_2719",
+            "confidence": "high",
+            "verdict_candidate_2719": "correct",
+            "verdict_candidate_1606": "correct",
+            "verdict_candidate_9388": "correct",
+            "verdict_candidate_8737": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_2719",
+              "probability": 0.6468496322631836,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2719": {
+              "value": "correct",
+              "probability": 0.9999994039535522,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1606": {
+              "value": "correct",
+              "probability": 0.9995114803314209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9388": {
+              "value": "correct",
+              "probability": 0.9997444748878479,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8737": {
+              "value": "correct",
+              "probability": 0.9999876618385315,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 339,
+            "scored_rows": 69
+          },
+          "case_id": "equal-mass",
+          "elapsed_ms": 1985.6,
+          "candidate_ids": [
+            "candidate_2719",
+            "candidate_1606",
+            "candidate_9388",
+            "candidate_8737"
+          ],
+          "reference_answer": "they weigh the same",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_8737",
+            "confidence": "high",
+            "verdict_candidate_8737": "correct",
+            "verdict_candidate_9388": "correct",
+            "verdict_candidate_2719": "correct",
+            "verdict_candidate_1606": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_8737",
+              "probability": 0.9079203009605408,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8737": {
+              "value": "correct",
+              "probability": 0.9999996423721313,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9388": {
+              "value": "correct",
+              "probability": 0.999466598033905,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2719": {
+              "value": "correct",
+              "probability": 0.9974258542060852,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1606": {
+              "value": "correct",
+              "probability": 0.9999938607215881,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 339,
+            "scored_rows": 69
+          },
+          "case_id": "equal-mass",
+          "elapsed_ms": 1990.7,
+          "candidate_ids": [
+            "candidate_8737",
+            "candidate_9388",
+            "candidate_2719",
+            "candidate_1606"
+          ],
+          "reference_answer": "they weigh the same",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_1606",
+            "confidence": "high",
+            "verdict_candidate_1606": "correct",
+            "verdict_candidate_8737": "correct",
+            "verdict_candidate_2719": "correct",
+            "verdict_candidate_9388": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1606",
+              "probability": 0.9995710253715515,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1606": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8737": {
+              "value": "correct",
+              "probability": 0.9995060563087463,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_2719": {
+              "value": "correct",
+              "probability": 0.9959235191345215,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_9388": {
+              "value": "correct",
+              "probability": 0.9999834299087524,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 339,
+            "scored_rows": 69
+          },
+          "case_id": "equal-mass",
+          "elapsed_ms": 1986.1,
+          "candidate_ids": [
+            "candidate_1606",
+            "candidate_8737",
+            "candidate_2719",
+            "candidate_9388"
+          ],
+          "reference_answer": "they weigh the same",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "red-light",
+      "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+      "votes": {
+        "SparkLLM/Spark-X2.5-4B:latest": 3,
+        "ornith-1.5:9b": 1,
+        "granite4.2:latest": 1
+      },
+      "winner_positions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_5390",
+            "confidence": "high",
+            "verdict_candidate_5390": "correct",
+            "verdict_candidate_6498": "correct",
+            "verdict_candidate_6696": "correct",
+            "verdict_candidate_6370": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5390",
+              "probability": 0.9991910457611084,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5390": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6498": {
+              "value": "correct",
+              "probability": 0.9944488406181335,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6696": {
+              "value": "correct",
+              "probability": 0.9946333169937134,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6370": {
+              "value": "correct",
+              "probability": 0.9792372584342957,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 310,
+            "scored_rows": 77
+          },
+          "case_id": "red-light",
+          "elapsed_ms": 1912.2,
+          "candidate_ids": [
+            "candidate_5390",
+            "candidate_6498",
+            "candidate_6696",
+            "candidate_6370"
+          ],
+          "reference_answer": "stop",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6498",
+            "confidence": "high",
+            "verdict_candidate_6498": "correct",
+            "verdict_candidate_6696": "correct",
+            "verdict_candidate_5390": "correct",
+            "verdict_candidate_6370": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6498",
+              "probability": 0.9994942545890808,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6498": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6696": {
+              "value": "correct",
+              "probability": 0.999455451965332,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5390": {
+              "value": "correct",
+              "probability": 0.9996240735054016,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6370": {
+              "value": "correct",
+              "probability": 0.9930667281150818,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 310,
+            "scored_rows": 77
+          },
+          "case_id": "red-light",
+          "elapsed_ms": 1899.5,
+          "candidate_ids": [
+            "candidate_6498",
+            "candidate_6696",
+            "candidate_5390",
+            "candidate_6370"
+          ],
+          "reference_answer": "stop",
+          "winner_model": "ornith-1.5:9b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_6370",
+            "confidence": "high",
+            "verdict_candidate_6370": "correct",
+            "verdict_candidate_6498": "correct",
+            "verdict_candidate_5390": "correct",
+            "verdict_candidate_6696": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_6370",
+              "probability": 0.999808132648468,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6370": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6498": {
+              "value": "correct",
+              "probability": 0.9981940388679504,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5390": {
+              "value": "correct",
+              "probability": 0.999923825263977,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6696": {
+              "value": "correct",
+              "probability": 0.9999747276306152,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 310,
+            "scored_rows": 77
+          },
+          "case_id": "red-light",
+          "elapsed_ms": 1916.5,
+          "candidate_ids": [
+            "candidate_6370",
+            "candidate_6498",
+            "candidate_5390",
+            "candidate_6696"
+          ],
+          "reference_answer": "stop",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_5390",
+            "confidence": "high",
+            "verdict_candidate_5390": "correct",
+            "verdict_candidate_6696": "correct",
+            "verdict_candidate_6370": "correct",
+            "verdict_candidate_6498": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5390",
+              "probability": 0.9996631145477295,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5390": {
+              "value": "correct",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6696": {
+              "value": "correct",
+              "probability": 0.9991218447685242,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6370": {
+              "value": "correct",
+              "probability": 0.9174066781997681,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6498": {
+              "value": "correct",
+              "probability": 0.998820424079895,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 310,
+            "scored_rows": 77
+          },
+          "case_id": "red-light",
+          "elapsed_ms": 1899.1,
+          "candidate_ids": [
+            "candidate_5390",
+            "candidate_6696",
+            "candidate_6370",
+            "candidate_6498"
+          ],
+          "reference_answer": "stop",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_5390",
+            "confidence": "high",
+            "verdict_candidate_5390": "correct",
+            "verdict_candidate_6696": "correct",
+            "verdict_candidate_6498": "correct",
+            "verdict_candidate_6370": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5390",
+              "probability": 0.9993454217910767,
+              "scored_nodes": 3,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5390": {
+              "value": "correct",
+              "probability": 0.9999998211860657,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6696": {
+              "value": "correct",
+              "probability": 0.9994046688079834,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6498": {
+              "value": "correct",
+              "probability": 0.9914032816886902,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_6370": {
+              "value": "correct",
+              "probability": 0.9944431781768799,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 310,
+            "scored_rows": 77
+          },
+          "case_id": "red-light",
+          "elapsed_ms": 1920.5,
+          "candidate_ids": [
+            "candidate_5390",
+            "candidate_6696",
+            "candidate_6498",
+            "candidate_6370"
+          ],
+          "reference_answer": "stop",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        }
+      ]
+    },
+    {
+      "case_id": "refrigeration",
+      "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+      "votes": {
+        "gemma4:12b": 1,
+        "granite4.2:latest": 1,
+        "SparkLLM/Spark-X2.5-4B:latest": 3
+      },
+      "winner_positions": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "passes": [
+        {
+          "decision": {
+            "winner": "candidate_5341",
+            "confidence": "high",
+            "verdict_candidate_5341": "correct",
+            "verdict_candidate_3436": "correct",
+            "verdict_candidate_8288": "correct",
+            "verdict_candidate_1914": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_5341",
+              "probability": 0.8476688265800476,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5341": {
+              "value": "correct",
+              "probability": 0.9999997019767761,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3436": {
+              "value": "correct",
+              "probability": 0.9994474053382874,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8288": {
+              "value": "correct",
+              "probability": 0.9999420046806335,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1914": {
+              "value": "correct",
+              "probability": 0.9999876022338867,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 69
+          },
+          "case_id": "refrigeration",
+          "elapsed_ms": 1984.4,
+          "candidate_ids": [
+            "candidate_5341",
+            "candidate_3436",
+            "candidate_8288",
+            "candidate_1914"
+          ],
+          "reference_answer": "refrigerator",
+          "winner_model": "gemma4:12b",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_3436",
+            "confidence": "high",
+            "verdict_candidate_3436": "correct",
+            "verdict_candidate_1914": "correct",
+            "verdict_candidate_5341": "correct",
+            "verdict_candidate_8288": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_3436",
+              "probability": 0.9958721995353699,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3436": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1914": {
+              "value": "correct",
+              "probability": 0.999439001083374,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5341": {
+              "value": "correct",
+              "probability": 0.9992234110832214,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8288": {
+              "value": "correct",
+              "probability": 0.999992847442627,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 69
+          },
+          "case_id": "refrigeration",
+          "elapsed_ms": 2003.6,
+          "candidate_ids": [
+            "candidate_3436",
+            "candidate_1914",
+            "candidate_5341",
+            "candidate_8288"
+          ],
+          "reference_answer": "refrigerator",
+          "winner_model": "granite4.2:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_1914",
+            "confidence": "high",
+            "verdict_candidate_1914": "correct",
+            "verdict_candidate_8288": "correct",
+            "verdict_candidate_5341": "correct",
+            "verdict_candidate_3436": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1914",
+              "probability": 0.9795472025871277,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1914": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8288": {
+              "value": "correct",
+              "probability": 0.9995999336242676,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5341": {
+              "value": "correct",
+              "probability": 0.9986952543258667,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3436": {
+              "value": "correct",
+              "probability": 0.9999777674674988,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 69
+          },
+          "case_id": "refrigeration",
+          "elapsed_ms": 1988.5,
+          "candidate_ids": [
+            "candidate_1914",
+            "candidate_8288",
+            "candidate_5341",
+            "candidate_3436"
+          ],
+          "reference_answer": "refrigerator",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_1914",
+            "confidence": "high",
+            "verdict_candidate_1914": "correct",
+            "verdict_candidate_3436": "correct",
+            "verdict_candidate_5341": "correct",
+            "verdict_candidate_8288": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1914",
+              "probability": 0.9893356561660767,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1914": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3436": {
+              "value": "correct",
+              "probability": 0.9978694319725037,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5341": {
+              "value": "correct",
+              "probability": 0.9968482255935669,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8288": {
+              "value": "correct",
+              "probability": 0.9999802708625793,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 69
+          },
+          "case_id": "refrigeration",
+          "elapsed_ms": 1996.7,
+          "candidate_ids": [
+            "candidate_1914",
+            "candidate_3436",
+            "candidate_5341",
+            "candidate_8288"
+          ],
+          "reference_answer": "refrigerator",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        },
+        {
+          "decision": {
+            "winner": "candidate_1914",
+            "confidence": "high",
+            "verdict_candidate_1914": "correct",
+            "verdict_candidate_8288": "correct",
+            "verdict_candidate_3436": "correct",
+            "verdict_candidate_5341": "correct"
+          },
+          "fields": {
+            "winner": {
+              "value": "candidate_1914",
+              "probability": 0.9909983277320862,
+              "scored_nodes": 2,
+              "tree": true
+            },
+            "confidence": {
+              "value": "high",
+              "probability": 1.0,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_1914": {
+              "value": "correct",
+              "probability": 0.9999997615814209,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_8288": {
+              "value": "correct",
+              "probability": 0.9994909763336182,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_3436": {
+              "value": "correct",
+              "probability": 0.9985267519950867,
+              "scored_nodes": 1,
+              "tree": true
+            },
+            "verdict_candidate_5341": {
+              "value": "correct",
+              "probability": 0.9999380111694336,
+              "scored_nodes": 1,
+              "tree": true
+            }
+          },
+          "usage": {
+            "context_tokens": 340,
+            "scored_rows": 69
+          },
+          "case_id": "refrigeration",
+          "elapsed_ms": 1985.6,
+          "candidate_ids": [
+            "candidate_1914",
+            "candidate_8288",
+            "candidate_3436",
+            "candidate_5341"
+          ],
+          "reference_answer": "refrigerator",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_position": 1
+        }
+      ]
+    }
+  ]
+}

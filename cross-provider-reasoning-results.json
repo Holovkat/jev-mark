@@ -1,0 +1,5384 @@
+{
+  "seed": 20260922,
+  "suite": "reasoning",
+  "rounds": 3,
+  "models": [
+    "gemma4:12b",
+    "granite4.2:latest",
+    "ornith-1.5:9b",
+    "SparkLLM/Spark-X2.5-4B:latest"
+  ],
+  "profiles": [
+    {
+      "id": "typesafe-env-dev",
+      "name": "TypeSafe env.dev",
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "model": "jev-latest"
+    }
+  ],
+  "cases": [
+    {
+      "id": "dead-battery",
+      "question": "You turn a car key and hear a slow clicking sound. The cabin lights were accidentally left on overnight, the dashboard is now dim, and the engine does not turn over. You have access to another car and jumper cables, but no replacement parts. What is the most direct action that addresses the likely cause?",
+      "reference_answer": "jump-start or recharge the battery",
+      "rubric": "Connect the overnight electrical drain and dim dashboard to a discharged battery; choose the available action that restores starting power.",
+      "choices": [
+        "jump-start or recharge the battery",
+        "replace the tyres",
+        "add fuel to the tank",
+        "adjust the headlights"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_6916",
+          "response": "The slow clicking sound and dim dashboard indicate the car's battery is depleted, which is why the engine won't turn over. Since you have jumper cables and another car available, the most direct and immediate solution is to use them to jump-start the battery.\n\nFINAL: jump-start or recharge the battery"
+        },
+        {
+          "id": "candidate_2676",
+          "response": "The symptoms of a dim dashboard, clicking sounds, and lights left on overnight indicate a depleted battery. Since you have jumper cables and another car available, the most direct solution is to provide an external charge.\n\nFINAL: jump-start or recharge the battery"
+        },
+        {
+          "id": "candidate_9292",
+          "response": "The slow clicking sound and dim dashboard suggest the battery is weak or discharged, likely due to the cabin lights left on overnight. Jumper cables from another car can provide enough voltage to start the engine directly. Replacing tires, adding fuel, or adjusting headlights would not address the immediate inability to start the engine.\n\nFINAL: jump-start"
+        },
+        {
+          "id": "candidate_1126",
+          "response": "The slow clicking sound, dim dashboard lights, and engine not turning over all point to a dead battery caused by the cabin lights being left on overnight. Since you have jumper cables and another car available, the most direct action is to jump-start the battery to restore power and allow the engine to turn over.\n\nFINAL: jump-start or recharge the battery"
+        }
+      ]
+    },
+    {
+      "id": "sealed-balloon",
+      "question": "A rubber balloon is tied shut and left in a warm car. Several hours later it is larger, but no material has been added and the knot is still intact. Which explanation best accounts for the change?",
+      "reference_answer": "the trapped air expanded when warmed",
+      "rubric": "Use the facts that the balloon is sealed and warmed; distinguish expansion from adding mass or leakage.",
+      "choices": [
+        "the trapped air expanded when warmed",
+        "the balloon created more air",
+        "the rubber converted into fuel",
+        "the air disappeared through the knot"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_9381",
+          "response": "When the rubber balloon is left in a warm car, the air inside it heats up. This increase in temperature causes the trapped air to expand, which makes the balloon grow larger. Since no air was added and the knot remains, the expansion of the existing air is the only logical explanation.\n\nFINAL: the trapped air expanded when warmed"
+        },
+        {
+          "id": "candidate_2236",
+          "response": "The increase in size is caused by the thermal expansion of the gas molecules inside the balloon. As the temperature rises, the air molecules move faster and push outward with more force.\n\nFINAL: the trapped air expanded when warmed"
+        },
+        {
+          "id": "candidate_9509",
+          "response": "The balloon is sealed, so no air can enter or leave through the knot. When the car warms up, the air inside the balloon expands because warmer gases occupy a larger volume. This expansion makes the balloon appear larger without any addition or removal of material.\n\nFINAL: the trapped air expanded when warmed"
+        },
+        {
+          "id": "candidate_1636",
+          "response": "The trapped air inside the balloon expanded when warmed, causing the balloon to grow larger. Since no material was added and the knot remained intact, the increase in size is due to the gas expanding with heat rather than any new air being created or the rubber changing into fuel.\n\nFINAL: the trapped air expanded when warmed"
+        }
+      ]
+    },
+    {
+      "id": "wet-towel",
+      "question": "Two identical wet towels are hung outside. One is spread fully open in sunlight and wind; the other is folded into a thick bundle in the shade. Assuming the same starting amount of water, which towel will normally dry first, and why?",
+      "reference_answer": "the spread towel because more water is exposed to moving warm air",
+      "rubric": "Reason from exposed surface area, airflow, and heat; reject claims that water is created or timing must be identical.",
+      "choices": [
+        "the spread towel because more water is exposed to moving warm air",
+        "the folded towel because it stores heat",
+        "both must dry at exactly the same time",
+        "the spread towel because sunlight creates water"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_2069",
+          "response": "When a wet towel is spread out, its large surface area allows more water to be exposed to the moving air and sunlight, which accelerates evaporation. A folded towel, on the other hand, traps heat and limits the surface area, slowing down the drying process. Therefore, the spread towel will dry first.\n\nFINAL: the spread towel because more water is exposed to moving warm air"
+        },
+        {
+          "id": "candidate_8513",
+          "response": "The spread towel has a much larger surface area, allowing more water to evaporate into the moving air. The folded towel traps moisture inside its layers, making it much harder for the water to escape. Therefore, the spread towel will dry significantly faster.\n\nFINAL: the spread towel because more water is exposed to moving warm air"
+        },
+        {
+          "id": "candidate_7793",
+          "response": "The spread towel will dry first because exposing more surface area to airflow and sunlight increases evaporation, while the folded towel reduces surface area and traps moisture in the bundle. The shade also slows evaporation compared to sunlight. Therefore, the spread towel dries faster under normal conditions.\n\nFINAL: the spread towel because more water is exposed to moving warm air"
+        },
+        {
+          "id": "candidate_1988",
+          "response": "The spread towel will dry first because it exposes more surface area to the moving warm air, which accelerates evaporation, while the folded bundle in the shade has less air circulation and no solar heating.\n\nFINAL: the spread towel because more water is exposed to moving warm air"
+        }
+      ]
+    },
+    {
+      "id": "ice-salt",
+      "question": "A person packs ice around a drink and sprinkles salt over the ice. The ice begins melting faster and the mixture becomes colder than the original ice-water mixture. What is the best explanation?",
+      "reference_answer": "salt lowers the freezing point, so melting absorbs heat",
+      "rubric": "Explain the combined freezing-point and heat-absorption effect; do not treat cold as being generated from nothing.",
+      "choices": [
+        "salt lowers the freezing point, so melting absorbs heat",
+        "salt generates cold without changing the ice",
+        "the drink transfers all of its mass into the ice",
+        "the ice becomes warmer because salt is hot"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_9440",
+          "response": "When salt is added to ice, it lowers the freezing point, which causes the ice to melt more quickly. This process absorbs heat from the surrounding environment, making the mixture feel colder without actually changing the amount of ice.\n\nFINAL: salt lowers the freezing point, so melting absorbs heat"
+        },
+        {
+          "id": "candidate_4540",
+          "response": "Salt lowers the freezing point of water, which causes the ice to melt more rapidly. This melting process absorbs heat from the surrounding environment and the drink, lowering the overall temperature.\n\nFINAL: salt lowers the freezing point, so melting absorbs heat"
+        },
+        {
+          "id": "candidate_3493",
+          "response": "Salt lowers the freezing point of water, allowing the ice to melt at temperatures below 0\u00b0C. As the ice melts, the process absorbs heat from the surroundings, including the drink, making the mixture colder than the original ice-water mixture. This effect occurs because salt disrupts the ice structure, promoting melting while the melting absorbs latent heat, effectively cooling the environment.\n\nFINAL: salt lowers the freezing point, so melting absorbs heat"
+        },
+        {
+          "id": "candidate_9746",
+          "response": "Salt lowers the freezing point of water, so the ice melts faster. Since melting is an endothermic process, it absorbs heat from the surroundings, which is why the mixture becomes colder than the original ice-water mixture.\n\nFINAL: salt lowers the freezing point, so melting absorbs heat"
+        }
+      ]
+    },
+    {
+      "id": "blocked-laptop",
+      "question": "A laptop becomes unusually hot and slows down only when used on a soft blanket. The same laptop performs normally on a hard desk, and no software changes were made. Which first response is most justified?",
+      "reference_answer": "move it to a hard surface and clear its ventilation",
+      "rubric": "Use the observed surface-dependent heat and performance change to identify blocked airflow as the first intervention.",
+      "choices": [
+        "move it to a hard surface and clear its ventilation",
+        "install a larger screen",
+        "delete unrelated documents",
+        "increase the display brightness"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_9547",
+          "response": "The laptop overheating and slowing down specifically when on a soft blanket indicates poor ventilation, as soft surfaces trap heat and block airflow. Since the issue is clearly tied to the surface and no software changes were made, the most logical first step is to address the airflow problem.\n\nFINAL: move it to a hard surface and clear its ventilation"
+        },
+        {
+          "id": "candidate_2769",
+          "response": "The laptop's performance issues are linked to its physical placement on a soft surface, which likely blocks the air vents and causes overheating. Moving it to a hard surface ensures proper airflow and cooling.\n\nFINAL: move it to a hard surface and clear its ventilation"
+        },
+        {
+          "id": "candidate_9850",
+          "response": "The laptop's heat and slowdown occur only when used on a soft blanket, suggesting poor ventilation due to the blanket trapping heat and blocking airflow. Since the laptop works normally on a hard surface, the issue is likely related to physical positioning affecting airflow. The most justified first response is to move it to a hard surface and clear its ventilation.\n\nFINAL: move it to a hard surface and clear its ventilation"
+        },
+        {
+          "id": "candidate_4355",
+          "response": "The laptop overheats on a soft blanket because the blanket blocks its ventilation, trapping heat and triggering thermal throttling that slows performance. Since the same laptop works fine on a hard desk with no software changes, the issue is physical airflow rather than software or hardware capacity. Therefore, the most justified first response is to move it to a hard surface and clear its ventilation.\n\nFINAL: move it to a hard surface and clear its ventilation"
+        }
+      ]
+    },
+    {
+      "id": "smoke-alarm",
+      "question": "A smoke alarm gives one short chirp every minute, but there is no smoke, heat, or burning smell. The alarm has been installed for years and its test button has not been used recently. What should be checked first?",
+      "reference_answer": "the alarm battery and its maintenance state",
+      "rubric": "A periodic chirp from an old alarm commonly indicates a low battery or maintenance/end-of-life condition; do not ignore a safety device.",
+      "choices": [
+        "the alarm battery and its maintenance state",
+        "whether the walls need repainting",
+        "whether the door is locked",
+        "whether the room needs more furniture"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_7337",
+          "response": "The short, frequent chirp from the smoke alarm without any actual danger typically indicates a low battery, especially since the test button hasn't been used recently. Since the alarm has been installed for years, the most logical first step is to verify the battery and its maintenance state.\n\nFINAL: the alarm battery and its maintenance state"
+        },
+        {
+          "id": "candidate_3815",
+          "response": "A recurring chirp from a smoke alarm typically indicates a low battery or a malfunction in the device's internal components. Since the alarm has been in place for years without recent testing, the battery's condition is the most likely cause of the warning signal.\n\nFINAL: the alarm battery and its maintenance state"
+        },
+        {
+          "id": "candidate_5747",
+          "response": "The most likely cause of a single short chirp without smoke, heat, or burning smell is a low battery or battery failure, especially since the test button hasn't been used recently and the alarm has been installed for years. Maintenance state (battery level) is the primary safety indicator for a functional smoke alarm. Therefore, the battery and its maintenance state should be checked first.\n\nFINAL: the alarm battery and its maintenance state"
+        },
+        {
+          "id": "candidate_5203",
+          "response": "A single short chirp every minute is the classic low-battery warning for smoke alarms, and since the test button hasn't been used recently, the battery is the most likely culprit. The other options\u2014repainting, locking the door, or adding furniture\u2014have no connection to an alarm chirping.\n\nFINAL: the alarm battery and its maintenance state"
+        }
+      ]
+    },
+    {
+      "id": "plant-window",
+      "question": "A houseplant sits in a dark room. Its soil is already wet, but its leaves are pale and new growth is weak. Someone suggests adding even more water because the plant looks unhealthy. Which change most directly addresses the stated environmental clue?",
+      "reference_answer": "provide suitable light",
+      "rubric": "Connect pale weak growth and a dark room to insufficient light; the already-wet soil argues against adding more water first.",
+      "choices": [
+        "provide suitable light",
+        "add more water immediately",
+        "remove all leaves",
+        "seal the pot in plastic"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_6093",
+          "response": "The plant is in a dark room, which is a key environmental clue indicating it is likely suffering from insufficient light. Since the soil is already wet and the problem stems from the lack of light rather than overwatering, adding more water would only worsen the issue. Therefore, providing suitable light is the most direct solution to address the environmental condition.\n\nFINAL: provide suitable light"
+        },
+        {
+          "id": "candidate_2658",
+          "response": "The plant is in a dark room and showing signs of poor growth, which indicates a lack of sunlight rather than a lack of water. Since the soil is already wet, adding more water would likely cause root rot and would not solve the primary issue of insufficient light. Providing suitable light is the most direct way to address the environmental condition described.\n\nFINAL: provide suitable light"
+        },
+        {
+          "id": "candidate_7405",
+          "response": "The plant is in a dark room, soil is already wet, leaves are pale, and new growth is weak\u2014these suggest poor light rather than water deficiency. Adding more water would not address the likely lack of light causing pale leaves and weak growth. The most direct response to the environmental clue (darkness) is to provide suitable light.\n\nFINAL: provide suitable light"
+        },
+        {
+          "id": "candidate_7023",
+          "response": "The key environmental clue is that the plant sits in a dark room, which limits photosynthesis and causes pale leaves and weak new growth. Adding more water won't help since the soil is already wet, and the real issue is insufficient light. Therefore, providing suitable light most directly addresses the stated environmental clue.\n\nFINAL: provide suitable light"
+        }
+      ]
+    },
+    {
+      "id": "short-route-delay",
+      "question": "A delivery driver takes a route that is two kilometres shorter than the usual route but arrives later. The shorter route includes several traffic lights and a temporary road closure, while the longer route is a clear highway. What conclusion is best supported?",
+      "reference_answer": "shorter distance does not guarantee shorter travel time",
+      "rubric": "Use the stated delays and distinguish route length from elapsed travel time; do not invent a wrong turn.",
+      "choices": [
+        "shorter distance does not guarantee shorter travel time",
+        "the driver must have taken a wrong turn",
+        "highways are always shorter",
+        "traffic lights make distance disappear"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_2046",
+          "response": "The delivery driver arrived later despite taking a shorter distance, which indicates that distance alone does not determine travel time. The shorter route had more traffic lights and a road closure, which likely slowed the driver down. Therefore, the shorter distance did not result in a shorter travel time.\n\nFINAL: shorter distance does not guarantee shorter travel time"
+        },
+        {
+          "id": "candidate_2881",
+          "response": "The presence of traffic lights and road closures on the shorter route creates delays that outweigh the distance saved. Therefore, a shorter physical distance does not automatically result in a faster travel time.\n\nFINAL: shorter distance does not guarantee shorter travel time"
+        },
+        {
+          "id": "candidate_2948",
+          "response": "The shorter route, despite being two kilometres shorter in distance, includes several traffic lights and a temporary road closure, which likely increased travel time due to stops and delays. The longer route is a clear highway without such interruptions. Therefore, shorter distance does not guarantee shorter travel time.\n\nFINAL: shorter distance does not guarantee shorter travel time"
+        },
+        {
+          "id": "candidate_7739",
+          "response": "The scenario shows that a shorter distance doesn't necessarily mean faster travel time. The temporary road closure and multiple traffic lights on the shorter route likely caused delays, while the clear highway on the longer route allowed for faster travel despite covering more distance.\n\nFINAL: shorter distance does not guarantee shorter travel time"
+        }
+      ]
+    },
+    {
+      "id": "thermos-choice",
+      "question": "You need to keep soup hot for a three-hour trip. One container is a sealed vacuum flask with a tight lid; the other is an uncovered metal bowl. Both start at the same temperature and contain the same soup. Which container is better for the stated goal?",
+      "reference_answer": "the sealed vacuum flask",
+      "rubric": "Choose the container that reduces heat transfer and evaporation; being uncovered does not preserve heat.",
+      "choices": [
+        "the sealed vacuum flask",
+        "the uncovered metal bowl",
+        "both must retain heat equally",
+        "the bowl because it is uncovered"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_6108",
+          "response": "A sealed vacuum flask is much better for keeping soup hot because its vacuum insulation prevents heat from escaping. An uncovered metal bowl loses heat quickly to the surrounding air.\n\nFINAL: the sealed vacuum flask"
+        },
+        {
+          "id": "candidate_9147",
+          "response": "A sealed vacuum flask is designed to minimize heat loss through conduction, convection, and radiation, whereas an uncovered metal bowl allows heat to escape rapidly into the air. Therefore, the flask is the superior choice for maintaining temperature over a long period.\n\nFINAL: the sealed vacuum flask"
+        },
+        {
+          "id": "candidate_4369",
+          "response": "A sealed vacuum flask minimizes heat loss by reducing air exposure and insulating effectively, while an uncovered metal bowl allows heat to escape more readily through convection and radiation. Over several hours, the uncovered bowl will lose heat faster, reducing the soup's temperature. Therefore, the sealed vacuum flask is better for keeping the soup hot for the three-hour trip.\n\nFINAL: the sealed vacuum flask"
+        },
+        {
+          "id": "candidate_4987",
+          "response": "The sealed vacuum flask is far better for keeping soup hot. Its vacuum layer and tight lid block conduction, convection, and evaporation, while the uncovered metal bowl loses heat rapidly through all three mechanisms.\n\nFINAL: the sealed vacuum flask"
+        }
+      ]
+    },
+    {
+      "id": "shadow-sun",
+      "question": "At noon, a flagpole casts a short shadow toward the east. Later in the afternoon, the same pole casts a longer shadow in a different direction. The pole has not moved. What most directly explains the change?",
+      "reference_answer": "the Sun's apparent position changed as Earth rotated",
+      "rubric": "Use the fixed object and changing shadow direction/length to reason about the Sun's apparent movement caused by Earth's rotation.",
+      "choices": [
+        "the Sun's apparent position changed as Earth rotated",
+        "the pole grew and then shrank",
+        "the ground moved independently of Earth",
+        "the flagpole produced extra sunlight"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_2139",
+          "response": "The flagpole remains stationary, so the change in shadow direction and length must be caused by the Sun's movement across the sky. As Earth rotates, the Sun appears to move from east to west, causing the shadow to shift and lengthen throughout the afternoon.\n\nFINAL: the Sun's apparent position changed as Earth rotated"
+        },
+        {
+          "id": "candidate_6127",
+          "response": "As the Earth rotates, the Sun's position in the sky changes relative to the ground. This change in the Sun's angle causes the shadow's length and direction to shift over time.\n\nFINAL: the Sun's apparent position changed as Earth rotated"
+        },
+        {
+          "id": "candidate_5582",
+          "response": "The Sun's apparent position changes as Earth rotates, causing the shadow direction and length to shift over time. The flagpole remains stationary, so the shadow changes due to the Sun's movement across the sky.\n\nFINAL: the Sun's apparent position changed as Earth rotated"
+        },
+        {
+          "id": "candidate_1288",
+          "response": "As Earth rotates, the Sun appears to move across the sky, changing its apparent position relative to the flagpole. This shift causes the shadow to lengthen and point in a different direction as the afternoon progresses. The change is due to the Sun's apparent motion, not any movement of the pole or ground.\n\nFINAL: the Sun's apparent position changed as Earth rotated"
+        }
+      ]
+    }
+  ],
+  "candidate_metadata": {
+    "dead-battery": {
+      "candidate_6916": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "jump-start or recharge the battery",
+        "correct": true
+      },
+      "candidate_2676": {
+        "model": "gemma4:12b",
+        "final_choice": "jump-start or recharge the battery",
+        "correct": true
+      },
+      "candidate_9292": {
+        "model": "granite4.2:latest",
+        "final_choice": null,
+        "correct": null
+      },
+      "candidate_1126": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "jump-start or recharge the battery",
+        "correct": true
+      }
+    },
+    "sealed-balloon": {
+      "candidate_9381": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "the trapped air expanded when warmed",
+        "correct": true
+      },
+      "candidate_2236": {
+        "model": "gemma4:12b",
+        "final_choice": "the trapped air expanded when warmed",
+        "correct": true
+      },
+      "candidate_9509": {
+        "model": "granite4.2:latest",
+        "final_choice": "the trapped air expanded when warmed",
+        "correct": true
+      },
+      "candidate_1636": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "the trapped air expanded when warmed",
+        "correct": true
+      }
+    },
+    "wet-towel": {
+      "candidate_2069": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "the spread towel because more water is exposed to moving warm air",
+        "correct": true
+      },
+      "candidate_8513": {
+        "model": "gemma4:12b",
+        "final_choice": "the spread towel because more water is exposed to moving warm air",
+        "correct": true
+      },
+      "candidate_7793": {
+        "model": "granite4.2:latest",
+        "final_choice": "the spread towel because more water is exposed to moving warm air",
+        "correct": true
+      },
+      "candidate_1988": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "the spread towel because more water is exposed to moving warm air",
+        "correct": true
+      }
+    },
+    "ice-salt": {
+      "candidate_9440": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "salt lowers the freezing point, so melting absorbs heat",
+        "correct": true
+      },
+      "candidate_4540": {
+        "model": "gemma4:12b",
+        "final_choice": "salt lowers the freezing point, so melting absorbs heat",
+        "correct": true
+      },
+      "candidate_3493": {
+        "model": "granite4.2:latest",
+        "final_choice": "salt lowers the freezing point, so melting absorbs heat",
+        "correct": true
+      },
+      "candidate_9746": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "salt lowers the freezing point, so melting absorbs heat",
+        "correct": true
+      }
+    },
+    "blocked-laptop": {
+      "candidate_9547": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "move it to a hard surface and clear its ventilation",
+        "correct": true
+      },
+      "candidate_2769": {
+        "model": "gemma4:12b",
+        "final_choice": "move it to a hard surface and clear its ventilation",
+        "correct": true
+      },
+      "candidate_9850": {
+        "model": "granite4.2:latest",
+        "final_choice": "move it to a hard surface and clear its ventilation",
+        "correct": true
+      },
+      "candidate_4355": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "move it to a hard surface and clear its ventilation",
+        "correct": true
+      }
+    },
+    "smoke-alarm": {
+      "candidate_7337": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "the alarm battery and its maintenance state",
+        "correct": true
+      },
+      "candidate_3815": {
+        "model": "gemma4:12b",
+        "final_choice": "the alarm battery and its maintenance state",
+        "correct": true
+      },
+      "candidate_5747": {
+        "model": "granite4.2:latest",
+        "final_choice": "the alarm battery and its maintenance state",
+        "correct": true
+      },
+      "candidate_5203": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "the alarm battery and its maintenance state",
+        "correct": true
+      }
+    },
+    "plant-window": {
+      "candidate_6093": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "provide suitable light",
+        "correct": true
+      },
+      "candidate_2658": {
+        "model": "gemma4:12b",
+        "final_choice": "provide suitable light",
+        "correct": true
+      },
+      "candidate_7405": {
+        "model": "granite4.2:latest",
+        "final_choice": "provide suitable light",
+        "correct": true
+      },
+      "candidate_7023": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "provide suitable light",
+        "correct": true
+      }
+    },
+    "short-route-delay": {
+      "candidate_2046": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "shorter distance does not guarantee shorter travel time",
+        "correct": true
+      },
+      "candidate_2881": {
+        "model": "gemma4:12b",
+        "final_choice": "shorter distance does not guarantee shorter travel time",
+        "correct": true
+      },
+      "candidate_2948": {
+        "model": "granite4.2:latest",
+        "final_choice": "shorter distance does not guarantee shorter travel time",
+        "correct": true
+      },
+      "candidate_7739": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "shorter distance does not guarantee shorter travel time",
+        "correct": true
+      }
+    },
+    "thermos-choice": {
+      "candidate_6108": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "the sealed vacuum flask",
+        "correct": true
+      },
+      "candidate_9147": {
+        "model": "gemma4:12b",
+        "final_choice": "the sealed vacuum flask",
+        "correct": true
+      },
+      "candidate_4369": {
+        "model": "granite4.2:latest",
+        "final_choice": "the sealed vacuum flask",
+        "correct": true
+      },
+      "candidate_4987": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "the sealed vacuum flask",
+        "correct": true
+      }
+    },
+    "shadow-sun": {
+      "candidate_2139": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "the Sun's apparent position changed as Earth rotated",
+        "correct": true
+      },
+      "candidate_6127": {
+        "model": "gemma4:12b",
+        "final_choice": "the Sun's apparent position changed as Earth rotated",
+        "correct": true
+      },
+      "candidate_5582": {
+        "model": "granite4.2:latest",
+        "final_choice": "the Sun's apparent position changed as Earth rotated",
+        "correct": true
+      },
+      "candidate_1288": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "the Sun's apparent position changed as Earth rotated",
+        "correct": true
+      }
+    }
+  },
+  "results": [
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "dead-battery",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_1126",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "correct",
+          "candidate_1126": "correct",
+          "candidate_6916": "correct",
+          "candidate_9292": "partial"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1126",
+          "probability": 0.9904788732528687,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2676": {
+          "value": "correct",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1126": {
+          "value": "correct",
+          "probability": 0.999923050403595,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6916": {
+          "value": "correct",
+          "probability": 0.9998671412467957,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9292": {
+          "value": "partial",
+          "probability": 0.8268733024597168,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 483,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2298.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "sealed-balloon",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_1636",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "correct",
+          "candidate_2236": "correct",
+          "candidate_9381": "correct",
+          "candidate_9509": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1636",
+          "probability": 0.996442437171936,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1636": {
+          "value": "correct",
+          "probability": 0.9999892115592957,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2236": {
+          "value": "correct",
+          "probability": 0.9870225787162781,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9381": {
+          "value": "correct",
+          "probability": 0.9969425201416016,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9509": {
+          "value": "correct",
+          "probability": 0.9993734359741211,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 438,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2148.3,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "wet-towel",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_1988",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_1988": "correct",
+          "candidate_7793": "correct",
+          "candidate_2069": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1988",
+          "probability": 0.8815068006515503,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8513": {
+          "value": "correct",
+          "probability": 0.9999930262565613,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1988": {
+          "value": "correct",
+          "probability": 0.9980131387710571,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7793": {
+          "value": "correct",
+          "probability": 0.9996998310089111,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2069": {
+          "value": "correct",
+          "probability": 0.7837279438972473,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 481,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2256.4,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "ice-salt",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_9746",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4540": "correct",
+          "candidate_9746": "correct",
+          "candidate_9440": "incorrect",
+          "candidate_3493": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9746",
+          "probability": 0.9839741587638855,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999996423721313,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4540": {
+          "value": "correct",
+          "probability": 0.9999982118606567,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9746": {
+          "value": "correct",
+          "probability": 0.9996453523635864,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9440": {
+          "value": "incorrect",
+          "probability": 0.9384212493896484,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3493": {
+          "value": "correct",
+          "probability": 0.9983593821525574,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 457,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2211.6,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "blocked-laptop",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_4355",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "correct",
+          "candidate_9850": "correct",
+          "candidate_4355": "correct",
+          "candidate_9547": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4355",
+          "probability": 0.8454079031944275,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2769": {
+          "value": "correct",
+          "probability": 0.9999990463256836,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9850": {
+          "value": "correct",
+          "probability": 0.9998265504837036,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4355": {
+          "value": "correct",
+          "probability": 0.9999911785125732,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9547": {
+          "value": "correct",
+          "probability": 0.9990293383598328,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 491,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2267.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "smoke-alarm",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7337",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_5747": "correct",
+          "candidate_5203": "correct",
+          "candidate_3815": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7337",
+          "probability": 0.900344967842102,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7337": {
+          "value": "correct",
+          "probability": 0.9999996423721313,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5747": {
+          "value": "correct",
+          "probability": 0.999468982219696,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5203": {
+          "value": "correct",
+          "probability": 0.9757339954376221,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3815": {
+          "value": "correct",
+          "probability": 0.9999622106552124,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 502,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2275.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "plant-window",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_2658",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2658": "correct",
+          "candidate_6093": "correct",
+          "candidate_7023": "correct",
+          "candidate_7405": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2658",
+          "probability": 0.9954245686531067,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2658": {
+          "value": "correct",
+          "probability": 0.9999996423721313,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6093": {
+          "value": "correct",
+          "probability": 0.9962618350982666,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7023": {
+          "value": "correct",
+          "probability": 0.9946673512458801,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7405": {
+          "value": "correct",
+          "probability": 0.9998880624771118,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 502,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2272.5,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "short-route-delay",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_2948",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2046": "correct",
+          "candidate_2881": "correct",
+          "candidate_2948": "correct",
+          "candidate_7739": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2948",
+          "probability": 0.7303938269615173,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2046": {
+          "value": "correct",
+          "probability": 0.999998927116394,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2881": {
+          "value": "correct",
+          "probability": 0.9998087882995605,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2948": {
+          "value": "correct",
+          "probability": 0.9997596144676208,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7739": {
+          "value": "correct",
+          "probability": 0.9999474287033081,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 452,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2208.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "thermos-choice",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4369": "correct",
+          "candidate_6108": "correct",
+          "candidate_9147": "correct",
+          "candidate_4987": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4987",
+          "probability": 0.9984601140022278,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4369": {
+          "value": "correct",
+          "probability": 0.9999992251396179,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6108": {
+          "value": "correct",
+          "probability": 0.9991467595100403,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9147": {
+          "value": "correct",
+          "probability": 0.9994703531265259,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4987": {
+          "value": "correct",
+          "probability": 0.9999974966049194,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 430,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2150.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "shadow-sun",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_1288",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1288",
+          "probability": 0.9968999624252319,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5582": {
+          "value": "correct",
+          "probability": 0.9999992847442627,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1288": {
+          "value": "correct",
+          "probability": 0.9995477199554443,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2139": {
+          "value": "correct",
+          "probability": 0.6504533290863037,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6127": {
+          "value": "correct",
+          "probability": 0.9999754428863525,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 463,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2209.2,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "dead-battery",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1126",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9292": "correct",
+          "candidate_1126": "correct",
+          "candidate_2676": "correct",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1126",
+          "probability": 0.9902356863021851,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999984502792358,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9292": {
+          "value": "correct",
+          "probability": 0.9214739203453064,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1126": {
+          "value": "correct",
+          "probability": 0.9998252987861633,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2676": {
+          "value": "correct",
+          "probability": 0.9984797835350037,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6916": {
+          "value": "correct",
+          "probability": 0.9999768733978271,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 483,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2259.1,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "sealed-balloon",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9509",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9509": "correct",
+          "candidate_1636": "incorrect",
+          "candidate_2236": "correct",
+          "candidate_9381": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9509",
+          "probability": 0.9883817434310913,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9509": {
+          "value": "correct",
+          "probability": 0.9999988675117493,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1636": {
+          "value": "incorrect",
+          "probability": 0.6932594776153564,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2236": {
+          "value": "correct",
+          "probability": 0.9951170086860657,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9381": {
+          "value": "correct",
+          "probability": 0.9997435808181763,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 438,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2146.4,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "wet-towel",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1988",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2069": "correct",
+          "candidate_7793": "correct",
+          "candidate_1988": "correct",
+          "candidate_8513": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1988",
+          "probability": 0.7323158979415894,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2069": {
+          "value": "correct",
+          "probability": 0.9999900460243225,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7793": {
+          "value": "correct",
+          "probability": 0.9996337294578552,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1988": {
+          "value": "correct",
+          "probability": 0.9993228912353516,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8513": {
+          "value": "correct",
+          "probability": 0.9994581937789917,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 481,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2260.6,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "ice-salt",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9746",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9440": "correct",
+          "candidate_4540": "correct",
+          "candidate_9746": "correct",
+          "candidate_3493": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9746",
+          "probability": 0.9904350638389587,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999980926513672,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9440": {
+          "value": "correct",
+          "probability": 0.9975166916847229,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4540": {
+          "value": "correct",
+          "probability": 0.9992977380752563,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9746": {
+          "value": "correct",
+          "probability": 0.9999557733535767,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3493": {
+          "value": "correct",
+          "probability": 0.9995638132095337,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 457,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2210.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "blocked-laptop",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_4355",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "correct",
+          "candidate_4355": "correct",
+          "candidate_9547": "correct",
+          "candidate_9850": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4355",
+          "probability": 0.9993463158607483,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2769": {
+          "value": "correct",
+          "probability": 0.9999985098838806,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4355": {
+          "value": "correct",
+          "probability": 0.9999411106109619,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9547": {
+          "value": "correct",
+          "probability": 0.9887639284133911,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9850": {
+          "value": "correct",
+          "probability": 0.9995964765548706,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 491,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2267.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "smoke-alarm",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7337",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_3815": "correct",
+          "candidate_5203": "correct",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7337",
+          "probability": 0.996924102306366,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7337": {
+          "value": "correct",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3815": {
+          "value": "correct",
+          "probability": 0.9986518025398254,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5203": {
+          "value": "correct",
+          "probability": 0.9978305697441101,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5747": {
+          "value": "correct",
+          "probability": 0.9999462366104126,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 502,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2271.9,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "plant-window",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_6093",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6093": "correct",
+          "candidate_7023": "correct",
+          "candidate_7405": "correct",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_6093",
+          "probability": 0.9981576204299927,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6093": {
+          "value": "correct",
+          "probability": 0.9999997019767761,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7023": {
+          "value": "correct",
+          "probability": 0.9956760406494141,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7405": {
+          "value": "correct",
+          "probability": 0.9988548159599304,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2658": {
+          "value": "correct",
+          "probability": 0.9999645948410034,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 502,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2273.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "short-route-delay",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_2948",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2948": "correct",
+          "candidate_2046": "correct",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2948",
+          "probability": 0.9741671085357666,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7739": {
+          "value": "correct",
+          "probability": 0.9999988079071045,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2948": {
+          "value": "correct",
+          "probability": 0.9998804926872253,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2046": {
+          "value": "correct",
+          "probability": 0.9975627660751343,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2881": {
+          "value": "correct",
+          "probability": 0.9995015859603882,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 452,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2207.3,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "thermos-choice",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_4369": "correct",
+          "candidate_6108": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4987",
+          "probability": 0.9967382550239563,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4987": {
+          "value": "correct",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9147": {
+          "value": "correct",
+          "probability": 0.9991664886474609,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4369": {
+          "value": "correct",
+          "probability": 0.998746395111084,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6108": {
+          "value": "correct",
+          "probability": 0.9999850392341614,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 430,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2137.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "shadow-sun",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1288",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6127": "correct",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_5582": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1288",
+          "probability": 0.9988496899604797,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6127": {
+          "value": "correct",
+          "probability": 0.9999988079071045,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1288": {
+          "value": "correct",
+          "probability": 0.9997806549072266,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2139": {
+          "value": "correct",
+          "probability": 0.9920200109481812,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5582": {
+          "value": "correct",
+          "probability": 0.9999316930770874,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 463,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2212.4,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "dead-battery",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_2676",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "correct",
+          "candidate_9292": "correct",
+          "candidate_1126": "correct",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2676",
+          "probability": 0.737932562828064,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999999403953552,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2676": {
+          "value": "correct",
+          "probability": 0.9999986886978149,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9292": {
+          "value": "correct",
+          "probability": 0.5118082761764526,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1126": {
+          "value": "correct",
+          "probability": 0.9973905682563782,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6916": {
+          "value": "correct",
+          "probability": 0.9999817609786987,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 483,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2259.6,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "sealed-balloon",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_1636",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "correct",
+          "candidate_9509": "correct",
+          "candidate_9381": "correct",
+          "candidate_2236": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1636",
+          "probability": 0.9373791813850403,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1636": {
+          "value": "correct",
+          "probability": 0.9999862313270569,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9509": {
+          "value": "correct",
+          "probability": 0.9988187551498413,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9381": {
+          "value": "correct",
+          "probability": 0.99577397108078,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2236": {
+          "value": "correct",
+          "probability": 0.9985255599021912,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 438,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2147.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "wet-towel",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7793",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_7793": "correct",
+          "candidate_2069": "incorrect",
+          "candidate_1988": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7793",
+          "probability": 0.680113673210144,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8513": {
+          "value": "correct",
+          "probability": 0.9999948740005493,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7793": {
+          "value": "correct",
+          "probability": 0.9999431371688843,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2069": {
+          "value": "incorrect",
+          "probability": 0.5244554877281189,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1988": {
+          "value": "correct",
+          "probability": 0.9998031854629517,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 481,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2257.3,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "ice-salt",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_3493",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9746": "correct",
+          "candidate_3493": "correct",
+          "candidate_4540": "correct",
+          "candidate_9440": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_3493",
+          "probability": 0.9996621608734131,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999986290931702,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9746": {
+          "value": "correct",
+          "probability": 0.9999946355819702,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3493": {
+          "value": "correct",
+          "probability": 0.9999550580978394,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4540": {
+          "value": "correct",
+          "probability": 0.9994550943374634,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9440": {
+          "value": "incorrect",
+          "probability": 0.9642011523246765,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 457,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2212.5,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "blocked-laptop",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_4355",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4355": "correct",
+          "candidate_2769": "correct",
+          "candidate_9850": "correct",
+          "candidate_9547": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4355",
+          "probability": 0.9993571043014526,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4355": {
+          "value": "correct",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2769": {
+          "value": "correct",
+          "probability": 0.9940071105957031,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9850": {
+          "value": "correct",
+          "probability": 0.9993504881858826,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9547": {
+          "value": "correct",
+          "probability": 0.9986783862113953,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 491,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2263.6,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "smoke-alarm",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_5203",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_3815": "correct",
+          "candidate_5203": "correct",
+          "candidate_7337": "correct",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_5203",
+          "probability": 0.7361350059509277,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3815": {
+          "value": "correct",
+          "probability": 0.999999463558197,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5203": {
+          "value": "correct",
+          "probability": 0.9892088770866394,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7337": {
+          "value": "correct",
+          "probability": 0.9996497631072998,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5747": {
+          "value": "correct",
+          "probability": 0.9998744130134583,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 502,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2272.2,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "plant-window",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7405",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7405": "correct",
+          "candidate_7023": "correct",
+          "candidate_6093": "correct",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7405",
+          "probability": 0.9992720484733582,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7405": {
+          "value": "correct",
+          "probability": 0.999999463558197,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7023": {
+          "value": "correct",
+          "probability": 0.9993382692337036,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6093": {
+          "value": "correct",
+          "probability": 0.9994810819625854,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2658": {
+          "value": "correct",
+          "probability": 0.9999911785125732,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 502,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2276.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "short-route-delay",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7739",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2046": "correct",
+          "candidate_2948": "correct",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7739",
+          "probability": 0.9284629821777344,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7739": {
+          "value": "correct",
+          "probability": 0.999998927116394,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2046": {
+          "value": "correct",
+          "probability": 0.9979276061058044,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2948": {
+          "value": "correct",
+          "probability": 0.9978527426719666,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2881": {
+          "value": "correct",
+          "probability": 0.99905925989151,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 452,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2207.1,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "thermos-choice",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_6108": "correct",
+          "candidate_4369": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4987",
+          "probability": 0.9982843399047852,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4987": {
+          "value": "correct",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9147": {
+          "value": "correct",
+          "probability": 0.9992466568946838,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6108": {
+          "value": "correct",
+          "probability": 0.9994796514511108,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4369": {
+          "value": "correct",
+          "probability": 0.9998587965965271,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 430,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2143.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "shadow-sun",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_5582",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "correct",
+          "candidate_1288": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_5582",
+          "probability": 0.535480260848999,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5582": {
+          "value": "correct",
+          "probability": 0.9999987483024597,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2139": {
+          "value": "correct",
+          "probability": 0.9838032722473145,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6127": {
+          "value": "correct",
+          "probability": 0.9997888803482056,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1288": {
+          "value": "correct",
+          "probability": 0.9999467730522156,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 463,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2209.2,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "dead-battery",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_1126",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "correct",
+          "candidate_1126": "correct",
+          "candidate_6916": "correct",
+          "candidate_9292": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1126",
+          "confidence": 0.46,
+          "probabilities": {
+            "candidate_2676": 0.22,
+            "candidate_9292": 0.05,
+            "candidate_1126": 0.5599999999999999,
+            "candidate_6916": 0.08,
+            "abstain": 0.09
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "medium": 0.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_2676": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_1126": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_6916": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_9292": {
+          "choice": "correct",
+          "confidence": 0.72,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.79,
+            "incorrect": 0.0,
+            "partial": 0.21
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1625,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 700.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "sealed-balloon",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_9509",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "correct",
+          "candidate_2236": "correct",
+          "candidate_9381": "correct",
+          "candidate_9509": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9509",
+          "confidence": 0.44,
+          "probabilities": {
+            "candidate_9381": 0.12,
+            "candidate_1636": 0.12,
+            "abstain": 0.13,
+            "candidate_2236": 0.08,
+            "candidate_9509": 0.55
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_1636": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2236": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9381": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9509": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1587,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 645.6,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "wet-towel",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7793",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_1988": "correct",
+          "candidate_7793": "correct",
+          "candidate_2069": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7793",
+          "confidence": 0.3,
+          "probabilities": {
+            "candidate_7793": 0.44,
+            "abstain": 0.05,
+            "candidate_2069": 0.01,
+            "candidate_8513": 0.12,
+            "candidate_1988": 0.38
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_8513": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "correct": 0.98,
+            "partial": 0.02
+          }
+        },
+        "verdict_candidate_1988": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_7793": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2069": {
+          "choice": "correct",
+          "confidence": 0.86,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.01,
+            "correct": 0.89,
+            "partial": 0.1
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1645,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 669.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "ice-salt",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_3493",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4540": "correct",
+          "candidate_9746": "correct",
+          "candidate_9440": "correct",
+          "candidate_3493": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_3493",
+          "confidence": 0.45,
+          "probabilities": {
+            "candidate_3493": 0.56,
+            "candidate_4540": 0.04,
+            "candidate_9746": 0.39,
+            "abstain": 0.01,
+            "candidate_9440": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.96,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.02,
+            "high": 0.98
+          }
+        },
+        "verdict_candidate_4540": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9746": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9440": {
+          "choice": "correct",
+          "confidence": 0.29,
+          "probabilities": {
+            "partial": 0.45,
+            "unverifiable": 0.0,
+            "correct": 0.47,
+            "incorrect": 0.08
+          }
+        },
+        "verdict_candidate_3493": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1609,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 651.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "blocked-laptop",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_4355",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "correct",
+          "candidate_9850": "correct",
+          "candidate_4355": "correct",
+          "candidate_9547": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4355",
+          "confidence": 0.45,
+          "probabilities": {
+            "candidate_9850": 0.14,
+            "candidate_2769": 0.11,
+            "candidate_4355": 0.56,
+            "abstain": 0.16,
+            "candidate_9547": 0.03
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "high": 1.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_2769": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_9850": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_4355": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_9547": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.02,
+            "correct": 0.98
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1644,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 678.7,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "smoke-alarm",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_5747",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_5747": "correct",
+          "candidate_5203": "correct",
+          "candidate_3815": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_5747",
+          "confidence": 0.34,
+          "probabilities": {
+            "candidate_3815": 0.01,
+            "candidate_5747": 0.47,
+            "candidate_7337": 0.4,
+            "abstain": 0.08,
+            "candidate_5203": 0.04
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "medium": 0.0,
+            "low": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_7337": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_5747": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_5203": {
+          "choice": "correct",
+          "confidence": 0.88,
+          "probabilities": {
+            "partial": 0.09,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 0.91
+          }
+        },
+        "verdict_candidate_3815": {
+          "choice": "correct",
+          "confidence": 0.87,
+          "probabilities": {
+            "correct": 0.9,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.1
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1649,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 686.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "plant-window",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7023",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2658": "correct",
+          "candidate_6093": "correct",
+          "candidate_7023": "correct",
+          "candidate_7405": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7023",
+          "confidence": 0.32,
+          "probabilities": {
+            "candidate_6093": 0.03,
+            "abstain": 0.21,
+            "candidate_2658": 0.17,
+            "candidate_7405": 0.13,
+            "candidate_7023": 0.46
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "high": 1.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_2658": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_6093": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_7023": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_7405": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1656,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 774.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "short-route-delay",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_2948",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2046": "correct",
+          "candidate_2881": "correct",
+          "candidate_2948": "correct",
+          "candidate_7739": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_2948",
+          "confidence": 0.53,
+          "probabilities": {
+            "candidate_7739": 0.07,
+            "candidate_2948": 0.63,
+            "abstain": 0.1,
+            "candidate_2881": 0.04,
+            "candidate_2046": 0.16
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "medium": 0.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_2046": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2881": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.98,
+            "incorrect": 0.0,
+            "partial": 0.02
+          }
+        },
+        "verdict_candidate_2948": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_7739": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1600,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 673.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "thermos-choice",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4369": "correct",
+          "candidate_6108": "correct",
+          "candidate_9147": "correct",
+          "candidate_4987": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4987",
+          "confidence": 0.96,
+          "probabilities": {
+            "abstain": 0.0,
+            "candidate_4369": 0.02,
+            "candidate_4987": 0.97,
+            "candidate_9147": 0.01,
+            "candidate_6108": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "low": 0.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_4369": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_6108": {
+          "choice": "correct",
+          "confidence": 0.81,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.86,
+            "partial": 0.14,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_9147": {
+          "choice": "correct",
+          "confidence": 0.92,
+          "probabilities": {
+            "incorrect": 0.0,
+            "partial": 0.06,
+            "unverifiable": 0.0,
+            "correct": 0.94
+          }
+        },
+        "verdict_candidate_4987": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1593,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 714.6,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "shadow-sun",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_1288",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1288",
+          "confidence": 0.19,
+          "probabilities": {
+            "candidate_6127": 0.06,
+            "abstain": 0.11,
+            "candidate_1288": 0.33999999999999997,
+            "candidate_5582": 0.34,
+            "candidate_2139": 0.15
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "low": 0.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_5582": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_1288": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_2139": {
+          "choice": "correct",
+          "confidence": 0.98,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.99,
+            "partial": 0.01,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_6127": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.99,
+            "partial": 0.01,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1609,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 681.3,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "dead-battery",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1126",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9292": "correct",
+          "candidate_1126": "correct",
+          "candidate_2676": "correct",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1126",
+          "confidence": 0.8,
+          "probabilities": {
+            "candidate_9292": 0.06,
+            "candidate_2676": 0.02,
+            "candidate_1126": 0.84,
+            "candidate_6916": 0.06,
+            "abstain": 0.02
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.99,
+          "probabilities": {
+            "high": 1.0,
+            "medium": 0.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_9292": {
+          "choice": "correct",
+          "confidence": 0.62,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.72,
+            "incorrect": 0.0,
+            "partial": 0.28
+          }
+        },
+        "verdict_candidate_1126": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2676": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "correct": 0.99,
+            "partial": 0.01,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_6916": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1625,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 682.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "sealed-balloon",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9509",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9509": "correct",
+          "candidate_1636": "correct",
+          "candidate_2236": "correct",
+          "candidate_9381": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9509",
+          "confidence": 0.6,
+          "probabilities": {
+            "abstain": 0.09,
+            "candidate_9509": 0.6900000000000001,
+            "candidate_2236": 0.06,
+            "candidate_9381": 0.1,
+            "candidate_1636": 0.06
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "medium": 0.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_9509": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_1636": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "partial": 0.01,
+            "unverifiable": 0.0,
+            "correct": 0.99,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_2236": {
+          "choice": "correct",
+          "confidence": 0.89,
+          "probabilities": {
+            "partial": 0.08,
+            "unverifiable": 0.0,
+            "correct": 0.92,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9381": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1587,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 704.2,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "wet-towel",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1988",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2069": "correct",
+          "candidate_7793": "correct",
+          "candidate_1988": "correct",
+          "candidate_8513": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1988",
+          "confidence": 0.62,
+          "probabilities": {
+            "candidate_1988": 0.7,
+            "candidate_2069": 0.05,
+            "candidate_7793": 0.2,
+            "abstain": 0.04,
+            "candidate_8513": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "medium": 0.0,
+            "high": 1.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_2069": {
+          "choice": "correct",
+          "confidence": 0.94,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.95,
+            "partial": 0.05,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_7793": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_1988": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_8513": {
+          "choice": "correct",
+          "confidence": 0.84,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.88,
+            "unverifiable": 0.0,
+            "partial": 0.12
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1645,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 723.2,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "ice-salt",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_3493",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9440": "correct",
+          "candidate_4540": "correct",
+          "candidate_9746": "correct",
+          "candidate_3493": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_3493",
+          "confidence": 0.67,
+          "probabilities": {
+            "candidate_4540": 0.04,
+            "candidate_9746": 0.21,
+            "abstain": 0.01,
+            "candidate_9440": 0.01,
+            "candidate_3493": 0.73
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.98,
+          "probabilities": {
+            "medium": 0.01,
+            "low": 0.0,
+            "high": 0.99
+          }
+        },
+        "verdict_candidate_9440": {
+          "choice": "correct",
+          "confidence": 0.6,
+          "probabilities": {
+            "correct": 0.7,
+            "partial": 0.28,
+            "unverifiable": 0.0,
+            "incorrect": 0.02
+          }
+        },
+        "verdict_candidate_4540": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9746": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_3493": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1609,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 685.7,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "blocked-laptop",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_4355",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "correct",
+          "candidate_4355": "correct",
+          "candidate_9547": "correct",
+          "candidate_9850": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4355",
+          "confidence": 0.86,
+          "probabilities": {
+            "candidate_9850": 0.02,
+            "candidate_4355": 0.88,
+            "abstain": 0.06,
+            "candidate_2769": 0.03,
+            "candidate_9547": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_2769": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.99,
+            "unverifiable": 0.0,
+            "partial": 0.01
+          }
+        },
+        "verdict_candidate_4355": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9547": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.98,
+            "unverifiable": 0.0,
+            "partial": 0.02
+          }
+        },
+        "verdict_candidate_9850": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1644,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 678.8,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "smoke-alarm",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_5747",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_3815": "correct",
+          "candidate_5203": "correct",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_5747",
+          "confidence": 0.42,
+          "probabilities": {
+            "abstain": 0.05,
+            "candidate_5203": 0.03,
+            "candidate_5747": 0.54,
+            "candidate_3815": 0.01,
+            "candidate_7337": 0.37
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "medium": 0.0,
+            "low": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_7337": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_3815": {
+          "choice": "correct",
+          "confidence": 0.92,
+          "probabilities": {
+            "partial": 0.06,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 0.94
+          }
+        },
+        "verdict_candidate_5203": {
+          "choice": "correct",
+          "confidence": 0.92,
+          "probabilities": {
+            "partial": 0.06,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 0.94
+          }
+        },
+        "verdict_candidate_5747": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1649,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 684.0,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "plant-window",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7023",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6093": "correct",
+          "candidate_7023": "correct",
+          "candidate_7405": "correct",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7023",
+          "confidence": 0.15,
+          "probabilities": {
+            "candidate_6093": 0.29,
+            "abstain": 0.18,
+            "candidate_7023": 0.32,
+            "candidate_7405": 0.15,
+            "candidate_2658": 0.06
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_6093": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_7023": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_7405": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2658": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1656,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 685.7,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "short-route-delay",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_2948",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2948": "correct",
+          "candidate_2046": "correct",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_2948",
+          "confidence": 0.41,
+          "probabilities": {
+            "candidate_2881": 0.1,
+            "candidate_2948": 0.52,
+            "candidate_2046": 0.06,
+            "abstain": 0.16,
+            "candidate_7739": 0.16
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "low": 0.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_7739": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_2948": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_2046": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_2881": {
+          "choice": "correct",
+          "confidence": 0.96,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.03,
+            "incorrect": 0.0,
+            "correct": 0.97
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1600,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 655.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "thermos-choice",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_4369": "correct",
+          "candidate_6108": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4987",
+          "confidence": 0.78,
+          "probabilities": {
+            "candidate_9147": 0.07,
+            "candidate_6108": 0.01,
+            "candidate_4987": 0.82,
+            "candidate_4369": 0.09,
+            "abstain": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "medium": 0.0,
+            "high": 1.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_4987": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9147": {
+          "choice": "correct",
+          "confidence": 0.94,
+          "probabilities": {
+            "correct": 0.96,
+            "partial": 0.04,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_4369": {
+          "choice": "correct",
+          "confidence": 0.95,
+          "probabilities": {
+            "correct": 0.96,
+            "partial": 0.04,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_6108": {
+          "choice": "correct",
+          "confidence": 0.72,
+          "probabilities": {
+            "correct": 0.79,
+            "partial": 0.21,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1593,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 666.0,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "shadow-sun",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1288",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6127": "correct",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_5582": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1288",
+          "confidence": 0.32,
+          "probabilities": {
+            "candidate_6127": 0.18,
+            "candidate_2139": 0.2,
+            "candidate_5582": 0.06,
+            "candidate_1288": 0.45,
+            "abstain": 0.11
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "low": 0.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_6127": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_1288": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2139": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "partial": 0.02,
+            "correct": 0.97,
+            "unverifiable": 0.0,
+            "incorrect": 0.01
+          }
+        },
+        "verdict_candidate_5582": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1609,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 761.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "dead-battery",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_2676",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "correct",
+          "candidate_9292": "correct",
+          "candidate_1126": "correct",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_2676",
+          "confidence": 0.31,
+          "probabilities": {
+            "candidate_2676": 0.45,
+            "candidate_6916": 0.07,
+            "abstain": 0.11,
+            "candidate_9292": 0.03,
+            "candidate_1126": 0.34
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "medium": 0.0,
+            "low": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_2676": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9292": {
+          "choice": "correct",
+          "confidence": 0.78,
+          "probabilities": {
+            "partial": 0.17,
+            "correct": 0.83,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_1126": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_6916": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1625,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 744.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "sealed-balloon",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9509",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "correct",
+          "candidate_9509": "correct",
+          "candidate_9381": "correct",
+          "candidate_2236": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9509",
+          "confidence": 0.55,
+          "probabilities": {
+            "abstain": 0.1,
+            "candidate_9509": 0.64,
+            "candidate_2236": 0.05,
+            "candidate_1636": 0.1,
+            "candidate_9381": 0.11
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_1636": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9509": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9381": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2236": {
+          "choice": "correct",
+          "confidence": 0.9,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.92,
+            "incorrect": 0.0,
+            "partial": 0.08
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1587,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 694.8,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "wet-towel",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_1988",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_7793": "correct",
+          "candidate_2069": "correct",
+          "candidate_1988": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1988",
+          "confidence": 0.42,
+          "probabilities": {
+            "candidate_1988": 0.54,
+            "candidate_8513": 0.07,
+            "candidate_7793": 0.35,
+            "abstain": 0.03,
+            "candidate_2069": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "high": 1.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_8513": {
+          "choice": "correct",
+          "confidence": 0.95,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.03,
+            "correct": 0.97
+          }
+        },
+        "verdict_candidate_7793": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_2069": {
+          "choice": "correct",
+          "confidence": 0.86,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.01,
+            "partial": 0.1,
+            "correct": 0.89
+          }
+        },
+        "verdict_candidate_1988": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1645,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 663.0,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "ice-salt",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_3493",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9746": "correct",
+          "candidate_3493": "correct",
+          "candidate_4540": "correct",
+          "candidate_9440": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_3493",
+          "confidence": 0.68,
+          "probabilities": {
+            "candidate_3493": 0.75,
+            "candidate_9440": 0.0,
+            "candidate_9746": 0.21,
+            "candidate_4540": 0.03,
+            "abstain": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.96,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.02,
+            "high": 0.98
+          }
+        },
+        "verdict_candidate_9746": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_3493": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_4540": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "correct": 0.99,
+            "partial": 0.01,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9440": {
+          "choice": "correct",
+          "confidence": 0.24,
+          "probabilities": {
+            "correct": 0.43,
+            "partial": 0.42,
+            "unverifiable": 0.0,
+            "incorrect": 0.15
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1609,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 687.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "blocked-laptop",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_4355",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4355": "correct",
+          "candidate_2769": "correct",
+          "candidate_9850": "correct",
+          "candidate_9547": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4355",
+          "confidence": 0.78,
+          "probabilities": {
+            "abstain": 0.12,
+            "candidate_4355": 0.82,
+            "candidate_9850": 0.04,
+            "candidate_9547": 0.01,
+            "candidate_2769": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "medium": 0.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_4355": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2769": {
+          "choice": "correct",
+          "confidence": 0.85,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.89,
+            "incorrect": 0.0,
+            "partial": 0.11
+          }
+        },
+        "verdict_candidate_9850": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9547": {
+          "choice": "correct",
+          "confidence": 0.94,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.96,
+            "incorrect": 0.0,
+            "partial": 0.04
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1644,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 662.5,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "smoke-alarm",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_5747",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_3815": "correct",
+          "candidate_5203": "correct",
+          "candidate_7337": "correct",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_5747",
+          "confidence": 0.53,
+          "probabilities": {
+            "candidate_5203": 0.08,
+            "abstain": 0.13,
+            "candidate_7337": 0.11,
+            "candidate_5747": 0.62,
+            "candidate_3815": 0.06
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_3815": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_5203": {
+          "choice": "correct",
+          "confidence": 0.96,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.97,
+            "partial": 0.03,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_7337": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_5747": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1649,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 685.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "plant-window",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7405",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7405": "correct",
+          "candidate_7023": "correct",
+          "candidate_6093": "correct",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7405",
+          "confidence": 0.27,
+          "probabilities": {
+            "abstain": 0.19,
+            "candidate_7405": 0.41,
+            "candidate_7023": 0.33,
+            "candidate_6093": 0.03,
+            "candidate_2658": 0.04
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "low": 0.0,
+            "medium": 0.0,
+            "high": 1.0
+          }
+        },
+        "verdict_candidate_7405": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_7023": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_6093": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_2658": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1656,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 674.6,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "short-route-delay",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_2948",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2046": "correct",
+          "candidate_2948": "correct",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_2948",
+          "confidence": 0.17,
+          "probabilities": {
+            "candidate_2046": 0.15,
+            "candidate_2948": 0.34,
+            "abstain": 0.15,
+            "candidate_7739": 0.25,
+            "candidate_2881": 0.11
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "medium": 0.0,
+            "high": 1.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_7739": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_2046": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_2948": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_2881": {
+          "choice": "correct",
+          "confidence": 0.95,
+          "probabilities": {
+            "correct": 0.96,
+            "unverifiable": 0.0,
+            "partial": 0.04,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1600,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 698.3,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "thermos-choice",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_6108": "correct",
+          "candidate_4369": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4987",
+          "confidence": 0.82,
+          "probabilities": {
+            "candidate_4369": 0.08,
+            "candidate_6108": 0.01,
+            "candidate_9147": 0.05,
+            "candidate_4987": 0.85,
+            "abstain": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "low": 0.0,
+            "medium": 0.0
+          }
+        },
+        "verdict_candidate_4987": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_9147": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.02,
+            "correct": 0.98
+          }
+        },
+        "verdict_candidate_6108": {
+          "choice": "correct",
+          "confidence": 0.71,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.22,
+            "correct": 0.78
+          }
+        },
+        "verdict_candidate_4369": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.02,
+            "correct": 0.98
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1593,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 686.8,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "shadow-sun",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_1288",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "correct",
+          "candidate_1288": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1288",
+          "confidence": 0.32,
+          "probabilities": {
+            "candidate_2139": 0.26,
+            "candidate_5582": 0.16,
+            "candidate_1288": 0.46,
+            "abstain": 0.09,
+            "candidate_6127": 0.03
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 1.0,
+          "probabilities": {
+            "high": 1.0,
+            "medium": 0.0,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_5582": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2139": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_6127": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_1288": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1609,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 660.7,
+      "error": null
+    }
+  ],
+  "summaries": {
+    "local-jev": {
+      "provider": "local-jev",
+      "cases": 10,
+      "rounds": 3,
+      "winner_correct": 9,
+      "winner_known": 9,
+      "winner_accuracy": 1.0,
+      "abstentions": 1,
+      "errors": 0,
+      "order_stable_cases": 2,
+      "verdict_matches": 38,
+      "verdict_total": 40,
+      "verdict_accuracy": 0.95,
+      "mean_ms": 2226.5,
+      "median_ms": 2234.4,
+      "p95_ms": 2275.8,
+      "quality_shape": {
+        "all_candidates_correct": 9,
+        "mixed_candidate_quality": 1,
+        "no_candidate_correct": 0
+      },
+      "case_results": [
+        {
+          "case_id": "dead-battery",
+          "winner": "candidate_1126",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_1126",
+            "candidate_1126",
+            "candidate_2676"
+          ],
+          "verdicts": {
+            "candidate_6916": "correct",
+            "candidate_2676": "correct",
+            "candidate_9292": "correct",
+            "candidate_1126": "correct"
+          }
+        },
+        {
+          "case_id": "sealed-balloon",
+          "winner": "candidate_1636",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_1636",
+            "candidate_9509",
+            "candidate_1636"
+          ],
+          "verdicts": {
+            "candidate_9381": "correct",
+            "candidate_2236": "correct",
+            "candidate_9509": "correct",
+            "candidate_1636": "correct"
+          }
+        },
+        {
+          "case_id": "wet-towel",
+          "winner": "candidate_1988",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_1988",
+            "candidate_1988",
+            "candidate_7793"
+          ],
+          "verdicts": {
+            "candidate_2069": "correct",
+            "candidate_8513": "correct",
+            "candidate_7793": "correct",
+            "candidate_1988": "correct"
+          }
+        },
+        {
+          "case_id": "ice-salt",
+          "winner": "candidate_9746",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_9746",
+            "candidate_9746",
+            "candidate_3493"
+          ],
+          "verdicts": {
+            "candidate_9440": "incorrect",
+            "candidate_4540": "correct",
+            "candidate_3493": "correct",
+            "candidate_9746": "correct"
+          }
+        },
+        {
+          "case_id": "blocked-laptop",
+          "winner": "candidate_4355",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_4355",
+            "candidate_4355",
+            "candidate_4355"
+          ],
+          "verdicts": {
+            "candidate_9547": "correct",
+            "candidate_2769": "correct",
+            "candidate_9850": "correct",
+            "candidate_4355": "correct"
+          }
+        },
+        {
+          "case_id": "smoke-alarm",
+          "winner": "candidate_7337",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_7337",
+            "candidate_7337",
+            "candidate_5203"
+          ],
+          "verdicts": {
+            "candidate_7337": "correct",
+            "candidate_3815": "correct",
+            "candidate_5747": "correct",
+            "candidate_5203": "correct"
+          }
+        },
+        {
+          "case_id": "plant-window",
+          "winner": "abstain",
+          "winner_model": null,
+          "winner_correct": null,
+          "round_winners": [
+            "candidate_2658",
+            "candidate_6093",
+            "candidate_7405"
+          ],
+          "verdicts": {
+            "candidate_6093": "correct",
+            "candidate_2658": "correct",
+            "candidate_7405": "correct",
+            "candidate_7023": "correct"
+          }
+        },
+        {
+          "case_id": "short-route-delay",
+          "winner": "candidate_2948",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_2948",
+            "candidate_2948",
+            "candidate_7739"
+          ],
+          "verdicts": {
+            "candidate_2046": "correct",
+            "candidate_2881": "correct",
+            "candidate_2948": "correct",
+            "candidate_7739": "correct"
+          }
+        },
+        {
+          "case_id": "thermos-choice",
+          "winner": "candidate_4987",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_4987",
+            "candidate_4987",
+            "candidate_4987"
+          ],
+          "verdicts": {
+            "candidate_6108": "correct",
+            "candidate_9147": "correct",
+            "candidate_4369": "correct",
+            "candidate_4987": "correct"
+          }
+        },
+        {
+          "case_id": "shadow-sun",
+          "winner": "candidate_1288",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_1288",
+            "candidate_1288",
+            "candidate_5582"
+          ],
+          "verdicts": {
+            "candidate_2139": "correct",
+            "candidate_6127": "correct",
+            "candidate_5582": "correct",
+            "candidate_1288": "correct"
+          }
+        }
+      ]
+    },
+    "typesafe:typesafe-env-dev": {
+      "provider": "typesafe:typesafe-env-dev",
+      "cases": 10,
+      "rounds": 3,
+      "winner_correct": 10,
+      "winner_known": 10,
+      "winner_accuracy": 1.0,
+      "abstentions": 0,
+      "errors": 0,
+      "order_stable_cases": 7,
+      "verdict_matches": 39,
+      "verdict_total": 40,
+      "verdict_accuracy": 0.975,
+      "mean_ms": 688.7,
+      "median_ms": 684.7,
+      "p95_ms": 744.1,
+      "quality_shape": {
+        "all_candidates_correct": 9,
+        "mixed_candidate_quality": 1,
+        "no_candidate_correct": 0
+      },
+      "case_results": [
+        {
+          "case_id": "dead-battery",
+          "winner": "candidate_1126",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_1126",
+            "candidate_1126",
+            "candidate_2676"
+          ],
+          "verdicts": {
+            "candidate_6916": "correct",
+            "candidate_2676": "correct",
+            "candidate_9292": "correct",
+            "candidate_1126": "correct"
+          }
+        },
+        {
+          "case_id": "sealed-balloon",
+          "winner": "candidate_9509",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_9509",
+            "candidate_9509",
+            "candidate_9509"
+          ],
+          "verdicts": {
+            "candidate_9381": "correct",
+            "candidate_2236": "correct",
+            "candidate_9509": "correct",
+            "candidate_1636": "correct"
+          }
+        },
+        {
+          "case_id": "wet-towel",
+          "winner": "candidate_1988",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_7793",
+            "candidate_1988",
+            "candidate_1988"
+          ],
+          "verdicts": {
+            "candidate_2069": "correct",
+            "candidate_8513": "correct",
+            "candidate_7793": "correct",
+            "candidate_1988": "correct"
+          }
+        },
+        {
+          "case_id": "ice-salt",
+          "winner": "candidate_3493",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_3493",
+            "candidate_3493",
+            "candidate_3493"
+          ],
+          "verdicts": {
+            "candidate_9440": "correct",
+            "candidate_4540": "correct",
+            "candidate_3493": "correct",
+            "candidate_9746": "correct"
+          }
+        },
+        {
+          "case_id": "blocked-laptop",
+          "winner": "candidate_4355",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_4355",
+            "candidate_4355",
+            "candidate_4355"
+          ],
+          "verdicts": {
+            "candidate_9547": "correct",
+            "candidate_2769": "correct",
+            "candidate_9850": "correct",
+            "candidate_4355": "correct"
+          }
+        },
+        {
+          "case_id": "smoke-alarm",
+          "winner": "candidate_5747",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_5747",
+            "candidate_5747",
+            "candidate_5747"
+          ],
+          "verdicts": {
+            "candidate_7337": "correct",
+            "candidate_3815": "correct",
+            "candidate_5747": "correct",
+            "candidate_5203": "correct"
+          }
+        },
+        {
+          "case_id": "plant-window",
+          "winner": "candidate_7023",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_7023",
+            "candidate_7023",
+            "candidate_7405"
+          ],
+          "verdicts": {
+            "candidate_6093": "correct",
+            "candidate_2658": "correct",
+            "candidate_7405": "correct",
+            "candidate_7023": "correct"
+          }
+        },
+        {
+          "case_id": "short-route-delay",
+          "winner": "candidate_2948",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_2948",
+            "candidate_2948",
+            "candidate_2948"
+          ],
+          "verdicts": {
+            "candidate_2046": "correct",
+            "candidate_2881": "correct",
+            "candidate_2948": "correct",
+            "candidate_7739": "correct"
+          }
+        },
+        {
+          "case_id": "thermos-choice",
+          "winner": "candidate_4987",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_4987",
+            "candidate_4987",
+            "candidate_4987"
+          ],
+          "verdicts": {
+            "candidate_6108": "correct",
+            "candidate_9147": "correct",
+            "candidate_4369": "correct",
+            "candidate_4987": "correct"
+          }
+        },
+        {
+          "case_id": "shadow-sun",
+          "winner": "candidate_1288",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_1288",
+            "candidate_1288",
+            "candidate_1288"
+          ],
+          "verdicts": {
+            "candidate_2139": "correct",
+            "candidate_6127": "correct",
+            "candidate_5582": "correct",
+            "candidate_1288": "correct"
+          }
+        }
+      ]
+    }
+  },
+  "comparisons": [
+    {
+      "left": "local-jev",
+      "right": "typesafe:typesafe-env-dev",
+      "winner_matches": 6,
+      "cases": 10,
+      "agreement": 0.6
+    }
+  ]
+}

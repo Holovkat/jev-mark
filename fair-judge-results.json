@@ -1,0 +1,1015 @@
+{
+  "models": [
+    "gemma4:12b",
+    "granite4.2:latest",
+    "ornith-1.5:9b",
+    "SparkLLM/Spark-X2.5-4B:latest"
+  ],
+  "cases": [
+    {
+      "id": "car-wash",
+      "question": "If I wanted to wash my car at a local facility; should I walk there or drive to achieve the outcome",
+      "reference_answer": "drive",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_6916",
+          "response": "Washing a car at a local facility is a task that typically requires a vehicle to transport the car to the location. Therefore, the most practical and logical choice is to drive.\n\nFINAL: drive"
+        },
+        {
+          "id": "candidate_1126",
+          "response": "If you want to wash your car at a local facility, walking depends on how far the facility is and your convenience; driving may be more practical if it's farther away or if you need to bring supplies. The decision depends on distance and personal preference.  \nFINAL: walk or drive? (Note: The choices are only \"walk\" or \"drive\"; you must pick one.) Since the question asks \"should I walk there or drive to achieve the outcome,\" the safest practical answer for most people considering convenience and typical distances is to drive if the facility is not very close, but the instruction says pick one of the listed choices. However, the question is \"should I walk there or drive\", implying a recommendation. Naturally, if the facility is local and nearby, walking might be possible, but without knowing distance, the neutral practical choice often is to drive if you need to go there for car washing (since you might not want to walk with wet clothes etc.). But \"naturally\" answer: if it's a local facility, you might walk if it's close; but since no distance is given, the safest generic advice is to drive if you need to go there for car washing (as you might not want to walk with car cleaning supplies). However, the instruction says \"end with exactly one line in the form FINAL: <choice>\" with choice one of \"walk\" or \"drive\". I must pick one. Given typical usage, if you want to wash your car at a local facility, you'd usually drive there because car washing often involves water, tools, etc., and walking might be less convenient. But \"local\" could mean very close. However, naturally, people often drive to car wash facilities. So pick \"drive\".  \nFINAL: drive"
+        },
+        {
+          "id": "candidate_9292",
+          "response": "Washing a car requires transporting the vehicle to the facility, which is far more efficient by driving since the car needs to be physically present at the location. Walking would be impractical as you'd need to carry or push the car.\n\nFINAL: drive"
+        },
+        {
+          "id": "candidate_2676",
+          "response": "Since the goal is to get your car to a car wash facility, you need to transport the vehicle to the location. Driving is the only practical way to move a car to a facility.\n\nFINAL: drive"
+        }
+      ]
+    },
+    {
+      "id": "penguin-wings",
+      "question": "All birds have wings. A penguin is a bird. Does a penguin have wings?",
+      "reference_answer": "yes",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_9440",
+          "response": "Since all birds have wings and a penguin is a bird, it logically follows that a penguin must have wings. Penguins do have wings, though they use them for swimming rather than flying.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_4540",
+          "response": "Since all birds have wings and a penguin is a bird, it follows logically that a penguin must have wings. Therefore, the answer is yes.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_1988",
+          "response": "We know that all birds possess wings, and since a penguin is classified as a bird, it follows logically that a penguin must have wings.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_7793",
+          "response": "All birds have wings, and penguins are birds. However, penguins use their wings for swimming rather than flying, but they still have wings as part of their anatomy.  \nFINAL: yes"
+        }
+      ]
+    },
+    {
+      "id": "transport-distance",
+      "question": "A shop is 10 kilometres away and you have a working bicycle. To reach it efficiently, should you walk or cycle?",
+      "reference_answer": "cycle",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_5203",
+          "response": "A bicycle is faster and more efficient for covering distance compared to walking, especially over 10 kilometres. With a working bicycle available, cycling would allow you to reach the shop more quickly and with less effort.  \nFINAL: cycle"
+        },
+        {
+          "id": "candidate_6093",
+          "response": "Cycling is the more efficient choice for a 10-kilometre distance, as it covers ground much faster than walking and requires less physical effort over that range. Walking 10 km would take roughly two hours, while cycling would take only about 20-30 minutes.\n\nFINAL: cycle"
+        },
+        {
+          "id": "candidate_2658",
+          "response": "A 10-kilometre distance is quite long for walking, which would be slow and tiring. Since you have a working bicycle, cycling is the much more efficient and faster option to cover that distance.\n\nFINAL: cycle"
+        },
+        {
+          "id": "candidate_5747",
+          "response": "Cycling is significantly faster and more efficient than walking for a distance of 10 kilometres. Since you have a working bicycle available, it is the practical choice for reaching the shop.\n\nFINAL: cycle"
+        }
+      ]
+    },
+    {
+      "id": "ice-warm-room",
+      "question": "An ice cube is left in a warm room. Will it melt or freeze?",
+      "reference_answer": "melt",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_4369",
+          "response": "An ice cube left in a warm room will absorb heat from the surroundings, causing it to change from solid to liquid. It will not freeze because freezing requires removing heat or lowering the temperature.  \nFINAL: melt"
+        },
+        {
+          "id": "candidate_9147",
+          "response": "Since the room is warm, the temperature is above the freezing point of water. This causes the ice cube to undergo a phase change from solid to liquid.\n\nFINAL: melt"
+        },
+        {
+          "id": "candidate_6108",
+          "response": "An ice cube is already frozen, so it cannot freeze again. Since it is placed in a warm room, the heat will cause it to turn into liquid water.\n\nFINAL: melt"
+        },
+        {
+          "id": "candidate_7739",
+          "response": "An ice cube left in a warm room absorbs heat from its surroundings, causing its temperature to rise above 0\u00b0C (32\u00b0F). This added thermal energy breaks the bonds holding the water molecules in their solid crystalline structure, transforming the ice into liquid water.\n\nFINAL: melt"
+        }
+      ]
+    },
+    {
+      "id": "dead-phone",
+      "question": "A phone battery is dead and the goal is to charge it. Should you plug it in or unplug it?",
+      "reference_answer": "plug it in",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_3557",
+          "response": "To charge a dead phone battery, you need to connect it to a power source, which means you must plug it in. Unplugging it would prevent the battery from receiving power and would not help it charge.\n\nFINAL: plug it in"
+        },
+        {
+          "id": "candidate_3980",
+          "response": "To charge a dead phone battery, you need to connect it to a power source, which means plugging it in. Unplugging it would prevent charging entirely.\n\nFINAL: plug it in"
+        },
+        {
+          "id": "candidate_1343",
+          "response": "To charge a dead battery, the device must be connected to a power source. Therefore, you should plug it in.\n\nFINAL: plug it in"
+        },
+        {
+          "id": "candidate_9744",
+          "response": "To charge a dead phone battery, you need to connect it to a power source, so you should plug it in. Unplugging it would prevent charging.  \nFINAL: plug it in"
+        }
+      ]
+    },
+    {
+      "id": "square-rectangle",
+      "question": "Every square is a rectangle. This object is a square. Is it a rectangle?",
+      "reference_answer": "yes",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_1376",
+          "response": "Since every square is a rectangle by definition, and this object is a square, it must also be a rectangle.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_5321",
+          "response": "Yes, every square is a rectangle by definition, as a square meets all the criteria of a rectangle (four right angles and opposite sides equal). Since the object is a square, it must also be a rectangle.  \nFINAL: yes"
+        },
+        {
+          "id": "candidate_2602",
+          "response": "A square is a specific type of rectangle, so if the object is a square, it must also be a rectangle.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_4344",
+          "response": "By definition, a square is a special type of rectangle that has four equal sides. Since the object is a square, it must logically be a rectangle.\n\nFINAL: yes"
+        }
+      ]
+    },
+    {
+      "id": "rain-arrival",
+      "question": "You need to arrive dry during rain. Should you take an umbrella or leave it behind?",
+      "reference_answer": "take an umbrella",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_2958",
+          "response": "If it is raining or likely to rain, taking an umbrella helps keep you dry. Leaving it behind would increase the risk of getting wet.  \nFINAL: take an umbrella"
+        },
+        {
+          "id": "candidate_6565",
+          "response": "If you need to arrive dry during rain, the most logical choice is to take an umbrella, as it provides protection from the wet weather. Leaving it behind would leave you exposed to rain, which contradicts the goal of staying dry.\n\nFINAL: take an umbrella"
+        },
+        {
+          "id": "candidate_5243",
+          "response": "To arrive dry during rain, taking an umbrella is the logical choice since it protects you from getting wet, whereas leaving it behind would expose you to the rain.\n\nFINAL: take an umbrella"
+        },
+        {
+          "id": "candidate_9620",
+          "response": "To stay dry during rain, you need protection from the falling water. An umbrella provides this barrier, whereas leaving it behind would result in getting wet.\n\nFINAL: take an umbrella"
+        }
+      ]
+    },
+    {
+      "id": "boiling-water",
+      "question": "A recipe requires boiling water, but the water is cold. Should you heat it or chill it?",
+      "reference_answer": "heat it",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_2530",
+          "response": "Since the recipe requires boiling water and the water is currently cold, you need to raise its temperature to reach the boiling point. Chilling it would only make it colder and further from the required state.\n\nFINAL: heat it"
+        },
+        {
+          "id": "candidate_9375",
+          "response": "Since the recipe requires boiling water and the current water is cold, the temperature needs to be increased. Therefore, the water must be heated.\n\nFINAL: heat it"
+        },
+        {
+          "id": "candidate_4452",
+          "response": "To follow a recipe that calls for boiling water, you need to raise its temperature to the boiling point. Since the water is cold and needs to be hot, the correct action is to heat it.\n\nFINAL: heat it"
+        },
+        {
+          "id": "candidate_6960",
+          "response": "The recipe requires boiling water, which means the water needs to be raised in temperature to reach the boiling point. Since the water is currently cold, you need to increase its temperature, not decrease it. Therefore, you should heat it.\n\nFINAL: heat it"
+        }
+      ]
+    },
+    {
+      "id": "equal-mass",
+      "question": "Which is heavier: one kilogram of feathers or one kilogram of steel?",
+      "reference_answer": "they weigh the same",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_9388",
+          "response": "Both one kilogram of feathers and one kilogram of steel have the same mass\u2014one kilogram\u2014so they weigh the same under the same gravitational conditions.  \nFINAL: they weigh the same"
+        },
+        {
+          "id": "candidate_2719",
+          "response": "When comparing the weight of two objects, the actual material they are made of does not change their total mass. Since both items are specified as one kilogram, they possess the exact same amount of mass.\n\nFINAL: they weigh the same"
+        },
+        {
+          "id": "candidate_1606",
+          "response": "Both a kilogram of feathers and a kilogram of steel have the same mass by definition\u2014one kilogram each. The difference is only in volume and density, not weight, so they weigh exactly the same.\n\nFINAL: they weigh the same"
+        },
+        {
+          "id": "candidate_8737",
+          "response": "Both substances have a mass of exactly one kilogram. Since weight is determined by mass and gravity, they weigh the same.\n\nFINAL: they weigh the same"
+        }
+      ]
+    },
+    {
+      "id": "red-light",
+      "question": "A traffic light is red. Should a driver stop or accelerate?",
+      "reference_answer": "stop",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_6370",
+          "response": "A red traffic light indicates that drivers must come to a complete stop unless it is safe to proceed after stopping. Accelerating through a red light would be unsafe and illegal.  \nFINAL: stop"
+        },
+        {
+          "id": "candidate_5390",
+          "response": "When a traffic light is red, the correct and safe action for a driver is to come to a complete halt. Accelerating would be dangerous and illegal.\n\nFINAL: stop"
+        },
+        {
+          "id": "candidate_6498",
+          "response": "A red traffic light signals that vehicles must halt to ensure safety and obey traffic rules, so a driver should stop rather than accelerate.\n\nFINAL: stop"
+        },
+        {
+          "id": "candidate_6696",
+          "response": "A red traffic light indicates that a vehicle must come to a halt to allow other traffic or pedestrians to proceed. Therefore, the driver should stop.\n\nFINAL: stop"
+        }
+      ]
+    },
+    {
+      "id": "refrigeration",
+      "question": "Fresh food needs to stay cold for several hours. Should you put it in a refrigerator or leave it in direct sunlight?",
+      "reference_answer": "refrigerator",
+      "rubric": "Check the facts and whether the final choice achieves the stated outcome. Judge the reasoning, not writing style.",
+      "candidates": [
+        {
+          "id": "candidate_5341",
+          "response": "To keep food fresh and safe, it must be kept at a low temperature to prevent bacterial growth. Direct sunlight would heat the food up, while a refrigerator provides the necessary cooling.\n\nFINAL: refrigerator"
+        },
+        {
+          "id": "candidate_3436",
+          "response": "Fresh food should remain cold to prevent bacterial growth; leaving it in direct sunlight causes rapid temperature rise and spoilage. Refrigeration maintains a safe low temperature for several hours.  \nFINAL: refrigerator"
+        },
+        {
+          "id": "candidate_8288",
+          "response": "Fresh food needs to stay cold to prevent spoilage and bacterial growth. A refrigerator maintains a consistently low temperature, while direct sunlight would warm the food and accelerate decay. Therefore, the refrigerator is the correct choice.\n\nFINAL: refrigerator"
+        },
+        {
+          "id": "candidate_1914",
+          "response": "To keep fresh food cold for several hours, you must use a refrigerator, as direct sunlight would quickly warm the food and spoil it.\n\nFINAL: refrigerator"
+        }
+      ]
+    }
+  ],
+  "labels": {
+    "car-wash": {
+      "gemma4:12b": "candidate_2676",
+      "granite4.2:latest": "candidate_1126",
+      "ornith-1.5:9b": "candidate_9292",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_6916"
+    },
+    "penguin-wings": {
+      "gemma4:12b": "candidate_4540",
+      "granite4.2:latest": "candidate_7793",
+      "ornith-1.5:9b": "candidate_9440",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_1988"
+    },
+    "transport-distance": {
+      "gemma4:12b": "candidate_5747",
+      "granite4.2:latest": "candidate_5203",
+      "ornith-1.5:9b": "candidate_6093",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_2658"
+    },
+    "ice-warm-room": {
+      "gemma4:12b": "candidate_9147",
+      "granite4.2:latest": "candidate_4369",
+      "ornith-1.5:9b": "candidate_7739",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_6108"
+    },
+    "dead-phone": {
+      "gemma4:12b": "candidate_1343",
+      "granite4.2:latest": "candidate_9744",
+      "ornith-1.5:9b": "candidate_3980",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_3557"
+    },
+    "square-rectangle": {
+      "gemma4:12b": "candidate_4344",
+      "granite4.2:latest": "candidate_5321",
+      "ornith-1.5:9b": "candidate_1376",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_2602"
+    },
+    "rain-arrival": {
+      "gemma4:12b": "candidate_9620",
+      "granite4.2:latest": "candidate_2958",
+      "ornith-1.5:9b": "candidate_5243",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_6565"
+    },
+    "boiling-water": {
+      "gemma4:12b": "candidate_9375",
+      "granite4.2:latest": "candidate_6960",
+      "ornith-1.5:9b": "candidate_2530",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_4452"
+    },
+    "equal-mass": {
+      "gemma4:12b": "candidate_8737",
+      "granite4.2:latest": "candidate_9388",
+      "ornith-1.5:9b": "candidate_1606",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_2719"
+    },
+    "red-light": {
+      "gemma4:12b": "candidate_6696",
+      "granite4.2:latest": "candidate_6370",
+      "ornith-1.5:9b": "candidate_6498",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_5390"
+    },
+    "refrigeration": {
+      "gemma4:12b": "candidate_5341",
+      "granite4.2:latest": "candidate_3436",
+      "ornith-1.5:9b": "candidate_8288",
+      "SparkLLM/Spark-X2.5-4B:latest": "candidate_1914"
+    }
+  },
+  "judgements": [
+    {
+      "decision": {
+        "winner": "candidate_2676",
+        "confidence": "high",
+        "verdict_candidate_6916": "correct",
+        "verdict_candidate_1126": "correct",
+        "verdict_candidate_9292": "correct",
+        "verdict_candidate_2676": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2676",
+          "probability": 0.661719560623169,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999996423721313,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6916": {
+          "value": "correct",
+          "probability": 0.9999815225601196,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1126": {
+          "value": "correct",
+          "probability": 0.995715856552124,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9292": {
+          "value": "correct",
+          "probability": 0.9803136587142944,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2676": {
+          "value": "correct",
+          "probability": 0.9998483657836914,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 677,
+        "scored_rows": 69
+      },
+      "case_id": "car-wash",
+      "elapsed_ms": 3160.0,
+      "candidate_ids": [
+        "candidate_6916",
+        "candidate_1126",
+        "candidate_9292",
+        "candidate_2676"
+      ],
+      "reference_answer": "drive"
+    },
+    {
+      "decision": {
+        "winner": "candidate_4540",
+        "confidence": "high",
+        "verdict_candidate_9440": "correct",
+        "verdict_candidate_4540": "correct",
+        "verdict_candidate_1988": "correct",
+        "verdict_candidate_7793": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4540",
+          "probability": 0.8763781189918518,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9440": {
+          "value": "correct",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4540": {
+          "value": "correct",
+          "probability": 0.9999749660491943,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1988": {
+          "value": "correct",
+          "probability": 0.9999605417251587,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7793": {
+          "value": "correct",
+          "probability": 0.9999474883079529,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 321,
+        "scored_rows": 69
+      },
+      "case_id": "penguin-wings",
+      "elapsed_ms": 1952.5,
+      "candidate_ids": [
+        "candidate_9440",
+        "candidate_4540",
+        "candidate_1988",
+        "candidate_7793"
+      ],
+      "reference_answer": "yes"
+    },
+    {
+      "decision": {
+        "winner": "candidate_6093",
+        "confidence": "high",
+        "verdict_candidate_5203": "correct",
+        "verdict_candidate_6093": "correct",
+        "verdict_candidate_2658": "correct",
+        "verdict_candidate_5747": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_6093",
+          "probability": 0.9999018311500549,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5203": {
+          "value": "correct",
+          "probability": 0.9999993443489075,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6093": {
+          "value": "correct",
+          "probability": 0.999984085559845,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2658": {
+          "value": "correct",
+          "probability": 0.9998854994773865,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5747": {
+          "value": "correct",
+          "probability": 0.9999905824661255,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 381,
+        "scored_rows": 77
+      },
+      "case_id": "transport-distance",
+      "elapsed_ms": 2059.8,
+      "candidate_ids": [
+        "candidate_5203",
+        "candidate_6093",
+        "candidate_2658",
+        "candidate_5747"
+      ],
+      "reference_answer": "cycle"
+    },
+    {
+      "decision": {
+        "winner": "candidate_4369",
+        "confidence": "high",
+        "verdict_candidate_4369": "correct",
+        "verdict_candidate_9147": "correct",
+        "verdict_candidate_6108": "correct",
+        "verdict_candidate_7739": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4369",
+          "probability": 0.989936888217926,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4369": {
+          "value": "correct",
+          "probability": 0.9999979138374329,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9147": {
+          "value": "correct",
+          "probability": 0.9975728988647461,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6108": {
+          "value": "correct",
+          "probability": 0.5006924271583557,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7739": {
+          "value": "correct",
+          "probability": 0.9998355507850647,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 349,
+        "scored_rows": 69
+      },
+      "case_id": "ice-warm-room",
+      "elapsed_ms": 1951.8,
+      "candidate_ids": [
+        "candidate_4369",
+        "candidate_9147",
+        "candidate_6108",
+        "candidate_7739"
+      ],
+      "reference_answer": "melt"
+    },
+    {
+      "decision": {
+        "winner": "candidate_3557",
+        "confidence": "high",
+        "verdict_candidate_3557": "correct",
+        "verdict_candidate_3980": "correct",
+        "verdict_candidate_1343": "correct",
+        "verdict_candidate_9744": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_3557",
+          "probability": 0.9984244704246521,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3557": {
+          "value": "correct",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3980": {
+          "value": "correct",
+          "probability": 0.9999129176139832,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1343": {
+          "value": "correct",
+          "probability": 0.9999146461486816,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9744": {
+          "value": "correct",
+          "probability": 0.9999940395355225,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 340,
+        "scored_rows": 77
+      },
+      "case_id": "dead-phone",
+      "elapsed_ms": 1985.0,
+      "candidate_ids": [
+        "candidate_3557",
+        "candidate_3980",
+        "candidate_1343",
+        "candidate_9744"
+      ],
+      "reference_answer": "plug it in"
+    },
+    {
+      "decision": {
+        "winner": "candidate_5321",
+        "confidence": "high",
+        "verdict_candidate_1376": "correct",
+        "verdict_candidate_5321": "correct",
+        "verdict_candidate_2602": "correct",
+        "verdict_candidate_4344": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_5321",
+          "probability": 0.9456793665885925,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1376": {
+          "value": "correct",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5321": {
+          "value": "correct",
+          "probability": 0.9999498724937439,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2602": {
+          "value": "correct",
+          "probability": 0.9998817443847656,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4344": {
+          "value": "correct",
+          "probability": 0.9999796152114868,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 315,
+        "scored_rows": 69
+      },
+      "case_id": "square-rectangle",
+      "elapsed_ms": 1870.5,
+      "candidate_ids": [
+        "candidate_1376",
+        "candidate_5321",
+        "candidate_2602",
+        "candidate_4344"
+      ],
+      "reference_answer": "yes"
+    },
+    {
+      "decision": {
+        "winner": "candidate_2958",
+        "confidence": "high",
+        "verdict_candidate_2958": "correct",
+        "verdict_candidate_6565": "correct",
+        "verdict_candidate_5243": "correct",
+        "verdict_candidate_9620": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2958",
+          "probability": 0.9996938705444336,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2958": {
+          "value": "correct",
+          "probability": 0.9999998211860657,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6565": {
+          "value": "correct",
+          "probability": 0.9996914267539978,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5243": {
+          "value": "correct",
+          "probability": 0.9998390078544617,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9620": {
+          "value": "correct",
+          "probability": 0.9999919533729553,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 341,
+        "scored_rows": 69
+      },
+      "case_id": "rain-arrival",
+      "elapsed_ms": 1980.0,
+      "candidate_ids": [
+        "candidate_2958",
+        "candidate_6565",
+        "candidate_5243",
+        "candidate_9620"
+      ],
+      "reference_answer": "take an umbrella"
+    },
+    {
+      "decision": {
+        "winner": "candidate_2530",
+        "confidence": "high",
+        "verdict_candidate_2530": "correct",
+        "verdict_candidate_9375": "correct",
+        "verdict_candidate_4452": "correct",
+        "verdict_candidate_6960": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2530",
+          "probability": 0.9999555349349976,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2530": {
+          "value": "correct",
+          "probability": 0.9999998211860657,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9375": {
+          "value": "correct",
+          "probability": 0.9986490607261658,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4452": {
+          "value": "correct",
+          "probability": 0.999049961566925,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6960": {
+          "value": "correct",
+          "probability": 0.9999968409538269,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 356,
+        "scored_rows": 69
+      },
+      "case_id": "boiling-water",
+      "elapsed_ms": 2011.8,
+      "candidate_ids": [
+        "candidate_2530",
+        "candidate_9375",
+        "candidate_4452",
+        "candidate_6960"
+      ],
+      "reference_answer": "heat it"
+    },
+    {
+      "decision": {
+        "winner": "candidate_9388",
+        "confidence": "high",
+        "verdict_candidate_9388": "correct",
+        "verdict_candidate_2719": "correct",
+        "verdict_candidate_1606": "correct",
+        "verdict_candidate_8737": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9388",
+          "probability": 0.88376384973526,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9388": {
+          "value": "correct",
+          "probability": 0.9999996423721313,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2719": {
+          "value": "correct",
+          "probability": 0.9956642985343933,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1606": {
+          "value": "correct",
+          "probability": 0.9998220205307007,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8737": {
+          "value": "correct",
+          "probability": 0.9999932050704956,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 339,
+        "scored_rows": 69
+      },
+      "case_id": "equal-mass",
+      "elapsed_ms": 1962.2,
+      "candidate_ids": [
+        "candidate_9388",
+        "candidate_2719",
+        "candidate_1606",
+        "candidate_8737"
+      ],
+      "reference_answer": "they weigh the same"
+    },
+    {
+      "decision": {
+        "winner": "candidate_6370",
+        "confidence": "high",
+        "verdict_candidate_6370": "correct",
+        "verdict_candidate_5390": "correct",
+        "verdict_candidate_6498": "correct",
+        "verdict_candidate_6696": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_6370",
+          "probability": 0.9997009038925171,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6370": {
+          "value": "correct",
+          "probability": 0.9999995827674866,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5390": {
+          "value": "correct",
+          "probability": 0.9996573328971863,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6498": {
+          "value": "correct",
+          "probability": 0.9988572001457214,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6696": {
+          "value": "correct",
+          "probability": 0.9999866485595703,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 310,
+        "scored_rows": 77
+      },
+      "case_id": "red-light",
+      "elapsed_ms": 1854.2,
+      "candidate_ids": [
+        "candidate_6370",
+        "candidate_5390",
+        "candidate_6498",
+        "candidate_6696"
+      ],
+      "reference_answer": "stop"
+    },
+    {
+      "decision": {
+        "winner": "candidate_5341",
+        "confidence": "high",
+        "verdict_candidate_5341": "correct",
+        "verdict_candidate_3436": "correct",
+        "verdict_candidate_8288": "correct",
+        "verdict_candidate_1914": "correct"
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_5341",
+          "probability": 0.8476688265800476,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5341": {
+          "value": "correct",
+          "probability": 0.9999997019767761,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3436": {
+          "value": "correct",
+          "probability": 0.9994474053382874,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8288": {
+          "value": "correct",
+          "probability": 0.9999420046806335,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1914": {
+          "value": "correct",
+          "probability": 0.9999876022338867,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 340,
+        "scored_rows": 69
+      },
+      "case_id": "refrigeration",
+      "elapsed_ms": 1954.0,
+      "candidate_ids": [
+        "candidate_5341",
+        "candidate_3436",
+        "candidate_8288",
+        "candidate_1914"
+      ],
+      "reference_answer": "refrigerator"
+    }
+  ]
+}

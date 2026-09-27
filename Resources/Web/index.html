@@ -1,0 +1,2999 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B0D0A">
+  <title>JEV Workbench</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230B0D0A'/%3E%3Crect x='4' y='4' width='11' height='11' fill='none' stroke='%23E8E6DD' stroke-opacity='.35'/%3E%3Crect x='17' y='4' width='11' height='11' fill='none' stroke='%23E8E6DD' stroke-opacity='.35'/%3E%3Crect x='4' y='17' width='11' height='11' fill='none' stroke='%23E8E6DD' stroke-opacity='.35'/%3E%3Crect x='17' y='17' width='11' height='11' fill='%23F5A700'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ground: #0B0D0A;
+      --panel: #0E110C;
+      --panel-raised: #13160F;
+      --panel-soft: #171B12;
+      --line: rgba(232, 230, 221, .13);
+      --line-bright: rgba(232, 230, 221, .26);
+      --text: #E8E6DD;
+      --muted: #9BA094;
+      --quiet: #6A7062;
+      --acid: #F5A700;
+      --acid-dim: #C0880A;
+      --red: #E5484D;
+      --amber: #E8C33E;
+      --blue: #9DB8CC;
+      --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Fira Code", ui-monospace, "Menlo", "Consolas", monospace;
+      --display: var(--mono);
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(1100px 480px at 82% -8%, rgba(245, 167, 0, .06), transparent 62%),
+        linear-gradient(rgba(232, 230, 221, .028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232, 230, 221, .028) 1px, transparent 1px);
+      background-size: auto, 100% 52px, 52px 100%;
+      background-color: var(--ground);
+      color: var(--text);
+      font-family: var(--display);
+      font-size: 14px;
+      letter-spacing: .005em;
+    }
+    body::after {
+      content: ""; position: fixed; inset: 0; z-index: 999; pointer-events: none; opacity: .05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    }
+    button, input, textarea, select { font: inherit; }
+    button { color: inherit; }
+    .topbar {
+      min-height: 76px;
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 13, 10, .86);
+      backdrop-filter: blur(8px);
+    }
+    .identity { display: flex; align-items: center; gap: 13px; min-width: 240px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      color: var(--ground); background: var(--acid); border-radius: 6px;
+      font: 800 17px/1 var(--mono);
+      box-shadow: 0 0 22px rgba(245,167,0,.18);
+    }
+    .eyebrow, .micro-label, .section-label {
+      color: var(--muted); font: 600 10px/1.3 var(--mono); letter-spacing: .12em; text-transform: uppercase;
+    }
+    .identity h1 { margin: 3px 0 0; font-size: 19px; letter-spacing: -.02em; line-height: 1; font-weight: 700; }
+    .identity h1 span { color: var(--muted); font-weight: 500; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .report-count { display: inline-grid; min-width: 18px; height: 18px; place-items: center; margin-left: 4px; padding: 0 4px; border-radius: 9px; background: var(--panel-raised); color: var(--acid); font: 9px var(--mono); }
+    .provider-status {
+      display: flex; align-items: center; gap: 10px; min-height: 37px;
+      padding: 7px 12px; border: 1px solid var(--line); border-radius: 7px;
+      background: var(--panel); max-width: min(420px, 48vw);
+    }
+    .status-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--quiet); }
+    .provider-status.good .status-dot { background: var(--acid); box-shadow: 0 0 9px rgba(245,167,0,.42); }
+    .provider-status.warn .status-dot { background: var(--amber); }
+    .provider-status.bad .status-dot { background: var(--red); }
+    .provider-name { font-size: 12px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .status-detail { color: var(--muted); font: 10px var(--mono); white-space: nowrap; }
+    .quiet-button, .button, .case-button, .suite-toggle { cursor: pointer; }
+    .quiet-button {
+      border: 1px solid var(--line); background: transparent; color: var(--muted);
+      border-radius: 6px; min-height: 36px; padding: 7px 11px; font-size: 11px;
+      transition: color .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .quiet-button:hover { color: var(--text); border-color: var(--line-bright); background: var(--panel); }
+    .workspace {
+      --library-width: 238px;
+      --results-width: 410px;
+      height: calc(100vh - 76px); min-height: 540px;
+      display: grid;
+      grid-template-columns: minmax(190px, var(--library-width)) 14px minmax(360px, 1fr) 14px minmax(300px, var(--results-width));
+      gap: 0; padding: 14px 18px 18px;
+    }
+    .panel-splitter {
+      display: grid; place-items: center; min-width: 0; min-height: 0;
+      cursor: col-resize; touch-action: none; user-select: none; outline: none;
+    }
+    .panel-splitter::before {
+      content: ""; width: 3px; height: 34px; border-radius: 3px;
+      background: var(--line-bright); transition: background .15s ease, height .15s ease;
+    }
+    .panel-splitter:hover::before, .panel-splitter:focus-visible::before, .panel-splitter.dragging::before {
+      height: 48px; background: var(--acid-dim);
+    }
+    .panel-splitter:focus-visible { outline: 1px solid var(--acid-dim); outline-offset: -2px; border-radius: 5px; }
+    body.resizing-panels, body.resizing-panels * { cursor: col-resize !important; user-select: none !important; }
+    .pane {
+      min-width: 0; min-height: 0; overflow: auto; border: 1px solid var(--line);
+      border-radius: 10px; background: rgba(14,17,12,.92);
+      scrollbar-color: var(--line-bright) transparent; scrollbar-width: thin;
+    }
+    .library { padding: 15px 11px 12px; }
+    .pane-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 5px; }
+    .count { color: var(--quiet); font: 10px var(--mono); }
+    .new-case {
+      width: 100%; margin: 13px 0 9px; border: 1px dashed var(--line-bright); border-radius: 6px;
+      padding: 10px; text-align: left; color: var(--acid); background: transparent; font-size: 12px;
+    }
+    .new-case:hover { background: rgba(245,167,0,.06); border-color: var(--acid-dim); }
+    .search {
+      width: 100%; margin-bottom: 11px; padding: 9px 10px; outline: none;
+      color: var(--text); background: #0C0F0A; border: 1px solid var(--line); border-radius: 5px;
+      font-size: 11px;
+    }
+    .search:focus, textarea:focus, input:focus, select:focus { border-color: var(--acid-dim); box-shadow: 0 0 0 2px rgba(245,167,0,.08); }
+    .suite {
+      margin: 10px 0; border: 1px solid var(--line); border-radius: 7px;
+      background: rgba(11, 13, 10, .55); overflow: hidden;
+    }
+    .suite.open { border-color: rgba(245,167,0,.4); }
+    .suite-head {
+      width: 100%; padding: 10px 10px 8px; display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+      border: 0; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer;
+    }
+    .suite-head:hover { background: rgba(245,167,0,.05); }
+    .suite-head:focus-visible { outline: 1px solid var(--acid-dim); outline-offset: -2px; }
+    .suite-head::after { content: "+"; color: var(--quiet); font: 11px var(--mono); }
+    .suite.open .suite-head::after { content: "\2212"; color: var(--acid-dim); }
+    .suite-title { color: var(--acid); font: 600 10px var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+    .suite-count { color: var(--quiet); font: 10px var(--mono); }
+    .suite-description { padding: 0 10px 10px; color: var(--acid); opacity: .72; font-size: 9px; line-height: 1.45; }
+    .case-list { display: none; gap: 3px; padding: 0 6px 8px; }
+    .suite.open .case-list { display: grid; }
+    .case-button {
+      width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
+      padding: 8px 8px; border: 1px solid transparent; border-radius: 5px; text-align: left;
+      background: transparent; color: var(--muted); font-size: 11px; line-height: 1.35;
+    }
+    .case-button:hover { color: var(--text); background: var(--panel-raised); }
+    .case-button.active { color: var(--text); border-color: rgba(245,167,0,.4); background: rgba(245,167,0,.06); }
+    .case-button.active::before { content: ""; position: absolute; }
+    .case-name { overflow: hidden; text-overflow: ellipsis; }
+    .kind-tag { color: var(--quiet); font: 9px var(--mono); text-transform: uppercase; }
+    .case-button.active .kind-tag { color: var(--acid-dim); }
+    .empty-library { padding: 10px 6px; color: var(--quiet); font-size: 11px; }
+    .editor { padding: 20px 22px 18px; }
+    .editor-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 17px; }
+    .editor-head h2 { margin: 5px 0 3px; font-size: 24px; letter-spacing: -.02em; line-height: 1.1; }
+    .subtitle { color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .case-id { padding: 5px 7px; border: 1px solid var(--line); border-radius: 4px; color: var(--quiet); font: 9px var(--mono); white-space: nowrap; }
+    .form-grid { display: grid; gap: 13px; }
+    .field { display: grid; gap: 6px; min-width: 0; }
+    .field-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #C5C3B8; font-size: 11px; font-weight: 650; }
+    .field-hint { color: var(--quiet); font: 9px var(--mono); font-weight: 400; }
+    textarea, input, select {
+      width: 100%; outline: none; color: var(--text); background: #0C0F0A;
+      border: 1px solid var(--line); border-radius: 6px; padding: 10px 11px;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    textarea { resize: vertical; min-height: 70px; line-height: 1.48; font-size: 12px; }
+    textarea.context { min-height: 128px; }
+    textarea.small { min-height: 83px; font-family: var(--mono); font-size: 10px; }
+    input, select { min-height: 37px; font-size: 11px; }
+    .split-fields { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: 10px; align-items: end; }
+    .type-picker { min-width: 0; }
+    .type-picker select { color: var(--acid); }
+    .type-controls { display: grid; gap: 10px; }
+    .criteria-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .provider-warning {
+      display: none; border: 1px solid rgba(232,195,62,.4); border-radius: 5px; padding: 9px 10px;
+      color: #E8C33E; background: rgba(232,195,62,.06); font-size: 10px; line-height: 1.45;
+    }
+    .provider-warning.visible { display: block; }
+    .form-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+    .button {
+      display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+      min-height: 40px; border: 1px solid var(--acid); border-radius: 6px; padding: 9px 15px;
+      background: var(--acid); color: #1A1404; font-size: 12px; font-weight: 750;
+      transition: transform .12s ease, background .15s ease, opacity .15s ease;
+    }
+    .button:hover:not(:disabled) { background: #FFBE33; transform: translateY(-1px); }
+    .button:disabled { cursor: wait; opacity: .55; }
+    .run-note { color: var(--quiet); font-size: 10px; line-height: 1.4; text-align: right; }
+    .spinner { display: none; width: 12px; height: 12px; border: 2px solid rgba(26,20,4,.3); border-top-color: #1A1404; border-radius: 50%; animation: spin .8s linear infinite; }
+    .button.running .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    details { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 10px; }
+    summary { color: var(--muted); cursor: pointer; font: 10px var(--mono); list-style-position: inside; }
+    pre {
+      max-height: 245px; overflow: auto; padding: 12px; border: 1px solid var(--line); border-radius: 5px;
+      background: #0A0D09; color: #AEB3A4; font: 10px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere;
+    }
+    .results { padding: 17px 16px 15px; background: linear-gradient(170deg, rgba(19,22,14,.98), rgba(13,16,11,.97) 42%); }
+    .results-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 13px; border-bottom: 1px solid var(--line); }
+    .result-title { color: #C5C3B8; font: 600 10px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .run-time { color: var(--muted); font: 10px var(--mono); }
+    .empty-state { min-height: 360px; display: grid; align-content: center; justify-items: start; padding: 8px 9px; }
+    .empty-glyph { width: 48px; height: 48px; margin-bottom: 20px; display: grid; place-items: center; border: 1px solid var(--line-bright); border-radius: 50%; color: var(--acid); font: 19px var(--mono); box-shadow: inset 0 0 22px rgba(245,167,0,.05); }
+    .empty-state h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: -.03em; }
+    .empty-state p { max-width: 255px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+    .result-state { display: none; padding-top: 16px; }
+    .result-state.visible { display: block; }
+    .result-state.error .answer-value { color: var(--red); }
+    .answer-block { border-left: 2px solid var(--acid); padding: 2px 0 3px 13px; margin: 2px 0 13px; }
+    .answer-block.no-reference { border-left-color: var(--blue); }
+    .answer-value { margin: 5px 0 6px; color: var(--acid); font-size: clamp(22px, 2.2vw, 32px); font-weight: 750; letter-spacing: -.02em; overflow-wrap: anywhere; }
+    .answer-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill { padding: 4px 6px; border: 1px solid var(--line-bright); border-radius: 3px; color: #AEB3A4; font: 9px var(--mono); }
+    .pill.match { color: var(--acid); border-color: rgba(245,167,0,.4); }
+    .pill.mismatch { color: var(--amber); border-color: rgba(232,195,62,.42); }
+    .result-guidance { margin: 11px 0 14px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+    .result-guidance.error-text { color: var(--red); }
+    .workflow-outcome { margin: 12px 0 14px; padding: 11px 12px; border: 1px solid var(--line-bright); border-radius: 7px; background: rgba(11,13,10,.58); }
+    .workflow-title { color: var(--muted); font: 600 9px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .workflow-value { margin: 6px 0; color: var(--acid); font-size: 15px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+    .workflow-detail { color: #AEB3A4; font-size: 10px; line-height: 1.55; white-space: pre-line; }
+    .field-results { display: grid; gap: 9px; }
+    .field-result { padding: 10px 10px 8px; border: 1px solid var(--line); border-radius: 6px; background: rgba(11,13,10,.55); }
+    .field-result-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+    .field-name { color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .field-value { color: var(--text); font-size: 12px; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+    .distribution { display: grid; gap: 5px; margin-top: 8px; }
+    .prob-row { display: grid; grid-template-columns: minmax(0, 1fr) 33px; gap: 7px; align-items: center; color: var(--muted); font-size: 9px; }
+    .prob-main { min-width: 0; display: grid; grid-template-columns: minmax(70px, 1fr) minmax(45px, 1.2fr); gap: 6px; align-items: center; }
+    .prob-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .track { height: 4px; overflow: hidden; border-radius: 4px; background: rgba(232,230,221,.1); }
+    .fill { display: block; height: 100%; border-radius: inherit; background: var(--acid-dim); }
+    .prob-row.selected .prob-label { color: var(--acid); }
+    .prob-row.selected .fill { background: var(--acid); }
+    .prob-value { color: #A8ADA0; font: 9px var(--mono); text-align: right; }
+    .no-distribution { margin-top: 7px; color: var(--quiet); font-size: 9px; line-height: 1.45; }
+    .reference-box { margin: 11px 0 0; padding: 9px 10px; border-left: 2px solid var(--line-bright); background: rgba(255,255,255,.025); }
+    .reference-box .micro-label { margin-bottom: 4px; }
+    .reference-text { color: #B9B7AC; font-size: 10px; line-height: 1.5; }
+    .fine-print { margin: 12px 0 0; color: var(--quiet); font-size: 9px; line-height: 1.55; }
+    .raw-response { margin-top: 13px; }
+    .report-screen { min-height: calc(100vh - 76px); padding: 22px 18px 32px; }
+    .report-toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin: 0 auto 18px; max-width: 1600px; }
+    .report-toolbar h2 { margin: 5px 0 4px; font-size: 24px; letter-spacing: -.02em; }
+    .report-toolbar p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .report-actions { display: flex; align-items: center; gap: 8px; }
+    .report-groups { display: grid; gap: 20px; max-width: 1600px; margin: 0 auto; }
+    .report-empty { min-height: 300px; display: grid; place-content: center; justify-items: center; gap: 8px; border: 1px dashed var(--line-bright); border-radius: 9px; color: var(--muted); text-align: center; }
+    .report-empty strong { color: var(--text); font-size: 16px; }
+    .report-empty span { max-width: 430px; font-size: 11px; line-height: 1.6; }
+    .report-group { overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: rgba(14,17,12,.92); }
+    .report-group h3 { margin: 0; padding: 13px 15px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .report-table-wrap { overflow: auto; max-height: calc(100vh - 220px); scrollbar-color: var(--line-bright) transparent; }
+    .report-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
+    .report-table th, .report-table td { min-width: 190px; padding: 10px 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .report-table th:first-child, .report-table td:first-child { position: sticky; left: 0; z-index: 1; min-width: 300px; max-width: 460px; background: #10130D; }
+    .report-table thead th { position: sticky; top: 0; z-index: 2; background: #15180F; color: var(--acid); font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    .report-table thead th:first-child { z-index: 3; }
+    .report-table tr:last-child td { border-bottom: 0; }
+    .report-table th:last-child, .report-table td:last-child { border-right: 0; }
+    .report-question-id, .report-run-id { display: block; margin-bottom: 5px; color: var(--quiet); font: 9px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .report-question-text { color: #C9C7BC; line-height: 1.5; white-space: pre-line; overflow-wrap: anywhere; }
+    .report-model { display: block; color: var(--text); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+    .report-model-stats { display: block; margin-top: 6px; color: var(--muted); font: 9px/1.45 var(--mono); }
+    .report-answer { display: block; color: var(--text); line-height: 1.5; overflow-wrap: anywhere; }
+    .report-verdict { display: inline-block; margin-top: 6px; padding: 3px 5px; border: 1px solid var(--line-bright); border-radius: 3px; color: var(--muted); font: 8px var(--mono); text-transform: uppercase; }
+    .report-verdict.match { color: var(--acid); border-color: rgba(245,167,0,.4); }
+    .report-verdict.differs { color: var(--amber); border-color: rgba(232,195,62,.42); }
+    .report-verdict.partial { color: var(--blue); border-color: rgba(157,184,204,.4); }
+    .report-model-scores { display: block; margin-top: 4px; color: var(--text); font: 9px/1.45 var(--mono); white-space: pre-line; }
+    .grid-screen { min-height: calc(100vh - 76px); padding: 22px 18px 40px; }
+    .grid-shell { width: min(100%, 1720px); margin: 0 auto; }
+    .grid-hero {
+      display: flex; justify-content: space-between; align-items: end; gap: 22px;
+      padding: 10px 2px 20px; border-bottom: 1px solid var(--line); margin-bottom: 16px;
+    }
+    .grid-hero h2 { margin: 5px 0 6px; font-size: clamp(24px, 3vw, 34px); letter-spacing: -.02em; }
+    .grid-hero p { max-width: 760px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+    .grid-hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+    .grid-hero-select { width: 130px; min-height: 36px; padding: 7px 11px; font-size: 11px; }
+    .grid-hero-seed { width: 170px; min-height: 36px; margin: 0; padding: 7px 11px; font-size: 11px; }
+    .grid-run-table { overflow-x: auto; padding: 0 14px 14px; }
+    .grid-run-table table { width: 100%; border-collapse: collapse; color: var(--muted); font: 9px/1.5 var(--mono); }
+    .grid-run-table th { padding: 6px 8px; border-bottom: 1px solid var(--line-bright); color: #C5C3B8; font-weight: 650; text-align: left; white-space: nowrap; }
+    .grid-run-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+    .grid-run-table tr:last-child td { border-bottom: 0; }
+    .grid-run-table td.status-completed { color: var(--acid); }
+    .grid-run-table td.status-failed, .grid-run-table td.status-stopped, .grid-run-table td.status-budget { color: var(--red); }
+    .grid-run-table button { border: 0; padding: 3px 6px; color: var(--acid); background: transparent; cursor: pointer; font: 9px var(--mono); white-space: nowrap; }
+    .grid-run-table button:hover { color: #FFC23D; text-decoration: underline; }
+    .grid-run-table button:disabled { color: var(--quiet); cursor: default; text-decoration: none; }
+    .grid-notice {
+      display: flex; align-items: center; gap: 10px; min-height: 42px; margin: 0 0 16px;
+      padding: 9px 12px; border: 1px solid var(--line); border-radius: 7px;
+      color: var(--muted); background: rgba(14,17,12,.78); font-size: 10px; line-height: 1.5;
+    }
+    .grid-notice::before { content: ""; width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--acid-dim); box-shadow: 0 0 10px rgba(245,167,0,.34); }
+    .grid-notice.error { color: #F2A0A3; border-color: rgba(229,72,77,.36); }
+    .grid-notice.error::before { background: var(--red); box-shadow: 0 0 10px rgba(229,72,77,.38); }
+    .grid-notice.running::before { animation: statusPulse .8s ease-in-out infinite alternate; }
+    .grid-games { display: grid; gap: 16px; }
+    .grid-empty { min-height: 240px; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 24px; border: 1px dashed var(--line-bright); border-radius: 9px; text-align: center; color: var(--muted); background: rgba(14,17,12,.45); }
+    .grid-empty-mark { width: 45px; height: 45px; display: grid; place-items: center; margin-bottom: 5px; border: 1px solid rgba(245,167,0,.34); border-radius: 50%; color: var(--acid); box-shadow: 0 0 28px rgba(245,167,0,.12), inset 0 0 16px rgba(245,167,0,.08); font: 17px var(--mono); }
+    .grid-empty strong { color: var(--text); font-size: 15px; }
+    .grid-empty span { max-width: 560px; font-size: 10px; line-height: 1.7; }
+    .grid-game-card { overflow: hidden; border: 1px solid rgba(232,230,221,.16); border-radius: 9px; background: linear-gradient(145deg, rgba(18,21,13,.96), rgba(12,15,10,.96)); box-shadow: 0 12px 36px rgba(0,0,0,.18); animation: cardArrival .34s ease-out both; }
+    .grid-game-head { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 13px 15px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, rgba(245,167,0,.05), transparent 50%); }
+    .grid-game-title { margin: 0 0 5px; font-size: 13px; letter-spacing: -.015em; }
+    .grid-game-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; color: var(--muted); font: 9px/1.45 var(--mono); }
+    .grid-game-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+    .grid-game-status { min-height: 26px; padding: 7px 15px 0; color: var(--muted); font: 9px/1.5 var(--mono); }
+    .grid-game-status.error { color: var(--red); }
+    .grid-game-status.good { color: var(--acid); }
+    .grid-board-viewport { overflow: auto; padding: 12px 14px 15px; scrollbar-color: var(--line-bright) transparent; }
+    .grid-board {
+      display: grid; grid-template-columns: repeat(var(--grid-cols), minmax(11px, 1fr)); gap: 3px;
+      min-width: max(100%, calc(var(--grid-cols) * 11px)); padding: 9px; border: 1px solid rgba(232,230,221,.14);
+      border-radius: 7px; background:
+        radial-gradient(ellipse at 50% 55%, rgba(245,167,0,.05), transparent 68%),
+        repeating-linear-gradient(0deg, rgba(232,230,221,.02) 0 1px, transparent 1px 5px),
+        #090C08;
+    }
+    .grid-square {
+      position: relative; display: block; aspect-ratio: 1; min-width: 0; overflow: hidden;
+      border: 1px solid rgba(232,230,221,.09); border-radius: 3px; background: rgba(20,23,15,.55);
+      box-shadow: inset 0 0 5px rgba(232,230,221,.03); transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .grid-square::after { content: ""; position: absolute; inset: 24%; border-radius: 2px; background: rgba(232,230,221,.05); }
+    .grid-square.wall {
+      border-color: rgba(229,72,77,.8);
+      background:
+        radial-gradient(ellipse at 35% 28%, rgba(255,150,150,.55), transparent 22%),
+        repeating-linear-gradient(135deg, rgba(229,72,77,.82) 0 2px, rgba(120,26,28,.92) 2px 5px, rgba(240,110,110,.8) 5px 7px);
+      box-shadow: 0 0 7px rgba(229,72,77,.45), 0 0 16px rgba(229,72,77,.2), inset 0 0 8px rgba(255,130,130,.35);
+      animation: gooAppear .48s cubic-bezier(.18,.76,.28,1) both;
+      animation-delay: var(--goo-delay, 0ms);
+    }
+    .grid-square.wall::after { inset: 12%; border-radius: 40% 60% 56% 44%; background: radial-gradient(circle at 35% 35%, rgba(255,180,180,.85), rgba(229,72,77,.3) 38%, transparent 68%); mix-blend-mode: screen; }
+    .grid-square.visited { border-color: rgba(92,219,120,.55); background: rgba(92,219,120,.18); box-shadow: inset 0 0 8px rgba(92,219,120,.25); }
+    .grid-square.visited::after { background: rgba(92,219,120,.14); }
+    .grid-square.spawn { border-color: rgba(157,184,204,.75); box-shadow: 0 0 9px rgba(157,184,204,.3), inset 0 0 8px rgba(157,184,204,.22); }
+    .grid-square.exit { border-color: rgba(245,167,0,.55); background: rgba(245,167,0,.1); }
+    .grid-square.token { z-index: 1; transform: scale(.92); border: 1px solid #FFD268; background: radial-gradient(circle, #FFE9B0 0 16%, #FFC23D 22% 39%, #F5A700 55%, #3A2A05 76%); box-shadow: 0 0 7px #FFC23D, 0 0 18px rgba(245,167,0,.8), 0 0 30px rgba(245,167,0,.3); animation: tokenArrival .25s ease-out; }
+    .grid-square.token::after { inset: 30%; border-radius: 50%; background: #FFF3D0; box-shadow: 0 0 5px #fff; }
+    .grid-square.flag-pocket { border: 1px dashed rgba(229,72,77,.7); background: rgba(229,72,77,.18); box-shadow: inset 0 0 6px rgba(229,72,77,.25); }
+    .grid-square.flag-pocket::after { background: rgba(229,72,77,.12); }
+    /* Order matters: RED beats pocket, and a YELLOW dead end beats both. */
+    .grid-square.visited-red { border: 1px solid #E5484D; background: rgba(229,72,77,.5); box-shadow: 0 0 8px rgba(229,72,77,.5), inset 0 0 6px rgba(229,72,77,.45); }
+    .grid-square.visited-red::after { background: rgba(255,140,140,.2); }
+    .grid-square.flag-dead-end { container-type: size; border: 1px solid #E8C33E; background: rgba(232,195,62,.45); box-shadow: 0 0 8px rgba(232,195,62,.5), inset 0 0 6px rgba(232,195,62,.42); }
+    .grid-square.flag-dead-end::after { background: transparent; }
+    .grid-square.flag-dead-end::before {
+      content: "⚑"; position: absolute; inset: 0; display: grid; place-items: center;
+      color: #2A2404; font-size: 10px; font-size: 90cqw; font-weight: 700; line-height: 1;
+      text-shadow: 0 0 2px rgba(255,240,190,.9);
+      z-index: 2; pointer-events: none;
+    }
+    .grid-square.decision-option { outline: 2px solid rgba(232,230,221,.75); outline-offset: -1px; }
+    .grid-square.decision-chosen { animation: tokenArrival .25s ease-out, decisionPulse .5s ease-in-out 2; }
+    .grid-square.decision-rejected-flag { outline: 2px solid #E5484D; outline-offset: -1px; }
+    .grid-square.decision-ignored { box-shadow: 0 0 0 2px rgba(229,72,77,.9), 0 0 10px rgba(229,72,77,.5), 0 0 18px rgba(245,167,0,.6) !important; }
+    @keyframes decisionPulse { 0%, 100% { box-shadow: 0 0 0 1px rgba(245,167,0,.95), 0 0 9px rgba(245,167,0,.5); } 50% { box-shadow: 0 0 0 2px #ffffff, 0 0 15px rgba(245,167,0,.85); } }
+    .grid-key { display: flex; flex-wrap: wrap; align-items: center; gap: 9px 17px; padding: 10px 16px 13px; color: var(--muted); font: 9px var(--mono); }
+    .grid-key-item { display: inline-flex; align-items: center; gap: 6px; }
+    .grid-key-swatch { width: 10px; height: 10px; border: 1px solid var(--line-bright); border-radius: 3px; background: rgba(24,38,29,.7); }
+    .grid-key-swatch.goo { border-color: rgba(229,72,77,.8); background: #E5484D; box-shadow: 0 0 8px rgba(229,72,77,.45); }
+    .grid-key-swatch.token { border-color: #FFD268; border-radius: 50%; background: #F5A700; box-shadow: 0 0 8px rgba(245,167,0,.7); }
+    .grid-key-swatch.visited { border-color: rgba(92,219,120,.55); background: rgba(92,219,120,.18); }
+    .grid-key-swatch.visited-red { border-color: #E5484D; background: rgba(229,72,77,.5); }
+    .grid-key-swatch.dead-end { border-color: #E8C33E; background: rgba(232,195,62,.45); color: #2A2404; display: grid; place-items: center; font-size: 8px; font-weight: 700; }
+    .grid-key-swatch.pocket { border: 1px dashed rgba(229,72,77,.7); background: rgba(229,72,77,.18); }
+    .grid-key-swatch.decision { border-color: rgba(232,230,221,.6); background: rgba(10,13,9,.7); }
+    .grid-run-list { display: grid; gap: 6px; padding: 0 14px 14px; }
+    .grid-run-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 5px; background: rgba(10,13,9,.72); }
+    .grid-run-summary { display: grid; gap: 3px; min-width: 0; }
+    .grid-run-name { color: var(--text); font-size: 10px; font-weight: 650; }
+    .grid-run-detail { color: var(--muted); font: 9px/1.45 var(--mono); overflow-wrap: anywhere; }
+    .grid-run-view { flex: 0 0 auto; border: 0; padding: 5px 7px; color: var(--acid); background: transparent; cursor: pointer; font: 9px var(--mono); }
+    .grid-run-view:hover { color: #FFC23D; text-decoration: underline; }
+    @keyframes gooAppear { from { opacity: .12; transform: scale(.68); filter: brightness(1.8) saturate(1.35); } to { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); } }
+    @keyframes tokenArrival { 0% { transform: scale(.55); filter: brightness(1.8); } 100% { transform: scale(.92); filter: brightness(1); } }
+    @keyframes cardArrival { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes statusPulse { from { opacity: .5; transform: scale(.86); } to { opacity: 1; transform: scale(1.18); } }
+    .grid-game-status { font-variant-numeric: tabular-nums; }
+    .loading-examples { padding: 12px 6px; color: var(--quiet); font-size: 10px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 1060px) {
+      .workspace {
+        height: auto; min-height: calc(100vh - 76px);
+        grid-template-columns: minmax(190px, var(--library-width)) 14px minmax(0,1fr);
+        grid-template-rows: auto auto; row-gap: 13px;
+      }
+      .library { grid-column: 1; grid-row: 1 / span 2; }
+      #librarySplitter { grid-column: 2; grid-row: 1 / span 2; }
+      .editor { grid-column: 3; grid-row: 1; }
+      #resultsSplitter { display: none; }
+      .results { grid-column: 3; grid-row: 2; }
+      .editor, .results { min-height: 540px; }
+    }
+    @media (max-width: 740px) {
+      .topbar { padding: 12px 14px; align-items: flex-start; }
+      .identity { min-width: 0; }
+      .top-actions { align-items: flex-end; flex-direction: column; gap: 6px; }
+      .report-screen { padding: 14px 10px 24px; }
+      .report-toolbar { flex-direction: column; }
+      .report-actions { width: 100%; justify-content: flex-end; }
+      .grid-screen { padding: 14px 10px 28px; }
+      .grid-hero { align-items: flex-start; flex-direction: column; }
+      .grid-hero-actions { width: 100%; justify-content: flex-start; }
+      .grid-game-head { align-items: flex-start; flex-direction: column; }
+      .grid-game-actions { justify-content: flex-start; }
+      .grid-run-row { align-items: flex-start; }
+      .provider-status { max-width: 58vw; padding: 6px 8px; }
+      .status-detail { display: none; }
+      .workspace { display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+      .panel-splitter { display: none; }
+      .library { max-height: 290px; }
+      .editor, .results { min-height: 0; }
+      .editor { padding: 17px 15px; }
+      .results { min-height: 340px; }
+      .split-fields { grid-template-columns: 1fr; }
+      .type-picker { max-width: 220px; }
+      .criteria-pair { grid-template-columns: 1fr; }
+      .empty-state { min-height: 230px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="identity">
+      <div class="brand-mark" aria-hidden="true">J</div>
+      <div><div class="eyebrow">Local decision service</div><h1>JEV <span>Workbench</span></h1></div>
+    </div>
+    <div class="top-actions">
+      <div id="providerStatus" class="provider-status" role="status" aria-live="polite">
+        <span class="status-dot"></span><span id="providerName" class="provider-name">Checking gateway…</span><span id="statusDetail" class="status-detail">127.0.0.1:8096</span>
+      </div>
+      <button id="refreshStatus" class="quiet-button" type="button">Refresh status</button>
+      <button id="gridNavigationButton" class="quiet-button" type="button" aria-pressed="false">Logic grid</button>
+      <button id="parallelReportButton" class="quiet-button" type="button" aria-pressed="false">Parallel report <span id="reportRunCount" class="report-count">0</span></button>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace">
+    <aside id="libraryPane" class="pane library" aria-label="Test examples">
+      <div class="pane-heading"><span class="section-label">Test library</span><span id="caseCount" class="count">—</span></div>
+      <button id="newCase" class="new-case" type="button">＋ &nbsp; Build a custom test</button>
+      <label class="sr-only" for="searchCases">Filter examples</label>
+      <input id="searchCases" class="search" type="search" placeholder="Filter examples…">
+      <div id="suites"><div class="loading-examples">Loading the benchmark cases…</div></div>
+    </aside>
+
+    <div id="librarySplitter" class="panel-splitter" role="separator" tabindex="0" aria-label="Resize test library panel" aria-orientation="vertical" aria-controls="libraryPane" aria-valuemin="190" aria-valuemax="420" aria-valuenow="238"></div>
+
+    <section id="editorPane" class="pane editor" aria-labelledby="editorTitle">
+      <div class="editor-head">
+        <div><div id="caseKicker" class="section-label">Ready to run</div><h2 id="editorTitle">Choose an example</h2><div class="subtitle">Edit the evidence, then send it through the selected provider. Parallel examples use bounded provider-appropriate request batching.</div></div>
+        <span id="caseId" class="case-id">NO CASE</span>
+      </div>
+      <form id="testForm" class="form-grid">
+        <div class="split-fields">
+          <label class="field type-picker" for="primitive">
+            <span class="field-label">JEV primitive</span>
+            <select id="primitive" name="primitive">
+              <option value="choice">Choice</option><option value="score">Score</option><option value="noul">Noul · yes/no</option><option value="parallel">Parallel batch</option>
+            </select>
+          </label>
+          <label class="field" for="question">
+            <span class="field-label"><span id="questionLabel">Decision question</span><span id="questionHint" class="field-hint">sent as field guidance</span></span>
+            <input id="question" name="question" type="text" placeholder="What should JEV decide?" required>
+          </label>
+        </div>
+        <label class="field" for="context">
+          <span class="field-label">Evidence / context <span class="field-hint">sent to the selected provider</span></span>
+          <textarea id="context" class="context" name="context" placeholder="Paste or edit the evidence JEV should evaluate…" required></textarea>
+        </label>
+        <div id="choiceControls" class="type-controls">
+          <label class="field" for="choices">
+            <span class="field-label">Allowed choices <span class="field-hint">one per line</span></span>
+            <textarea id="choices" class="small" name="choices" placeholder="Option A&#10;Option B"></textarea>
+          </label>
+        </div>
+        <div id="scoreControls" class="type-controls" hidden>
+          <label class="field" for="scoreCriteria">
+            <span class="field-label">Ordered score levels <span class="field-hint">2–10 lines, lowest to highest</span></span>
+            <textarea id="scoreCriteria" class="small" name="scoreCriteria" placeholder="0 — no evidence&#10;1 — partial evidence&#10;2 — complete evidence"></textarea>
+          </label>
+        </div>
+        <div id="noulControls" class="type-controls" hidden>
+          <div class="criteria-pair">
+            <label class="field" for="trueCriteria"><span class="field-label">True means</span><input id="trueCriteria" type="text" placeholder="The evidence supports the claim."></label>
+            <label class="field" for="falseCriteria"><span class="field-label">False means</span><input id="falseCriteria" type="text" placeholder="The evidence does not support the claim."></label>
+          </div>
+        </div>
+        <div id="parallelControls" class="type-controls" hidden>
+          <label class="field" for="parallelSchema">
+            <span class="field-label">Parallel question schema <span class="field-hint">JSON fields · Choice / Score / Noul</span></span>
+            <textarea id="parallelSchema" class="small" spellcheck="false" placeholder='{"intent":{"type":"choice","choices":["bug","feature"],"instructions":"Classify the request."},"severity":{"type":"score","criteria":["low","medium","high"],"instructions":"Rate urgency."}}'></textarea>
+          </label>
+          <div class="field-hint">Parallel schemas are split into concurrent requests when needed to respect the provider's per-request field limit.</div>
+        </div>
+        <label class="field" for="guidance">
+          <span class="field-label">Additional instructions <span class="field-hint">optional rubric / guardrails</span></span>
+          <textarea id="guidance" name="guidance" placeholder="Add a rubric or a rule for handling missing evidence…" style="min-height:60px"></textarea>
+        </label>
+        <div id="providerWarning" class="provider-warning"></div>
+        <div class="form-footer">
+          <button id="runButton" class="button" type="submit"><span class="spinner" aria-hidden="true"></span><span id="runLabel">Run decision</span><span aria-hidden="true">↗</span></button>
+          <div id="runNote" class="run-note">Nothing is sent until you run a test.</div>
+        </div>
+      </form>
+      <details><summary>Inspect exact request JSON</summary><pre id="requestPreview">Choose a case or enter your own test.</pre></details>
+    </section>
+
+    <div id="resultsSplitter" class="panel-splitter" role="separator" tabindex="0" aria-label="Resize decision results panel" aria-orientation="vertical" aria-controls="resultsPane" aria-valuemin="300" aria-valuemax="760" aria-valuenow="410"></div>
+
+    <aside id="resultsPane" class="pane results" aria-label="Decision results">
+      <div class="results-head"><span class="result-title">Result panel</span><span id="runTime" class="run-time">Awaiting first run</span></div>
+      <div id="emptyState" class="empty-state">
+        <div class="empty-glyph" aria-hidden="true">↳</div>
+        <h3>Results land here.</h3>
+        <p>Choose a built-in case or create your own. The selected JEV provider will return its structured decision here.</p>
+      </div>
+      <div id="resultState" class="result-state" aria-live="polite">
+        <div id="answerBlock" class="answer-block">
+          <div id="answerLabel" class="micro-label">Primary decision</div>
+          <div id="answerValue" class="answer-value">—</div>
+          <div id="answerMeta" class="answer-meta"></div>
+        </div>
+        <p id="resultGuidance" class="result-guidance"></p>
+        <div id="workflowOutcome" class="workflow-outcome" hidden>
+          <div id="workflowTitle" class="workflow-title"></div>
+          <div id="workflowValue" class="workflow-value"></div>
+          <div id="workflowDetail" class="workflow-detail"></div>
+        </div>
+        <div id="fieldResults" class="field-results"></div>
+        <div id="referenceBox" class="reference-box" hidden><div class="micro-label">Reference · not sent to model</div><div id="referenceText" class="reference-text"></div></div>
+        <p class="fine-print">Probabilities are provider outputs, not calibrated truth. A reference match is a comparison signal, not proof.</p>
+        <details class="raw-response"><summary>Inspect raw response JSON</summary><pre id="responsePreview"></pre></details>
+      </div>
+    </aside>
+  </main>
+
+  <main id="reportScreen" class="report-screen" hidden aria-labelledby="reportTitle">
+    <div class="report-toolbar">
+      <div>
+        <div class="section-label">Parallel runs · locally saved</div>
+        <h2 id="reportTitle">Model comparison report</h2>
+        <p id="reportSummary">Run a parallel example with each selected provider to add comparison columns.</p>
+      </div>
+      <div class="report-actions">
+        <button id="clearParallelReport" class="quiet-button" type="button" disabled>Clear report</button>
+        <button id="backToWorkbench" class="quiet-button" type="button">Back to workbench</button>
+      </div>
+    </div>
+    <div id="reportGroups" class="report-groups"></div>
+  </main>
+
+  <main id="gridScreen" class="grid-screen" hidden aria-labelledby="gridPageTitle">
+    <div class="grid-shell">
+      <section class="grid-hero">
+        <div>
+          <div class="section-label">Agent logic lab · spatial navigation</div>
+          <h2 id="gridPageTitle">Radioactive Run</h2>
+          <p>Generate &amp; run builds a seeded field locally (same seed and width, same field every time) and then sends the token on its way. The JEV model makes every navigation decision whenever more than one legal move exists, including when to go back; the code only enforces legality, applies a forced move when exactly one legal move exists, and keeps score of the metrics. The model sees a fog-of-war map of the cells it has observed plus its recent move history, and an optional memory aid summarises what it has already observed (dead-end and explored-pocket flags derived only from seen cells) at a level recorded per run. A run ends at the exit, at the move budget (4× the shortest path, at least +40), when you press Stop, or after three failed attempts at one decision.</p>
+        </div>
+        <div class="grid-hero-actions">
+          <select id="gridColumns" class="grid-hero-select" aria-label="Field width in columns">
+            <option value="40">40 columns</option>
+            <option value="60" selected>60 columns</option>
+            <option value="80">80 columns</option>
+          </select>
+          <select id="gridMemoryAid" class="grid-hero-select" aria-label="Memory aid level">
+            <option value="memory" selected>Memory aid: map + facts + pockets</option>
+            <option value="facts">Memory aid: map + move facts</option>
+            <option value="map">Memory aid: map only</option>
+          </select>
+          <input id="gridSeed" class="search grid-hero-seed" type="text" placeholder="random seed" autocomplete="off" spellcheck="false" aria-label="Field seed (blank for a random seed)">
+          <button id="newGridGame" class="button" type="button">＋ &nbsp; Generate &amp; run</button>
+          <button id="stopGridRun" class="quiet-button" type="button" hidden>Stop token</button>
+          <button id="exportGridJson" class="quiet-button" type="button">Export JSON</button>
+          <button id="backFromGrid" class="quiet-button" type="button">Back to workbench</button>
+        </div>
+      </section>
+      <div id="gridNotice" class="grid-notice" role="status" aria-live="polite">Generate a seeded field and the selected JEV model will choose every non-forced move from its fog-of-war map and move history. The model can also be given memory aids (dead-end and explored-pocket flags derived only from cells it has already observed), and the chosen level is recorded per run. Code enforces legality only; a run ends at the exit, at the move budget, on Stop, or after three failed attempts at one decision.</div>
+      <div id="gridGames" class="grid-games"></div>
+    </div>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const state = { suites: [], selected: null, edited: false, provider: null, profiles: [], lastRequest: null, reportRuns: [], gridGames: [], screen: "workbench", openSuite: null };
+    const panelWidthsKey = "jev-workbench-panel-widths-v1";
+    const parallelReportKey = "jev-workbench-parallel-report-v1";
+    const gridGamesKey = "jev-workbench-grid-games-v1";
+    const APPLE_FANOUT_MAX_IN_FLIGHT = 4;
+    const CLM_FANOUT_MAX_IN_FLIGHT = 8;
+    // Providers that answer each parallel question in its own request, using that question's own context.
+    function fanOutProfile(backend) {
+      if (backend === "apple:foundation-models") return { label: "Apple", maxInFlight: APPLE_FANOUT_MAX_IN_FLIGHT, unit: "sessions" };
+      // Field instructions in parallel suites route a field to its prompt inside the shared
+      // batch context. A per-question request has no shared context, and CLM embeds
+      // instructions as the question itself, so the routing text would displace the real
+      // question (which is already in that request's own context).
+      if (backend?.startsWith("clm:")) return { label: "CLM", maxInFlight: CLM_FANOUT_MAX_IN_FLIGHT, unit: "requests", dropRoutingInstructions: true };
+      return null;
+    }
+    function withoutInstructions(definition) {
+      const { instructions, ...rest } = definition;
+      return rest;
+    }
+    try { state.reportRuns = JSON.parse(localStorage.getItem(parallelReportKey) || "[]"); } catch { state.reportRuns = []; }
+    if (!Array.isArray(state.reportRuns)) state.reportRuns = [];
+    try { state.gridGames = JSON.parse(localStorage.getItem(gridGamesKey) || "[]"); } catch { state.gridGames = []; }
+    if (!Array.isArray(state.gridGames)) state.gridGames = [];
+    let interruptedGridRun = false;
+    for (const game of state.gridGames) {
+      for (const run of game.runs || []) {
+        if (run.status === "running") {
+          run.status = "interrupted";
+          run.endedAt = new Date().toISOString();
+          run.error = "The page was reloaded before this run reached the exit.";
+          interruptedGridRun = true;
+        }
+      }
+    }
+    if (interruptedGridRun) {
+      try { localStorage.setItem(gridGamesKey, JSON.stringify(state.gridGames)); } catch {}
+    }
+    const activeGridRuns = new Map();
+    const panelWidthBounds = { library: [190, 420], results: [300, 760] };
+    function clampPanelWidth(panel, value, min = panelWidthBounds[panel][0], max = panelWidthBounds[panel][1]) {
+      return Math.round(Math.max(min, Math.min(max, Number(value) || min)));
+    }
+    function readPanelWidths() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(panelWidthsKey) || "{}");
+        return {
+          library: clampPanelWidth("library", saved.library ?? 238),
+          results: clampPanelWidth("results", saved.results ?? 410),
+        };
+      } catch {
+        return { library: 238, results: 410 };
+      }
+    }
+    const panelWidths = readPanelWidths();
+    const escapeText = (value) => String(value ?? "");
+
+    function panelLayoutLimits() {
+      const workspace = $("workspace");
+      const style = getComputedStyle(workspace);
+      const contentWidth = workspace.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const compact = window.matchMedia("(max-width: 1060px)").matches;
+      return {
+        compact,
+        availablePanelWidth: contentWidth - (compact ? 14 : 28) - (compact ? 320 : 360),
+      };
+    }
+
+    function visiblePanelWidths() {
+      const { compact, availablePanelWidth } = panelLayoutLimits();
+      const libraryMax = Math.max(panelWidthBounds.library[0], Math.min(panelWidthBounds.library[1], availablePanelWidth - (compact ? 0 : panelWidthBounds.results[0])));
+      if (compact) return { library: Math.min(panelWidths.library, libraryMax), results: panelWidths.results };
+
+      let library = panelWidths.library;
+      let results = panelWidths.results;
+      let excess = library + results - availablePanelWidth;
+      const libraryReduction = Math.min(Math.max(0, library - panelWidthBounds.library[0]), Math.max(0, excess));
+      library -= libraryReduction;
+      excess -= libraryReduction;
+      results = Math.min(results, Math.max(panelWidthBounds.results[0], results - Math.max(0, excess)));
+      return { library, results };
+    }
+
+    function panelResizeRange(panel) {
+      const { compact, availablePanelWidth } = panelLayoutLimits();
+      const minimum = panelWidthBounds[panel][0];
+      const otherWidth = visiblePanelWidths()[panel === "library" ? "results" : "library"];
+      const max = compact && panel === "results"
+        ? panelWidthBounds.results[1]
+        : Math.max(minimum, Math.min(panelWidthBounds[panel][1], availablePanelWidth - (compact ? 0 : otherWidth)));
+      return { min: minimum, max };
+    }
+
+    function applyPanelWidths() {
+      const visible = visiblePanelWidths();
+      $("workspace").style.setProperty("--library-width", `${visible.library}px`);
+      $("workspace").style.setProperty("--results-width", `${visible.results}px`);
+      for (const panel of ["library", "results"]) {
+        const splitter = $(panel === "library" ? "librarySplitter" : "resultsSplitter");
+        const range = panelResizeRange(panel);
+        splitter.setAttribute("aria-valuemin", String(range.min));
+        splitter.setAttribute("aria-valuemax", String(range.max));
+        splitter.setAttribute("aria-valuenow", String(visible[panel]));
+      }
+    }
+
+    function savePanelWidths() {
+      try { localStorage.setItem(panelWidthsKey, JSON.stringify(panelWidths)); } catch {}
+    }
+
+    function setPanelWidth(panel, value, save = false) {
+      const range = panelResizeRange(panel);
+      panelWidths[panel] = clampPanelWidth(panel, value, range.min, range.max);
+      applyPanelWidths();
+      if (save) savePanelWidths();
+    }
+
+    function startPanelResize(event, panel) {
+      if ((event.pointerType === "mouse" && event.button !== 0) || window.matchMedia("(max-width: 740px)").matches) return;
+      const splitter = event.currentTarget;
+      const startingWidth = visiblePanelWidths()[panel];
+      const startX = event.clientX;
+      event.preventDefault();
+      splitter.focus({ preventScroll: true });
+      splitter.classList.add("dragging");
+      document.body.classList.add("resizing-panels");
+
+      const onMove = (moveEvent) => {
+        const delta = moveEvent.clientX - startX;
+        setPanelWidth(panel, startingWidth + (panel === "library" ? delta : -delta));
+      };
+      const onEnd = () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onEnd);
+        window.removeEventListener("pointercancel", onEnd);
+        splitter.classList.remove("dragging");
+        document.body.classList.remove("resizing-panels");
+        savePanelWidths();
+      };
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onEnd);
+      window.addEventListener("pointercancel", onEnd);
+    }
+
+    function adjustPanelWithKeyboard(event, panel) {
+      const range = panelResizeRange(panel);
+      const current = visiblePanelWidths()[panel];
+      const step = event.shiftKey ? 36 : 12;
+      let next;
+      if (event.key === "Home") next = range.min;
+      else if (event.key === "End") next = range.max;
+      else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        const delta = event.key === "ArrowRight" ? step : -step;
+        next = current + (panel === "library" ? delta : -delta);
+      } else return;
+      event.preventDefault();
+      setPanelWidth(panel, next, true);
+    }
+
+    function displayName(backend) {
+      if (!backend) return "No provider selected";
+      if (backend === "apple:foundation-models") return "Apple · Foundation Models";
+      if (backend.startsWith("local:")) return `Ollama · ${backend.slice(6)}`;
+      if (backend.startsWith("clm:")) return `CLM · ${backend.slice(4)}`;
+      if (backend.startsWith("remote:")) {
+        const id = backend.slice(7);
+        const profile = state.profiles.find((item) => item.id === id);
+        return `TypeSafe · ${profile?.name || id}`;
+      }
+      return backend;
+    }
+
+    function formatDuration(milliseconds) {
+      const value = Number(milliseconds);
+      if (!Number.isFinite(value) || value < 0) return "—";
+      if (value < 1000) return Math.round(value) + " ms";
+      if (value < 60000) return (value / 1000).toFixed(1) + " s";
+      return Math.floor(value / 60000) + "m " + ((value % 60000) / 1000).toFixed(0) + "s";
+    }
+
+    function setMainPage(screen) {
+      state.screen = screen;
+      $("workspace").hidden = screen !== "workbench";
+      $("reportScreen").hidden = screen !== "report";
+      $("gridScreen").hidden = screen !== "grid";
+      $("parallelReportButton").hidden = screen === "report";
+      $("parallelReportButton").setAttribute("aria-pressed", String(screen === "report"));
+      $("gridNavigationButton").setAttribute("aria-pressed", String(screen === "grid"));
+      $("gridNavigationButton").textContent = screen === "grid" ? "Back to workbench" : "Logic grid";
+      if (screen === "report") renderParallelReport();
+      if (screen === "grid") {
+        renderGridGames();
+        updateGridProviderNote();
+      }
+    }
+
+    function setReportView(open) {
+      setMainPage(open ? "report" : "workbench");
+    }
+
+    function renderParallelReport() {
+      const root = $("reportGroups");
+      root.replaceChildren();
+      const runs = state.reportRuns;
+      $("reportRunCount").textContent = String(runs.length);
+      $("clearParallelReport").disabled = runs.length === 0;
+      if (!runs.length) {
+        $("reportSummary").textContent = "No parallel runs saved yet. Run a parallel example with each selected model to add comparison columns.";
+        const empty = document.createElement("div");
+        empty.className = "report-empty";
+        const title = document.createElement("strong");
+        title.textContent = "Your comparison report is empty";
+        const detail = document.createElement("span");
+        detail.textContent = "Run any item in Parallel & agentic patterns. Each successful run adds a model column here; results stay in this browser until you clear them.";
+        empty.append(title, detail);
+        root.append(empty);
+        return;
+      }
+
+      const groups = new Map();
+      for (const run of runs) {
+        const key = run.caseId || run.caseName || "parallel-test";
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(run);
+      }
+      const modelCount = new Set(runs.map((run) => run.backendId || run.modelName)).size;
+      $("reportSummary").textContent = runs.length + " successful runs · " + groups.size + " parallel test" + (groups.size === 1 ? "" : "s") + " · " + modelCount + " model" + (modelCount === 1 ? "" : "s") + ". Run another provider on the same test to append a comparison column.";
+
+      for (const [caseId, caseRuns] of groups) {
+        const group = document.createElement("section");
+        group.className = "report-group";
+        const title = document.createElement("h3");
+        title.textContent = caseRuns[0].caseName || caseId;
+        group.append(title);
+        const wrap = document.createElement("div");
+        wrap.className = "report-table-wrap";
+        const table = document.createElement("table");
+        table.className = "report-table";
+        const thead = document.createElement("thead");
+        const header = document.createElement("tr");
+        const questionHead = document.createElement("th");
+        questionHead.scope = "col";
+        questionHead.textContent = "Question";
+        header.append(questionHead);
+        caseRuns.forEach((run, index) => {
+          const th = document.createElement("th");
+          th.scope = "col";
+          const model = document.createElement("span");
+          model.className = "report-model";
+          model.textContent = run.modelName || run.backendId || "Unknown provider";
+          const runId = document.createElement("span");
+          runId.className = "report-run-id";
+          const at = run.completedAt ? new Date(run.completedAt).toLocaleString() : "saved run";
+          runId.textContent = "Run " + (index + 1) + " · " + at;
+          const stats = document.createElement("span");
+          stats.className = "report-model-stats";
+          const scoreLines = outcomeSummary(run.fields || []);
+          const scored = (run.fields || []).filter((field) => field.match !== null && field.match !== undefined);
+          const correct = scored.filter((field) => field.match).length;
+          const accuracy = scoreLines ? "" : scored.length ? " · " + correct + "/" + scored.length + " correct (" + Math.round(correct / scored.length * 100) + "%)" : " · reference n/a";
+          const requests = Number(run.requestCount) > 1 ? " · " + run.requestCount + " requests" : "";
+          const concurrency = Number(run.maxConcurrency) > 0 ? " · max " + run.maxConcurrency + " in flight" : "";
+          const failures = Number(run.failedCount) > 0 ? " · " + run.failedCount + " failed" : "";
+          stats.textContent = formatDuration(run.elapsedMs) + accuracy + requests + concurrency + failures;
+          th.append(model, runId, stats);
+          if (scoreLines) {
+            const scores = document.createElement("span");
+            scores.className = "report-model-scores";
+            scores.textContent = scoreLines;
+            th.append(scores);
+          }
+          header.append(th);
+        });
+        thead.append(header);
+        table.append(thead);
+
+        const tbody = document.createElement("tbody");
+        for (const question of caseRuns[0].fields || []) {
+          const row = document.createElement("tr");
+          const questionCell = document.createElement("td");
+          const questionId = document.createElement("span");
+          questionId.className = "report-question-id";
+          questionId.textContent = question.id || "Question";
+          const questionText = document.createElement("span");
+          questionText.className = "report-question-text";
+          questionText.textContent = question.question || question.name || question.id || "(question unavailable)";
+          questionCell.append(questionId, questionText);
+          row.append(questionCell);
+          for (const run of caseRuns) {
+            const cell = document.createElement("td");
+            const answer = (run.fields || []).find((field) => field.id === question.id);
+            const answerText = document.createElement("span");
+            answerText.className = "report-answer";
+            answerText.textContent = answer?.error ? "Request failed" : answer ? String(answer.answer ?? "No value returned") : "Not run";
+            cell.append(answerText);
+            const verdict = document.createElement("span");
+            verdict.className = "report-verdict";
+            if (answer?.error) {
+              verdict.textContent = "request failed";
+              verdict.title = answer.error;
+            } else if (answer?.outcome) {
+              verdict.textContent = OUTCOME_LABELS[answer.outcome] || answer.outcome;
+              verdict.classList.add(answer.outcome === "reasonable" ? "partial" : ACCEPTABLE_OUTCOMES.has(answer.outcome) ? "match" : "differs");
+            } else if (!answer || answer.match === null || answer.match === undefined) {
+              verdict.textContent = answer ? "not scored" : "missing";
+            } else if (answer.match) {
+              verdict.textContent = "reference match";
+              verdict.classList.add("match");
+            } else {
+              verdict.textContent = "differs";
+              verdict.classList.add("differs");
+            }
+            cell.append(verdict);
+            row.append(cell);
+          }
+          tbody.append(row);
+        }
+        table.append(tbody);
+        wrap.append(table);
+        group.append(wrap);
+        root.append(group);
+      }
+    }
+
+    // LOGIC-SCORING-CORE-START
+    const OUTCOME_LABELS = {
+      correct: "correct",
+      wrong: "wrong",
+      overcaution: "over-cautious",
+      clarify: "clarified",
+      reasonable: "reasonable commit",
+      unjustified: "unjustified commit"
+    };
+    const ACCEPTABLE_OUTCOMES = new Set(["correct", "clarify", "reasonable"]);
+
+    // Definite questions have one right answer (a hedge pick is over-caution);
+    // judgment questions accept the clarifying answer or a listed defensible commit.
+    function scoreOutcome(answer, reference, scoring) {
+      if (!scoring || answer === undefined || answer === null || reference === null || reference === undefined) return null;
+      const value = String(answer);
+      if (scoring.kind === "judgment") {
+        if (value === String(reference)) return "clarify";
+        return (scoring.reasonable || []).map(String).includes(value) ? "reasonable" : "unjustified";
+      }
+      if (value === String(reference)) return "correct";
+      return scoring.hedge && value === String(scoring.hedge) ? "overcaution" : "wrong";
+    }
+
+    function outcomeSummary(fields) {
+      const scored = fields.filter((field) => field.outcome);
+      if (!scored.length) return null;
+      const count = (outcome) => scored.filter((field) => field.outcome === outcome).length;
+      const pct = (part, whole) => whole ? " (" + Math.round(part / whole * 100) + "%)" : "";
+      const acceptable = scored.filter((field) => ACCEPTABLE_OUTCOMES.has(field.outcome)).length;
+      const definite = count("correct") + count("wrong") + count("overcaution");
+      const hedged = scored.filter((field) => field.hedgeOffered).length;
+      const judgment = count("clarify") + count("reasonable") + count("unjustified");
+      const lines = ["Acceptable " + acceptable + "/" + scored.length + pct(acceptable, scored.length)];
+      if (definite) lines.push("Definite " + count("correct") + "/" + definite + pct(count("correct"), definite) + (hedged ? " · over-caution " + count("overcaution") + "/" + hedged : ""));
+      if (judgment) lines.push("Judgment " + judgment + ": clarify " + count("clarify") + " · reasonable " + count("reasonable") + " · unjustified " + count("unjustified"));
+      return lines.join("\n");
+    }
+    // LOGIC-SCORING-CORE-END
+
+    function saveParallelRun(data, request, elapsed, selectedCase, wasEdited, provider) {
+      if (selectedCase?.type !== "parallel") return;
+      const result = data.results?.[0] || {};
+      const decisions = result.decision || {};
+      const fields = result.fields || {};
+      const referenceAnswers = !wasEdited ? selectedCase.workflow?.reference_answers || {} : {};
+      const questionContexts = !wasEdited ? selectedCase.workflow?.question_contexts || {} : {};
+      const questionScoring = !wasEdited ? selectedCase.workflow?.question_scoring || {} : {};
+      const answers = Object.entries(request.schema).map(([name, definition]) => {
+        const field = fields[name] || {};
+        const answer = field.value ?? field.score ?? field.noul ?? decisions[name];
+        const reference = Object.prototype.hasOwnProperty.call(referenceAnswers, name) ? referenceAnswers[name] : null;
+        const instructions = definition.instructions;
+        const question = questionContexts[name] || (typeof instructions === "string" ? instructions : JSON.stringify(instructions || name));
+        return {
+          id: name,
+          name,
+          question,
+          answer,
+          reference,
+          match: reference === null || answer === undefined ? null : String(answer) === String(reference),
+          kind: questionScoring[name]?.kind || null,
+          hedgeOffered: Boolean(questionScoring[name]?.hedge),
+          outcome: field.error ? null : scoreOutcome(answer, reference, questionScoring[name]),
+          error: field.error || null
+        };
+      });
+      const backendId = provider?.selected_backend || "unknown";
+      state.reportRuns.push({
+        caseId: selectedCase.id || selectedCase.name || "parallel-test",
+        caseName: selectedCase.name || "Parallel test",
+        backendId,
+        modelName: displayName(backendId),
+        completedAt: new Date().toISOString(),
+        elapsedMs: elapsed,
+        requestCount: Number(data.request_count) || 1,
+        maxConcurrency: Number(data.max_concurrency) || null,
+        failedCount: Array.isArray(data.field_errors) ? data.field_errors.length : 0,
+        batchLatenciesMs: data.batch_latencies_ms || [],
+        fields: answers
+      });
+      try {
+        localStorage.setItem(parallelReportKey, JSON.stringify(state.reportRuns));
+      } catch {
+        $("runNote").textContent = "Run completed, but browser storage is full; this column is only available until the page is closed.";
+        $("runNote").style.color = "var(--amber)";
+      }
+      renderParallelReport();
+    }
+
+    async function refreshProvider() {
+      const badge = $("providerStatus");
+      try {
+        const [healthResponse, profilesResponse] = await Promise.all([
+          fetch("/health", { cache: "no-store" }), fetch("/providers", { cache: "no-store" })
+        ]);
+        if (!healthResponse.ok) throw new Error(`Gateway health returned HTTP ${healthResponse.status}`);
+        const health = await healthResponse.json();
+        const profiles = profilesResponse.ok ? await profilesResponse.json() : { providers: [] };
+        state.provider = health;
+        state.profiles = profiles.providers || [];
+        $("providerName").textContent = displayName(health.selected_backend);
+        $("statusDetail").textContent = health.backend_status || health.status || "unknown";
+        badge.className = "provider-status " + (["running", "configured"].includes(health.backend_status) ? "good" : ["stopped", "unavailable", "misconfigured"].includes(health.backend_status) ? "warn" : "bad");
+        if (health.selected_backend?.startsWith("remote:")) {
+          $("providerWarning").textContent = `This test will be sent to the selected remote provider (${displayName(health.selected_backend)}). Only run evidence you intend to share with that provider.`;
+          $("providerWarning").classList.add("visible");
+        } else {
+          $("providerWarning").classList.remove("visible");
+        }
+        updateGridProviderNote();
+      } catch (error) {
+        state.provider = null;
+        $("providerName").textContent = "Gateway unavailable";
+        $("statusDetail").textContent = "check menu-bar service";
+        badge.className = "provider-status bad";
+        updateGridProviderNote();
+      }
+    }
+
+    function totalCases() { return state.suites.reduce((sum, suite) => sum + suite.cases.length, 0); }
+
+    function renderLibrary(filter = "") {
+      const root = $("suites");
+      root.replaceChildren();
+      const query = filter.trim().toLowerCase();
+      let visibleCount = 0;
+      for (const suite of state.suites) {
+        const cases = suite.cases.filter((item) => !query || `${item.name} ${item.question} ${item.context}`.toLowerCase().includes(query));
+        if (!cases.length) continue;
+        visibleCount += cases.length;
+        const suiteKey = suite.id || suite.name;
+        const open = state.openSuite === suiteKey;
+        const section = document.createElement("section");
+        section.className = "suite" + (open ? " open" : "");
+        section.dataset.suite = suiteKey;
+        const head = document.createElement("button");
+        head.type = "button";
+        head.className = "suite-head";
+        head.setAttribute("aria-expanded", String(open));
+        const title = document.createElement("span");
+        title.className = "suite-title";
+        title.textContent = suite.name;
+        const count = document.createElement("span");
+        count.className = "suite-count";
+        count.textContent = String(cases.length).padStart(2, "0");
+        head.append(title, count);
+        head.addEventListener("click", () => {
+          state.openSuite = state.openSuite === suiteKey ? null : suiteKey;
+          renderLibrary($("searchCases").value);
+          root.querySelector(`[data-suite="${CSS.escape(suiteKey)}"] .suite-head`)?.focus();
+        });
+        const description = document.createElement("div");
+        description.className = "suite-description";
+        description.textContent = suite.description || "";
+        const list = document.createElement("div");
+        list.className = "case-list";
+        for (const item of cases) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "case-button" + (state.selected?.id === item.id && state.selected?.suite === item.suite ? " active" : "");
+          button.setAttribute("aria-pressed", String(state.selected?.id === item.id && state.selected?.suite === item.suite));
+          const name = document.createElement("span");
+          name.className = "case-name";
+          name.textContent = item.name;
+          const kind = document.createElement("span");
+          kind.className = "kind-tag";
+          kind.textContent = item.type === "parallel" ? "MULTI" : item.type;
+          button.append(name, kind);
+          button.addEventListener("click", () => selectCase(item));
+          list.append(button);
+        }
+        section.append(head, description, list);
+        root.append(section);
+      }
+      if (!visibleCount) {
+        const empty = document.createElement("div");
+        empty.className = "empty-library";
+        empty.textContent = query ? "No cases match that filter." : "No examples are available.";
+        root.append(empty);
+      }
+      $("caseCount").textContent = query ? `${visibleCount} shown` : `${totalCases()} cases`;
+    }
+
+    function updatePrimitiveControls() {
+      const kind = $("primitive").value;
+      $("choiceControls").hidden = kind !== "choice";
+      $("scoreControls").hidden = kind !== "score";
+      $("noulControls").hidden = kind !== "noul";
+      $("parallelControls").hidden = kind !== "parallel";
+      $("questionLabel").textContent = kind === "parallel" ? "Workflow instructions" : "Decision question";
+      $("questionHint").textContent = kind === "parallel" ? "shared across fields" : "sent as field guidance";
+      markEdited();
+    }
+
+    function markEdited() {
+      if (!state.selected) return;
+      state.edited = true;
+      $("caseKicker").textContent = "Edited test · reference not scored";
+      $("requestPreview").textContent = "Request JSON will appear here when you run the test.";
+    }
+
+    function selectCase(item) {
+      state.selected = item;
+      state.edited = false;
+      $("primitive").value = item.type || "choice";
+      $("question").value = item.question || "";
+      $("context").value = item.context || item.question || "";
+      $("choices").value = (item.choices || []).join("\n");
+      $("scoreCriteria").value = (item.criteria instanceof Array ? item.criteria : []).join("\n");
+      $("trueCriteria").value = item.criteria?.true || "The evidence supports the claim.";
+      $("falseCriteria").value = item.criteria?.false || "The evidence does not support the claim.";
+      $("parallelSchema").value = item.schema ? JSON.stringify(item.schema, null, 2) : "";
+      $("guidance").value = item.guidance || "";
+      $("caseKicker").textContent = item.suite ? `${item.suite} suite` : "Custom test";
+      $("editorTitle").textContent = item.name || "Custom decision";
+      $("caseId").textContent = (item.id || "custom").toUpperCase();
+      $("runNote").textContent = item.id === "logic-100-parallel"
+        ? "The supplied expected answer appears among each question's choices; the comparison key is not sent as separate metadata."
+        : "Reference answers are excluded from request metadata.";
+      $("requestPreview").textContent = "Request JSON will appear here when you run the test.";
+      $("resultState").className = "result-state";
+      $("workflowOutcome").hidden = true;
+      $("emptyState").hidden = false;
+      updatePrimitiveControls();
+      state.edited = false;
+      $("caseKicker").textContent = item.suite ? `${item.suite} suite` : "Custom test";
+      renderLibrary($("searchCases").value);
+    }
+
+    function newCustomCase() {
+      selectCase({
+        id: "custom", name: "Custom decision", type: "choice", suite: "",
+        question: "Which option best follows from the supplied facts?", context: "",
+        choices: ["option A", "option B"], expected: null,
+        guidance: "Use only the supplied facts. If the evidence is insufficient, say so when an uncertainty option is available."
+      });
+      state.edited = true;
+      $("caseKicker").textContent = "Custom test · no reference answer";
+      $("context").focus();
+    }
+
+    function buildParallelSchema() {
+      let schema;
+      try { schema = JSON.parse($("parallelSchema").value); }
+      catch { throw new Error("Parallel schema must be valid JSON."); }
+      if (!schema || typeof schema !== "object" || Array.isArray(schema) || Object.keys(schema).length < 2) {
+        throw new Error("Parallel schema must be a JSON object with at least two fields.");
+      }
+      for (const [name, definition] of Object.entries(schema)) {
+        if (!definition || typeof definition !== "object" || Array.isArray(definition)) {
+          throw new Error(`Field '${name}' must be a JSON object.`);
+        }
+        if (definition.type === "choice") {
+          const choices = Array.isArray(definition.choices)
+            ? definition.choices
+            : definition.criteria && typeof definition.criteria === "object" && !Array.isArray(definition.criteria)
+              ? Object.keys(definition.criteria)
+              : [];
+          if (choices.length < 2 || new Set(choices).size !== choices.length) {
+            throw new Error(`Choice field '${name}' needs at least two distinct choices.`);
+          }
+        } else if (definition.type === "score") {
+          if (!Array.isArray(definition.criteria) || definition.criteria.length < 2 || definition.criteria.length > 10) {
+            throw new Error(`Score field '${name}' needs 2–10 ordered criteria.`);
+          }
+        } else if (definition.type !== "noul") {
+          throw new Error(`Field '${name}' must use Choice, Score, or Noul.`);
+        }
+      }
+      return schema;
+    }
+
+    function buildRequest() {
+      const type = $("primitive").value;
+      const question = $("question").value.trim();
+      const context = $("context").value.trim();
+      if (!question || !context) throw new Error("Enter both a decision question and evidence/context.");
+      const schema = {};
+      if (type === "parallel") {
+        Object.assign(schema, buildParallelSchema());
+      } else if (type === "choice") {
+        const choices = $("choices").value.split("\n").map((item) => item.trim()).filter(Boolean);
+        if (choices.length < 2 || new Set(choices).size !== choices.length) throw new Error("Choice tests need at least two distinct options, one per line.");
+        schema.answer = { type: "choice", choices, instructions: question };
+        schema.confidence = { type: "choice", choices: ["high", "medium", "low"], instructions: "How clear is the best-supported answer from the supplied facts? Choose low when material information is missing or ambiguous." };
+      } else if (type === "score") {
+        const criteria = $("scoreCriteria").value.split("\n").map((item) => item.trim()).filter(Boolean);
+        if (criteria.length < 2 || criteria.length > 10) throw new Error("Score tests need 2–10 ordered levels, one per line.");
+        schema.adequacy = { type: "score", criteria, instructions: question };
+      } else {
+        schema.supported = {
+          type: "noul",
+          criteria: { true: $("trueCriteria").value.trim(), false: $("falseCriteria").value.trim() },
+          instructions: question
+        };
+        if (!schema.supported.criteria.true || !schema.supported.criteria.false) throw new Error("Describe what true and false mean for this test.");
+      }
+      return {
+        instructions: type === "parallel"
+          ? [question, $("guidance").value.trim()].filter(Boolean).join("\n\n")
+          : $("guidance").value.trim() || "Evaluate only the supplied evidence and apply each field's instructions.",
+        schema,
+        contexts: [context]
+      };
+    }
+
+    function prettyValue(value) {
+      if (value === true) return "true";
+      if (value === false) return "false";
+      if (value === null || value === undefined) return "No value returned";
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value);
+    }
+
+    function mostLikelyScoreLevel(field, value) {
+      const probabilities = field?.probabilities;
+      if (probabilities && typeof probabilities === "object") {
+        const mostLikely = Object.entries(probabilities).sort((a, b) => Number(b[1]) - Number(a[1]))[0];
+        if (mostLikely && Number.isFinite(Number(mostLikely[0]))) return Number(mostLikely[0]);
+      }
+      return Number.isInteger(Number(value)) ? Number(value) : null;
+    }
+
+    function scoreLevelText(index, field, definition) {
+      if (index === null || index === undefined) return "";
+      const raw = field?.legend?.[String(index)] || definition?.criteria?.[index] || `level ${index}`;
+      return String(raw).replace(/^\d+\s*[—:.-]\s*/, "");
+    }
+
+    function scoreDisplay(value, field, definition) {
+      const level = mostLikelyScoreLevel(field, value);
+      if (level === null) return `${prettyValue(value)} weighted score`;
+      return `Level ${level}: ${scoreLevelText(level, field, definition)}`;
+    }
+
+    function makePill(text, extra = "") {
+      const pill = document.createElement("span");
+      pill.className = `pill ${extra}`.trim();
+      pill.textContent = text;
+      return pill;
+    }
+
+    function addDistribution(target, field, definition, value) {
+      const probabilities = field?.probabilities;
+      if (!probabilities || typeof probabilities !== "object" || !Object.keys(probabilities).length) {
+        const note = document.createElement("div");
+        note.className = "no-distribution";
+        note.textContent = "This provider returns the structured value without a probability distribution.";
+        target.append(note);
+        return;
+      }
+      const distribution = document.createElement("div");
+      distribution.className = "distribution";
+      const type = definition?.type;
+      const legend = field?.legend || {};
+      let entries = Object.entries(probabilities);
+      if (type === "choice" && Array.isArray(definition.choices)) entries = definition.choices.filter((key) => key in probabilities).map((key) => [key, probabilities[key]]);
+      if (type === "score") entries.sort((a, b) => Number(a[0]) - Number(b[0]));
+      for (const [key, raw] of entries) {
+        const probability = Number(raw);
+        if (!Number.isFinite(probability)) continue;
+        const row = document.createElement("div");
+        row.className = "prob-row" + (String(value) === String(key) ? " selected" : "");
+        const main = document.createElement("div");
+        main.className = "prob-main";
+        const label = document.createElement("span");
+        label.className = "prob-label";
+        label.textContent = type === "score" ? (legend[key] || definition.criteria?.[Number(key)] || `Level ${key}`) : key;
+        const track = document.createElement("span");
+        track.className = "track";
+        const fill = document.createElement("span");
+        fill.className = "fill";
+        fill.style.width = `${Math.max(0, Math.min(100, probability * 100))}%`;
+        track.append(fill);
+        main.append(label, track);
+        const pct = document.createElement("span");
+        pct.className = "prob-value";
+        pct.textContent = `${(probability * 100).toFixed(1)}%`;
+        row.append(main, pct);
+        distribution.append(row);
+      }
+      target.append(distribution);
+    }
+
+    function fieldValue(name, schema, fields, decision) {
+      const field = fields[name] || {};
+      return field.value ?? field.score ?? field.noul ?? decision[name];
+    }
+
+    function workflowOutcome(workflow, schema, fields, decision, requestCount = 1) {
+      if (!workflow || typeof workflow !== "object") return null;
+      const names = Object.keys(schema);
+      if (workflow.type === "parallel-questions") {
+        return {
+          title: workflow.label || "Parallel questions",
+          value: names.length + " typed answers · " + requestCount + (requestCount === 1 ? " request" : " requests"),
+          detail: workflow.note || "All fields were evaluated against the same evidence packet. " + requestCount + " gateway request(s) used."
+        };
+      }
+      if (workflow.type === "intent-routing") {
+        const intent = fieldValue(workflow.intent_field, schema, fields, decision);
+        const complexity = Number(fieldValue(workflow.complexity_field, schema, fields, decision));
+        if (intent === undefined || intent === null) {
+          return { title: "Code-side route recommendation", value: "Route unavailable", detail: "The response did not include the configured intent field." };
+        }
+        const escalation = workflow.complexity_escalation || {};
+        let route = workflow.routes?.[intent];
+        if (intent === escalation.intent && Number.isFinite(complexity) && complexity > Number(escalation.threshold)) {
+          route = { label: "Human review", handler: "human", reason: `Complaint complexity ${complexity.toFixed(2)} exceeds the demonstration threshold ${escalation.threshold}.` };
+        }
+        if (!route) return { title: "Code-side route recommendation", value: "Human review", detail: `No route is configured for '${intent}'.` };
+        return {
+          title: "Code-side route recommendation",
+          value: `${route.label} · ${route.handler}`,
+          detail: route.reason || `Intent '${intent}' selected by the batch. Complexity score: ${Number.isFinite(complexity) ? complexity.toFixed(2) : "unavailable"}. This example displays a route; it does not call that handler.`
+        };
+      }
+      if (workflow.type === "composite-scoring") {
+        const weights = workflow.weights || {};
+        const parts = [];
+        let total = 0;
+        for (const [name, rawWeight] of Object.entries(weights)) {
+          const definition = schema[name];
+          const score = Number(fieldValue(name, schema, fields, decision));
+          const weight = Number(rawWeight);
+          if (definition?.type !== "score" || !Array.isArray(definition.criteria) || definition.criteria.length < 2 || !Number.isFinite(score) || !Number.isFinite(weight) || weight < 0) {
+            return { title: "Deterministic composite score", value: "Incomplete", detail: `A valid Score field or weight is missing for '${name}'.` };
+          }
+          const normalized = Math.max(0, Math.min(1, score / (definition.criteria.length - 1)));
+          total += normalized * weight;
+          parts.push(`${name}: ${(normalized * 100).toFixed(0)}% × ${(weight * 100).toFixed(0)}%`);
+        }
+        const weightTotal = Object.values(weights).reduce((sum, value) => sum + Number(value), 0);
+        if (!parts.length || !Number.isFinite(weightTotal) || weightTotal <= 0) {
+          return { title: "Deterministic composite score", value: "Incomplete", detail: "No usable score weights were configured." };
+        }
+        const normalizedTotal = total / weightTotal;
+        return {
+          title: "Deterministic composite score · code-owned weights",
+          value: `${(normalizedTotal * 100).toFixed(1)}% demonstration score`,
+          detail: `${parts.join(" + ")}\nNormalized to a 0–100% display. This is an inspectable ranking signal, not an approval or release gate.`
+        };
+      }
+      if (workflow.type === "confidence-routing") {
+        const name = workflow.field;
+        const field = fields[name] || {};
+        const action = fieldValue(name, schema, fields, decision);
+        const confidence = Number(field.confidence);
+        const minimum = Number(workflow.minimum_confidence ?? 0.6);
+        const routineThreshold = Number(workflow.routine_edit_confidence ?? 0.8);
+        if (action === undefined || action === null) {
+          return { title: "Confidence gate · no action executed", value: "Human review", detail: "No action classification was returned." };
+        }
+        if (!Number.isFinite(confidence)) {
+          return { title: "Confidence gate · no action executed", value: "Human review", detail: `The selected provider did not return provider-reported confidence for '${name}'. A probability peak is not substituted for calibrated confidence.` };
+        }
+        if (action === "unclear" || confidence < minimum) {
+          return { title: "Confidence gate · no action executed", value: "Human review", detail: `Provider-reported confidence ${(confidence * 100).toFixed(1)}% is below the ${ (minimum * 100).toFixed(0) }% floor, or the action is unclear.` };
+        }
+        if ((workflow.approval_required || []).includes(action)) {
+          return { title: "Confidence gate · no action executed", value: "Owner approval required", detail: `${action} remains approval-gated regardless of confidence (${(confidence * 100).toFixed(1)}%). Confidence does not grant authority.` };
+        }
+        if (action === "read_only") {
+          return { title: "Confidence gate · no action executed", value: "Eligible for read-only handling", detail: `Provider-reported confidence: ${(confidence * 100).toFixed(1)}%. No files or settings are changed by this example.` };
+        }
+        if (action === "routine_edit" && confidence >= routineThreshold) {
+          return { title: "Confidence gate · no action executed", value: "Eligible for scoped implementation", detail: `Provider-reported confidence ${(confidence * 100).toFixed(1)}% meets the demonstration threshold ${(routineThreshold * 100).toFixed(0)}%. This is only a route recommendation.` };
+        }
+        return { title: "Confidence gate · no action executed", value: "Confirm with a human", detail: `Provider-reported confidence ${(confidence * 100).toFixed(1)}% does not clear the policy for '${action}'.` };
+      }
+      if (workflow.type === "fan-out") {
+        const branches = workflow.branches || {};
+        const selected = [];
+        const uncertain = [];
+        for (const [name, label] of Object.entries(branches)) {
+          const field = fields[name] || {};
+          const value = fieldValue(name, schema, fields, decision);
+          if (value === true) selected.push(label);
+          else if (value === undefined || value === null || (Number.isFinite(Number(field.probability)) && Number(field.probability) < 0.65)) uncertain.push(label);
+        }
+        const detail = [
+          selected.length ? `Selected: ${selected.join("; ")}` : "No branch was selected from the returned values.",
+          uncertain.length ? `Low-margin or missing evidence: ${uncertain.join("; ")}` : "",
+          "This demonstrates code-side filtering only; it does not dispatch checks or agents."
+        ].filter(Boolean).join("\n");
+        return {
+          title: "Speculative fan-out · code-side filtering",
+          value: selected.length ? `${selected.length} follow-up ${selected.length === 1 ? "branch" : "branches"} selected` : "No follow-up branch selected",
+          detail
+        };
+      }
+      return null;
+    }
+
+    function renderResult(data, request, elapsed) {
+      const result = data.results?.[0];
+      if (!result || typeof result !== "object") throw new Error("JEV returned no decision result.");
+      const decision = result.decision || {};
+      const fields = result.fields || {};
+      const names = Object.keys(request.schema);
+      const returnedCount = names.filter((name) => fieldValue(name, request.schema, fields, decision) !== undefined).length;
+      const primaryName = names[0];
+      const primaryField = fields[primaryName] || {};
+      const primaryDefinition = request.schema[primaryName] || {};
+      const primaryValue = primaryField.value ?? primaryField.score ?? primaryField.noul ?? decision[primaryName];
+      const isParallel = state.selected?.type === "parallel";
+      $("answerLabel").textContent = isParallel ? "Parallel request" : "Primary decision";
+      $("answerValue").textContent = isParallel
+        ? returnedCount === names.length ? `${names.length} fields returned` : `${returnedCount}/${names.length} fields returned`
+        : primaryDefinition.type === "score"
+          ? scoreDisplay(primaryValue, primaryField, primaryDefinition)
+          : prettyValue(primaryValue);
+      $("runTime").textContent = `${elapsed.toFixed(0)} ms`;
+      $("answerMeta").replaceChildren();
+      const backendName = state.provider ? displayName(state.provider.selected_backend) : "JEV provider";
+      $("answerMeta").append(makePill(backendName));
+      if (isParallel) {
+        const requestCount = Number(data.request_count) || 1;
+        const maxConcurrency = Number(data.max_concurrency) || 0;
+        $("answerMeta").append(makePill(maxConcurrency > 0
+          ? `${requestCount} gateway requests · max ${maxConcurrency} in flight`
+          : requestCount === 1 ? "one gateway request" : requestCount + " parallel gateway requests"));
+      }
+      if (primaryField.probability !== undefined && Number.isFinite(Number(primaryField.probability))) {
+        $("answerMeta").append(makePill(`selected ${ (Number(primaryField.probability) * 100).toFixed(1) }%`));
+      }
+      const clarity = fields.confidence?.value ?? decision.confidence;
+      if (clarity !== undefined) $("answerMeta").append(makePill(`clarity · ${prettyValue(clarity)}`));
+
+      const expected = state.selected?.expected;
+      const referenceAnswers = state.selected?.workflow?.reference_answers;
+      let canCompare = false;
+      let matched = false;
+      let returnedReferences = 0;
+      let matchingReferences = 0;
+      if (!state.edited && isParallel && referenceAnswers && typeof referenceAnswers === "object" && !Array.isArray(referenceAnswers)) {
+        const references = Object.entries(referenceAnswers);
+        returnedReferences = references.filter(([name]) => fieldValue(name, request.schema, fields, decision) !== undefined).length;
+        matchingReferences = references.filter(([name, referenceValue]) =>
+          fieldValue(name, request.schema, fields, decision) !== undefined &&
+          String(fieldValue(name, request.schema, fields, decision)) === String(referenceValue)
+        ).length;
+        canCompare = references.length > 0 && returnedReferences === references.length;
+        matched = canCompare && matchingReferences === references.length;
+      } else if (!state.edited && primaryDefinition.type === "score" && state.selected?.expected_index !== undefined) {
+        const selectedLevel = mostLikelyScoreLevel(primaryField, primaryValue);
+        canCompare = selectedLevel !== null;
+        matched = canCompare && selectedLevel === Number(state.selected.expected_index);
+      } else if (!state.edited && expected !== null && expected !== undefined) {
+        canCompare = true;
+        matched = String(primaryValue) === String(expected);
+      }
+      const questionScoring = !state.edited && isParallel ? state.selected?.workflow?.question_scoring : null;
+      const scoredOutcomes = questionScoring && referenceAnswers
+        ? Object.keys(referenceAnswers).map((name) => scoreOutcome(fieldValue(name, request.schema, fields, decision), referenceAnswers[name], questionScoring[name])).filter(Boolean)
+        : [];
+      $("answerBlock").className = "answer-block" + (canCompare ? "" : " no-reference");
+      if (scoredOutcomes.length) {
+        const acceptable = scoredOutcomes.filter((outcome) => ACCEPTABLE_OUTCOMES.has(outcome)).length;
+        $("answerMeta").append(makePill(`acceptable ${acceptable}/${scoredOutcomes.length}`, acceptable === scoredOutcomes.length ? "match" : "mismatch"));
+      } else if (canCompare) $("answerMeta").append(makePill(matched ? "reference match" : "differs from reference", matched ? "match" : "mismatch"));
+      else if (returnedReferences > 0) $("answerMeta").append(makePill(`${returnedReferences}/${Object.keys(referenceAnswers || {}).length} reference values returned`, "mismatch"));
+
+      const providerValue = state.provider?.selected_backend || "";
+      const providerHasDistribution = primaryField.probabilities && Object.keys(primaryField.probabilities).length;
+      $("resultGuidance").className = "result-guidance";
+      $("resultGuidance").textContent = providerHasDistribution
+        ? "The bars show the returned decision distribution for each field."
+        : providerValue === "apple:foundation-models"
+          ? "Apple Foundation Models returned structured values but does not expose choice probabilities or calibrated confidence."
+          : "The selected response includes no decision probability distribution.";
+      const fieldErrors = Array.isArray(data.field_errors) ? data.field_errors : [];
+      if (fieldErrors.length) {
+        $("resultGuidance").classList.add("error-text");
+        $("resultGuidance").textContent += ` ${fieldErrors.length} question${fieldErrors.length === 1 ? "" : "s"} failed individually; successful answers were retained and failures are marked below.`;
+      }
+
+      const outcome = fieldErrors.length
+        ? null
+        : workflowOutcome(state.selected?.workflow, request.schema, fields, decision, Number(data.request_count) || 1);
+      $("workflowOutcome").hidden = !outcome;
+      if (outcome) {
+        $("workflowTitle").textContent = outcome.title;
+        $("workflowValue").textContent = outcome.value;
+        $("workflowDetail").textContent = outcome.detail;
+      }
+
+      const container = $("fieldResults");
+      container.replaceChildren();
+      for (const [name, definition] of Object.entries(request.schema)) {
+        const field = fields[name] || {};
+        const value = field.value ?? field.score ?? field.noul ?? decision[name];
+        const card = document.createElement("article");
+        card.className = "field-result";
+        const head = document.createElement("div");
+        head.className = "field-result-head";
+        const label = document.createElement("span");
+        label.className = "field-name";
+        label.textContent = `${name} · ${definition.type}`;
+        const valueLabel = document.createElement("span");
+        valueLabel.className = "field-value";
+        valueLabel.textContent = value === undefined && field.error
+          ? "Request failed"
+          : definition.type === "score"
+          ? scoreDisplay(value, field, definition)
+          : prettyValue(value);
+        head.append(label, valueLabel);
+        card.append(head);
+        if (!field.error) addDistribution(card, field, definition, value);
+        if (field.error) {
+          const errorNote = document.createElement("div");
+          errorNote.className = "no-distribution";
+          errorNote.style.color = "var(--red)";
+          errorNote.textContent = `Request failed: ${field.error}`;
+          card.append(errorNote);
+        }
+        if (!state.edited && referenceAnswers && Object.prototype.hasOwnProperty.call(referenceAnswers, name)) {
+          const referenceNote = document.createElement("div");
+          referenceNote.className = "no-distribution";
+          const referenceValue = referenceAnswers[name];
+          const referenceMatch = value !== undefined && String(value) === String(referenceValue);
+          const scoring = state.selected?.workflow?.question_scoring?.[name];
+          const outcome = scoreOutcome(value, referenceValue, scoring);
+          const verdict = value === undefined ? "not returned" : outcome ? OUTCOME_LABELS[outcome] : referenceMatch ? "match" : "differs";
+          referenceNote.textContent = `${scoring ? scoring.kind + " · " : ""}Reference: ${prettyValue(referenceValue)} · ${verdict}`;
+          card.append(referenceNote);
+        }
+        if (field.confidence !== undefined && Number.isFinite(Number(field.confidence))) {
+          const note = document.createElement("div");
+          note.className = "no-distribution";
+          note.textContent = `Provider confidence: ${(Number(field.confidence) * 100).toFixed(1)}% (provider-specific; not calibrated by this workbench).`;
+          card.append(note);
+        }
+        container.append(card);
+      }
+
+      const reference = state.selected?.reference || (!isParallel && canCompare ? String(expected) : "");
+      $("referenceBox").hidden = !reference;
+      $("referenceText").textContent = reference || "";
+      $("responsePreview").textContent = JSON.stringify(data, null, 2);
+      $("resultGuidance").textContent += state.selected?.id === "logic-100-parallel" && !state.edited
+        ? " Expected answers are used for local comparison and also appear as normal choices in their fields."
+        : " Reference answers are used for local comparison and are excluded from request metadata.";
+      $("emptyState").hidden = true;
+      $("resultState").className = "result-state visible";
+    }
+
+    async function sendDecisionRequest(payload, signal) {
+      const started = performance.now();
+      const response = await fetch("/v1/decision", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload), signal
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const rawError = body.error;
+        const detail = typeof rawError === "string"
+          ? rawError
+          : rawError && typeof rawError === "object"
+            ? rawError.message || rawError.detail || JSON.stringify(rawError)
+            : `JEV returned HTTP ${response.status}.`;
+        const error = new Error(`HTTP ${response.status}: ${detail}`);
+        error.responseBody = body;
+        throw error;
+      }
+      return { body, elapsed: performance.now() - started };
+    }
+
+    async function runWithConcurrency(items, maxConcurrency, worker, onProgress) {
+      const outcomes = new Array(items.length);
+      let nextIndex = 0;
+      let completed = 0;
+      let succeeded = 0;
+      let failed = 0;
+      const runWorker = async () => {
+        while (true) {
+          const index = nextIndex++;
+          if (index >= items.length) return;
+          const started = performance.now();
+          try {
+            outcomes[index] = { ok: true, value: await worker(items[index], index), elapsed: performance.now() - started };
+            succeeded++;
+          } catch (error) {
+            outcomes[index] = { ok: false, error, elapsed: performance.now() - started };
+            failed++;
+          }
+          completed++;
+          onProgress?.({ completed, total: items.length, succeeded, failed });
+        }
+      };
+      const workerCount = Math.min(Math.max(1, maxConcurrency), items.length);
+      await Promise.all(Array.from({ length: workerCount }, runWorker));
+      return outcomes;
+    }
+
+    // RADIOACTIVE-RUN-CORE-START
+    const GRID_DIRECTIONS = [
+      { id: "up", label: "Up", symbol: "↑", dx: 0, dy: -1 },
+      { id: "right", label: "Right", symbol: "→", dx: 1, dy: 0 },
+      { id: "down", label: "Down", symbol: "↓", dx: 0, dy: 1 },
+      { id: "left", label: "Left", symbol: "←", dx: -1, dy: 0 },
+    ];
+
+    function gridKey(row, col) { return `${row},${col}`; }
+
+    const RR_ROWS = 20;
+    const RR_COLUMN_OPTIONS = [40, 60, 80];
+    const RR_DEFAULT_COLUMNS = 60;
+    const RR_START_ROW = 10;
+
+    function rrMulberry32(seed) {
+      let a = seed >>> 0;
+      return function nextRandom() {
+        a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function rrHashSeed(text) {
+      let hash = 2166136261;
+      for (let index = 0; index < text.length; index++) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    }
+
+    function rrNormalizeSeed(input) {
+      const text = String(input ?? "").trim();
+      if (!text) return Math.floor(Math.random() * 4294967296) >>> 0;
+      if (/^-?\d+$/.test(text)) return Number(text) >>> 0;
+      return rrHashSeed(text);
+    }
+    function rrHasSafeRoute(wallRows, columns, rows = RR_ROWS) {
+      const start = { row: RR_START_ROW, col: 0 };
+      const queue = [start];
+      const visited = new Set([gridKey(start.row, start.col)]);
+      for (let index = 0; index < queue.length; index++) {
+        const current = queue[index];
+        if (current.col === columns - 1) return true;
+        for (const direction of GRID_DIRECTIONS) {
+          const row = current.row + direction.dy;
+          const col = current.col + direction.dx;
+          const key = gridKey(row, col);
+          if (row < 0 || row >= rows || col < 0 || col >= columns || visited.has(key) || wallRows[row][col] === "#") continue;
+          visited.add(key);
+          queue.push({ row, col });
+        }
+      }
+      return false;
+    }
+
+    function rrValidateGrid(wallRows, columns, rows = RR_ROWS) {
+      if (wallRows.length !== rows || wallRows.some((row) => row.length !== columns)) return "The generated field has an invalid size.";
+      for (let row = 0; row < rows; row++) {
+        let horizontalRun = 0;
+        for (let col = 0; col < columns; col++) {
+          const blocked = wallRows[row][col] === "#";
+          if (blocked && (col < 5 || col >= columns - 5)) return "A blocker entered a reserved start or exit lane.";
+          horizontalRun = blocked ? horizontalRun + 1 : 0;
+          if (horizontalRun > 5) return "A row contains more than five consecutive blockers.";
+        }
+      }
+      for (let col = 0; col < columns; col++) {
+        if (wallRows.every((row) => row[col] === "#")) return "A column is completely blocked.";
+      }
+      if (!rrHasSafeRoute(wallRows, columns, rows)) return "The field has no orthogonal route from start to exit.";
+      return null;
+    }
+
+    function rrShortestPath(wallRows, rows = RR_ROWS, columns = wallRows[0]?.length) {
+      const start = { row: RR_START_ROW, col: 0 };
+      const queue = [start];
+      const distances = new Map([[gridKey(start.row, start.col), 0]]);
+      for (let index = 0; index < queue.length; index++) {
+        const current = queue[index];
+        if (current.col === columns - 1) return distances.get(gridKey(current.row, current.col));
+        for (const direction of GRID_DIRECTIONS) {
+          const row = current.row + direction.dy;
+          const col = current.col + direction.dx;
+          const key = gridKey(row, col);
+          if (row < 0 || row >= rows || col < 0 || col >= columns || distances.has(key) || wallRows[row][col] === "#") continue;
+          distances.set(key, distances.get(gridKey(current.row, current.col)) + 1);
+          queue.push({ row, col });
+        }
+      }
+      return -1;
+    }
+
+    function rrProtectedRoute(columns, random) {
+      const route = new Set();
+      let row = RR_START_ROW;
+      route.add(gridKey(row, 0));
+      for (let col = 1; col < columns; col++) {
+        route.add(gridKey(row, col));
+        if (col < columns - 1 && random() < 0.27) {
+          row = Math.max(1, Math.min(RR_ROWS - 2, row + (random() < 0.5 ? -1 : 1)));
+          route.add(gridKey(row, col));
+        }
+      }
+      return route;
+    }
+
+    function rrRowPattern(row, columns, protectedRoute, density, random) {
+      const wallColumns = [];
+      const firstPlayableColumn = 5;
+      const endExclusive = columns - 5;
+      let col = firstPlayableColumn;
+      while (col < endExclusive) {
+        if (protectedRoute.has(gridKey(row, col))) { col++; continue; }
+        if (random() < density) {
+          const runLength = 1 + Math.floor(random() * 5);
+          for (let offset = 0; offset < runLength && col + offset < endExclusive; offset++) {
+            const candidateCol = col + offset;
+            if (protectedRoute.has(gridKey(row, candidateCol))) break;
+            wallColumns.push(candidateCol);
+          }
+          col += runLength + 1 + Math.floor(random() * 2);
+        } else {
+          col++;
+        }
+      }
+      return [...new Set(wallColumns)].sort((left, right) => left - right);
+    }
+
+    function rrGenerateBoard({ seed, rows = RR_ROWS, columns = RR_DEFAULT_COLUMNS }) {
+      let actualSeed = rrNormalizeSeed(seed);
+      for (let attempt = 0; attempt < 20; attempt++) {
+        const random = rrMulberry32(actualSeed);
+        const protectedRoute = rrProtectedRoute(columns, random);
+        const wallRows = Array.from({ length: rows }, (_, row) => {
+          const density = random() < 0.5 ? 0.14 + random() * 0.07 : 0.19 + random() * 0.08;
+          const pattern = rrRowPattern(row, columns, protectedRoute, density, random);
+          const cells = Array(columns).fill(".");
+          pattern.forEach((col) => { cells[col] = "#"; });
+          return cells.join("");
+        });
+        const validationError = rrValidateGrid(wallRows, columns, rows);
+        if (!validationError) {
+          return {
+            seed: actualSeed,
+            rows,
+            columns,
+            wallRows,
+            shortestPath: rrShortestPath(wallRows, rows, columns),
+            wallCount: wallRows.reduce((sum, row) => sum + [...row].filter((cell) => cell === "#").length, 0),
+          };
+        }
+        actualSeed = (actualSeed + 1) >>> 0;
+      }
+      throw new Error("Could not generate a valid field after 20 deterministic attempts.");
+    }
+    function rrMoveBudget(shortestPath) {
+      return Math.max(4 * shortestPath, shortestPath + 40);
+    }
+
+    function rrLegalMoves(board, pos) {
+      const moves = [];
+      for (const direction of GRID_DIRECTIONS) {
+        const row = pos.row + direction.dy;
+        const col = pos.col + direction.dx;
+        if (row < 0 || row >= board.rows || col < 0 || col >= board.columns) continue;
+        if (String(board.wallRows[row][col]) === "#") continue;
+        moves.push({ id: direction.id, label: direction.label, symbol: direction.symbol, row, col });
+      }
+      return moves;
+    }
+
+    const RR_MEMORY_AIDS = ["map", "facts", "memory"];
+    const RR_RED_VISITS = 3;
+    function rrCreateRunState(board, { viewRadius = 1, memoryAid = "memory" } = {}) {
+      const start = { row: RR_START_ROW, col: 0 };
+      const run = {
+        pos: { ...start },
+        visits: {},
+        observed: {},
+        steps: [],
+        moves: 0,
+        modelDecisions: 0,
+        forcedMoves: 0,
+        revisits: 0,
+        furthestColumn: 0,
+        furthestStep: 0,
+        budget: rrMoveBudget(board.shortestPath),
+        viewRadius,
+        memoryAid: RR_MEMORY_AIDS.includes(memoryAid) ? memoryAid : "memory",
+        flags: { deadEnds: {}, pockets: {} },
+        lastDecision: null,
+        flagsIgnored: 0,
+        flagsUnseen: 0,
+        status: "running",
+      };
+      rrMarkVisit(run, start);
+      rrObserve(run, board, run.pos);
+      return run;
+    }
+
+    function rrMarkVisit(run, pos) {
+      const key = gridKey(pos.row, pos.col);
+      run.visits[key] = (run.visits[key] || 0) + 1;
+    }
+
+    function rrObserve(run, board, pos) {
+      const radius = run.viewRadius || 1;
+      for (let row = pos.row - radius; row <= pos.row + radius; row++) {
+        for (let col = pos.col - radius; col <= pos.col + radius; col++) {
+          if (row < 0 || row >= board.rows || col < 0 || col >= board.columns) continue;
+          run.observed[gridKey(row, col)] = true;
+        }
+      }
+    }
+
+    function rrApplyMove(run, board, move, { forced = false, confidence = null, ms = null, flag = null } = {}) {
+      const legal = rrLegalMoves(board, run.pos);
+      const match = legal.find((item) => item.id === move.id);
+      if (!match) throw new Error(`Illegal move "${move.id}" from row ${run.pos.row + 1}, column ${run.pos.col + 1}.`);
+      if (run.status !== "running") throw new Error(`The run already ended with status ${run.status}.`);
+      const targetKey = gridKey(match.row, match.col);
+      const isRevisit = run.visits[targetKey] > 0;
+      if (isRevisit) run.revisits += 1;
+      run.pos = { row: match.row, col: match.col };
+      rrMarkVisit(run, run.pos);
+      run.moves += 1;
+      if (forced) run.forcedMoves += 1;
+      else run.modelDecisions += 1;
+      const previousFurthestColumn = run.furthestColumn;
+      run.furthestColumn = Math.max(run.furthestColumn, match.col);
+      if (run.furthestColumn > previousFurthestColumn) run.furthestStep = run.moves;
+      rrObserve(run, board, run.pos);
+      run.steps.push({ row: match.row, col: match.col, dir: match.id, forced, conf: confidence, ms, flag });
+      if (match.col === board.columns - 1) run.status = "completed";
+      else if (run.moves >= run.budget) run.status = "budget";
+      return run;
+    }
+    function rrVisitDigit(count) {
+      if (!count) return ".";
+      return String(Math.min(9, count));
+    }
+
+    function rrColumnHeaderLines(fromCol, toCol, exitCol) {
+      const tens = [];
+      const units = [];
+      for (let col = fromCol; col <= toCol; col++) {
+        const number = col + 1;
+        tens.push(number >= 10 ? String(Math.floor(number / 10) % 10) : " ");
+        units.push(String(number % 10));
+      }
+      const lines = [`   ${tens.join(" ")}`, `   ${units.join(" ")}`];
+      if (exitCol >= fromCol && exitCol <= toCol) {
+        lines.push(`   ${tens.map((_, index) => fromCol + index === exitCol ? "E" : " ").join(" ")}`);
+      }
+      return lines;
+    }
+
+    function rrRenderKnownMap(run, board, { halfWidth = 15 } = {}) {
+      const fromCol = Math.max(0, run.pos.col - halfWidth);
+      const toCol = Math.min(board.columns - 1, run.pos.col + halfWidth);
+      const clipped = fromCol > 0 || toCol < board.columns - 1;
+      const lines = [`Known map columns ${fromCol + 1}-${toCol + 1} of ${board.columns}${clipped ? " (clipped)" : ""}:`];
+      lines.push(...rrColumnHeaderLines(fromCol, toCol, board.columns - 1));
+      for (let row = 0; row < board.rows; row++) {
+        let line = `${String(row + 1).padStart(2, " ")} `;
+        for (let col = fromCol; col <= toCol; col++) {
+          const key = gridKey(row, col);
+          if (run.pos.row === row && run.pos.col === col) line += "@";
+          else if (!run.observed[key]) line += "?";
+          else if (board.wallRows[row][col] === "#") line += "#";
+          else line += rrVisitDigit(run.visits[key] || 0);
+          if (col < toCol) line += " ";
+        }
+        lines.push(line);
+      }
+      const redNote = run.memoryAid === "map" ? "" : `; 1-${RR_RED_VISITS} = GREEN, ${RR_RED_VISITS + 1} or more = RED`;
+      lines.push(`Legend: @ token · # goo (seen) · . seen open, never visited · 1-9 visit count (9 = 9 or more${redNote}) · ? unseen · E exit column`);
+      return lines.join("\n");
+    }
+
+    function rrNeighbourFacts(board, run, pos) {
+      let knownOpen = 0;
+      let knownGoo = 0;
+      let unseen = 0;
+      for (const direction of GRID_DIRECTIONS) {
+        const row = pos.row + direction.dy;
+        const col = pos.col + direction.dx;
+        if (row < 0 || row >= board.rows || col < 0 || col >= board.columns) continue;
+        if (!run.observed[gridKey(row, col)]) unseen += 1;
+        else if (board.wallRows[row][col] === "#") knownGoo += 1;
+        else knownOpen += 1;
+      }
+      return { knownOpen, knownGoo, unseen };
+    }
+
+    function rrMoveFacts(run, board, move, { forcePocket = false } = {}) {
+      const targetKey = gridKey(move.row, move.col);
+      const visits = run.visits[targetKey] || 0;
+      let unseen = 0;
+      let otherExits = 0;
+      for (const direction of GRID_DIRECTIONS) {
+        const row = move.row + direction.dy;
+        const col = move.col + direction.dx;
+        if (row < 0 || row >= board.rows || col < 0 || col >= board.columns) continue;
+        if (!run.observed[gridKey(row, col)]) unseen += 1;
+        else if (board.wallRows[row][col] !== "#" && !(row === run.pos.row && col === run.pos.col)) otherExits += 1;
+      }
+      const deadEnd = visits > 0 && unseen === 0 && otherExits === 0;
+      let previousKey = null;
+      if (run.steps.length === 1) previousKey = gridKey(RR_START_ROW, 0);
+      else if (run.steps.length > 1) previousKey = gridKey(run.steps[run.steps.length - 2].row, run.steps[run.steps.length - 2].col);
+      const isPrevious = previousKey !== null && targetKey === previousKey;
+      let pocket = false;
+      let pocketSize = 0;
+      let pocketCells = [];
+      if ((forcePocket || run.memoryAid === "memory") && !deadEnd) {
+        pocket = true;
+        const queue = [{ row: move.row, col: move.col }];
+        const seen = new Set([targetKey]);
+        while (queue.length) {
+          const cell = queue.shift();
+          pocketSize += 1;
+          const cellKey = gridKey(cell.row, cell.col);
+          pocketCells.push(cellKey);
+          if (cell.col === board.columns - 1) { pocket = false; }
+          for (const direction of GRID_DIRECTIONS) {
+            const row = cell.row + direction.dy;
+            const col = cell.col + direction.dx;
+            if (row < 0 || row >= board.rows || col < 0 || col >= board.columns) continue;
+            if (!run.observed[gridKey(row, col)]) { pocket = false; continue; }
+            if (board.wallRows[row][col] === "#") continue;
+            if (row === run.pos.row && col === run.pos.col) continue;
+            const nextKey = gridKey(row, col);
+            if (seen.has(nextKey)) continue;
+            seen.add(nextKey);
+            queue.push({ row, col });
+          }
+        }
+      }
+      const red = visits > RR_RED_VISITS;
+      return { visits, unseen, otherExits, deadEnd, pocket, pocketSize, pocketCells, isPrevious, red };
+    }
+
+    function rrRecordDecision(run, board, legal, { chosenId, forced, probabilities = null } = {}) {
+      const deadEndShown = run.memoryAid === "facts" || run.memoryAid === "memory";
+      const pocketShown = run.memoryAid === "memory";
+      if (!run.flags) run.flags = { deadEnds: {}, pockets: {} };
+      let chosen = null;
+      const candidates = legal.map((move) => {
+        const facts = rrMoveFacts(run, board, move, { forcePocket: true });
+        const flag = facts.deadEnd ? "deadEnd" : facts.red ? "red" : facts.pocket ? "pocket" : null;
+        if (facts.deadEnd) run.flags.deadEnds[gridKey(move.row, move.col)] = true;
+        if (facts.pocket) for (const key of facts.pocketCells) run.flags.pockets[key] = true;
+        const probability = probabilities && probabilities[move.id] != null && Number.isFinite(Number(probabilities[move.id]))
+          ? Number(probabilities[move.id])
+          : null;
+        const candidate = { id: move.id, row: move.row, col: move.col, flag, shown: flag === "pocket" ? pocketShown : deadEndShown, probability };
+        if (move.id === chosenId) chosen = candidate;
+        return candidate;
+      });
+      run.lastDecision = { from: { row: run.pos.row, col: run.pos.col }, forced, chosen: chosenId, candidates };
+      // Picking a flagged move only counts against the model when an unflagged one was on offer.
+      if (!forced && chosen && chosen.flag && candidates.some((candidate) => !candidate.flag)) {
+        if (chosen.shown) run.flagsIgnored = (run.flagsIgnored || 0) + 1;
+        else run.flagsUnseen = (run.flagsUnseen || 0) + 1;
+      }
+      return chosen ? chosen.flag : null;
+    }
+
+    const RR_FLAG_NAMES = { deadEnd: "yellow dead end", pocket: "pocket", red: "red" };
+
+    const RR_DIRECTION_TAGS = {
+      right: "FORWARD: one column closer to the exit",
+      up: "sideways: no progress toward the exit",
+      down: "sideways: no progress toward the exit",
+      left: "BACKWARD: one column further from the exit",
+    };
+
+    function rrMoveFactText(run, board, move) {
+      const facts = rrMoveFacts(run, board, move);
+      const flagged = (run.memoryAid !== "map" && (facts.deadEnd || facts.red)) || (run.memoryAid === "memory" && facts.pocket);
+      // A flagged Right only leads back to explored ground, so calling it FORWARD would contradict the flag.
+      const direction = move.id === "right" && flagged ? "NOT forward progress: flagged below" : RR_DIRECTION_TAGS[move.id];
+      const label = `${move.label} to row ${move.row + 1}, column ${move.col + 1} (${direction})`;
+      const visitText = `visited ${facts.visits} time${facts.visits === 1 ? "" : "s"}`;
+      if (run.memoryAid === "map") return `${label} · ${visitText}`;
+      const tags = [];
+      if (facts.deadEnd) tags.push("YELLOW · KNOWN DEAD END: you have been there and its only exit is back here");
+      if (facts.red) tags.push(`RED · ${visitText} (more than ${RR_RED_VISITS}): been here, done that; back away and find another path`);
+      if (facts.pocket) tags.push(`EXPLORED POCKET: all ${facts.pocketSize} cell(s) reachable through here are already explored and lead nowhere new`);
+      if (facts.isPrevious) tags.push("the cell you just came from");
+      if (facts.red) { /* visit count already in the RED tag */ }
+      else if (facts.deadEnd || (run.memoryAid === "memory" && facts.pocket) || !facts.visits) tags.push(facts.visits ? visitText : "never visited");
+      else tags.push(`GREEN · ${visitText}, ok`);
+      tags.push(facts.unseen ? `${facts.unseen} unseen neighbour${facts.unseen === 1 ? "" : "s"} (unexplored)` : "no unseen neighbours");
+      tags.push(`${facts.otherExits} other open exit${facts.otherExits === 1 ? "" : "s"}`);
+      return `${label} · ${tags.join(" · ")}`;
+    }
+
+    const RR_MOVE_INSTRUCTIONS = {
+      base: "You are navigating a hazardous grid. Choose the single next move that best progresses toward the goal, using the known map and your movement history.",
+      forward: "The exit is to the right, so Right is forward progress and is usually the best move. When a move is marked FORWARD, choose it. Use Up or Down only when there is no FORWARD move, to get around the goo; use Left only when Right, Up and Down cannot lead anywhere new.",
+      map: "Choose the next move. Prefer the FORWARD move when there is one.",
+      facts: "Choose the next move. Prefer the FORWARD move when there is one. Never choose YELLOW; avoid RED.",
+      memory: "Choose the next move. Prefer the FORWARD move when there is one. Never choose YELLOW; avoid RED and EXPLORED POCKET.",
+      colours: "Moves are colour-coded from your history: GREEN = visited 1 to 3 times, ok to use; YELLOW = known dead end, never choose it; RED = visited more than 3 times, been here and done that: back away from it and find another path with no RED, preferring never-visited cells. If every move is RED, choose the one visited least.",
+    };
+    function rrMoveInstructions(memoryAid) {
+      const level = RR_MEMORY_AIDS.includes(memoryAid) ? memoryAid : "memory";
+      const base = `${RR_MOVE_INSTRUCTIONS.base} ${RR_MOVE_INSTRUCTIONS.forward}`;
+      if (level === "facts") return `${base} ${RR_MOVE_INSTRUCTIONS.colours}`;
+      if (level === "memory") return `${base} ${RR_MOVE_INSTRUCTIONS.colours} A move marked EXPLORED POCKET leads only to cells you have already fully explored; do not choose it, even if it is Right, unless nothing else is legal.`;
+      return base;
+    }
+
+    function rrMoveCriteria(run, board, legal) {
+      const criteria = {};
+      for (const move of legal) {
+        criteria[move.id] = rrMoveFactText(run, board, move);
+      }
+      return criteria;
+    }
+
+    function rrBuildMoveContext(run, board) {
+      const legal = rrLegalMoves(board, run.pos);
+      const map = rrRenderKnownMap(run, board);
+      const historyLines = run.steps.slice(-20).map((step, index, list) => {
+        const number = run.steps.length - list.length + index + 1;
+        return `Step ${number}: ${step.dir} to row ${step.row + 1}, column ${step.col + 1}${step.forced ? " (forced)" : ""}`;
+      });
+      const facts = [
+        `Goal: reach any open cell in column ${board.columns} (the rightmost column) in as few moves as possible. You may revisit cells; revisiting is sometimes needed to escape dead ends. Use your known map and history to avoid repeating loops.`,
+        `Position: row ${run.pos.row + 1}, column ${run.pos.col + 1}. Step number: ${run.moves + 1}. Moves remaining in budget: ${run.budget - run.moves}. Furthest column reached so far: ${run.furthestColumn + 1}.`,
+      ];
+      let lines = [...facts, map, "Legal moves:"];
+      for (const move of legal) {
+        const facts2 = rrNeighbourFacts(board, run, move);
+        lines.push(`- ${rrMoveFactText(run, board, move)} · neighbours: ${facts2.knownOpen} known open / ${facts2.knownGoo} known goo / ${facts2.unseen} unseen`);
+      }
+      if (run.memoryAid === "facts" || run.memoryAid === "memory") {
+        lines.push(`Steps since you last reached a new furthest column: ${run.moves - (run.furthestStep || 0)}.`);
+        const recent = run.steps.slice(-12);
+        if (recent.length >= 8) {
+          const distinct = new Set(recent.map((step) => gridKey(step.row, step.col))).size;
+          if (distinct <= Math.ceil(recent.length / 2)) {
+            lines.push(`Loop warning: your last ${recent.length} moves covered only ${distinct} different cells. You are going in circles; pick a direction that reaches unexplored cells.`);
+          }
+        }
+      }
+      lines.push("Recent steps:");
+      const withHistory = [...lines, ...historyLines];
+      withHistory.push(`Totals so far: ${run.moves} moves, ${run.revisits} revisits, ${run.forcedMoves} forced moves, ${run.modelDecisions} model decisions.`);
+      let text = withHistory.join("\n");
+      while (text.length > 7000) {
+        const index = withHistory.findIndex((line) => line.startsWith("Step "));
+        if (index < 0) break;
+        withHistory.splice(index, 1);
+        text = withHistory.join("\n");
+      }
+      return text.slice(0, 7000);
+    }
+    function rrSummarizeRun(run, board) {
+      const completed = run.status === "completed";
+      const decisionSteps = run.steps.filter((step) => !step.forced && Number.isFinite(step.ms));
+      const confidenceSteps = run.steps.filter((step) => !step.forced && Number.isFinite(step.conf));
+      const avg = (list, pick) => list.length ? list.reduce((sum, step) => sum + pick(step), 0) / list.length : null;
+      return {
+        status: run.status,
+        moves: run.moves,
+        shortestPath: board.shortestPath,
+        efficiency: completed && run.moves ? board.shortestPath / run.moves : null,
+        modelDecisions: run.modelDecisions,
+        forcedMoves: run.forcedMoves,
+        revisits: run.revisits,
+        furthestColumn: run.furthestColumn,
+        memoryAid: run.memoryAid || null,
+        avgDecisionMs: avg(decisionSteps, (step) => step.ms),
+        avgConfidence: avg(confidenceSteps, (step) => step.conf),
+        flagsIgnored: run.flagsIgnored || 0,
+        flagsUnseen: run.flagsUnseen || 0,
+        deadEndsFound: run.flags ? Object.keys(run.flags.deadEnds || {}).length : 0,
+        pocketCellsFound: run.flags ? Object.keys(run.flags.pockets || {}).length : 0,
+      };
+    }
+
+    function rrParseMoveValue(body, legalIds) {
+      const result = body?.results?.[0] || {};
+      const field = result.fields?.move || {};
+      const fallback = result.decision?.move;
+      let value = field.value ?? fallback;
+      if (value && typeof value === "object" && "value" in value) value = value.value;
+      const move = String(value ?? "").trim();
+      if (!legalIds.includes(move)) throw new Error("invalid move");
+      const rawProbabilities = field.probabilities;
+      let confidence = null;
+      const probabilities = {};
+      let hasProbabilities = false;
+      if (rawProbabilities && typeof rawProbabilities === "object") {
+        for (const id of legalIds) {
+          if (!(id in rawProbabilities)) continue;
+          const raw = rawProbabilities[id];
+          const number = Array.isArray(raw) ? Number(raw[0]) : Number(raw);
+          if (!Number.isFinite(number)) continue;
+          probabilities[id] = number;
+          hasProbabilities = true;
+          if (id === move && confidence === null) confidence = number;
+        }
+      }
+      return { move, confidence, probabilities: hasProbabilities ? probabilities : null };
+    }
+    // RADIOACTIVE-RUN-CORE-END
+
+    function makeGridId(prefix) {
+      return `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`}`;
+    }
+
+    function saveGridGames() {
+      const write = (games) => localStorage.setItem(gridGamesKey, JSON.stringify(games));
+      try {
+        write(state.gridGames);
+        return true;
+      } catch {
+        try {
+          const slimRuns = (runs) => runs.map((run, index) => (
+            index >= runs.length - 3 ? run : { ...run, steps: undefined }
+          ));
+          const trimmed = state.gridGames.map((game) => ({ ...game, runs: slimRuns(game.runs || []) }));
+          write(trimmed);
+          return true;
+        } catch {
+          setGridNotice("The board is active, but browser storage is full; this board may not survive closing the page.", "error");
+          return false;
+        }
+      }
+    }
+
+    function setGridNotice(message, tone = "") {
+      const notice = $("gridNotice");
+      notice.textContent = message;
+      notice.className = "grid-notice" + (tone ? ` ${tone}` : "");
+    }
+
+    function updateGridProviderNote() {
+      if (activeGridRuns.size || state.screen !== "grid") return;
+      if (!state.provider?.selected_backend) {
+        setGridNotice("JEV gateway is unavailable. No board or token decisions can be made until it is reachable.", "error");
+        return;
+      }
+      const backend = state.provider.selected_backend;
+      const status = state.provider.backend_status || "unknown";
+      if (["stopped", "unavailable", "misconfigured"].includes(status)) {
+        setGridNotice(`${displayName(backend)} is ${status}. Start or repair it in the menu-bar service before generating a field or moving the token.`, "error");
+        return;
+      }
+      const remoteNote = backend.startsWith("remote:") ? " This sends the move context to that remote provider." : "";
+      setGridNotice(`Selected JEV provider: ${displayName(backend)}. It chooses every non-forced move from its fog-of-war map and recent history; one decision request per step. Movement stops if JEV fails or the selected provider changes.${remoteNote}`);
+    }
+
+    async function readGridProvider(expectedBackend, signal) {
+      let response;
+      try {
+        response = await fetch("/health", { cache: "no-store", signal });
+      } catch (error) {
+        if (signal?.aborted || error.name === "AbortError") throw error;
+        throw new Error(`JEV health check failed: ${error.message || "network error"}.`);
+      }
+      if (!response.ok) {
+        throw new Error(`JEV health check returned HTTP ${response.status}.`);
+      }
+      const health = await response.json();
+      if (!health.selected_backend) {
+        const error = new Error("JEV has no selected provider.");
+        error.providerFatal = true;
+        throw error;
+      }
+      if (expectedBackend && health.selected_backend !== expectedBackend) {
+        const error = new Error(`The selected provider changed from ${displayName(expectedBackend)} to ${displayName(health.selected_backend)}. This run stopped to avoid mixing models.`);
+        error.providerFatal = true;
+        throw error;
+      }
+      if (["stopped", "unavailable", "misconfigured"].includes(health.backend_status)) {
+        throw new Error(`${displayName(health.selected_backend)} is ${health.backend_status}; JEV will not substitute another provider.`);
+      }
+      return health;
+    }
+
+    function createGridField() {
+      const columns = RR_COLUMN_OPTIONS.includes(Number($("gridColumns").value))
+        ? Number($("gridColumns").value)
+        : RR_DEFAULT_COLUMNS;
+      const seed = rrNormalizeSeed($("gridSeed").value);
+      const board = rrGenerateBoard({ seed, rows: RR_ROWS, columns });
+      const game = {
+        id: makeGridId("field"),
+        createdAt: new Date().toISOString(),
+        seed: board.seed,
+        rows: board.rows,
+        columns: board.columns,
+        wallRows: board.wallRows,
+        shortestPath: board.shortestPath,
+        wallCount: board.wallCount,
+        runs: [],
+        viewRunId: null,
+      };
+      state.gridGames.push(game);
+      saveGridGames();
+      return game;
+    }
+
+    function migrateGridGames() {
+      let changed = false;
+      for (const game of state.gridGames) {
+        if (!Number.isFinite(game.shortestPath)) {
+          game.shortestPath = rrShortestPath(game.wallRows, game.rows || RR_ROWS, game.columns || game.wallRows[0]?.length);
+          changed = true;
+        }
+      }
+      if (changed) saveGridGames();
+    }
+
+    async function exportGridJson() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        fields: state.gridGames,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `radioactive-run-export-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      setGridNotice("Exported all fields with their runs, steps, and metrics as JSON.");
+    }
+
+    async function generateGridGame() {
+      if (activeGridRuns.size) {
+        setGridNotice("Finish or stop the active token run before generating another field.", "error");
+        return;
+      }
+      let game = null;
+      try {
+        game = createGridField();
+        renderGridGames();
+        setGridNotice(`Field ${state.gridGames.length} generated locally from seed ${game.seed}: ${game.rows}\u00d7${game.columns}, shortest path ${game.shortestPath}. Starting the token run.`);
+        const card = [...$("gridGames").querySelectorAll(".grid-game-card")].at(-1);
+        card?.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (error) {
+        setGridNotice(error.message || "Could not generate the field.", "error");
+      }
+      if (game) await runGridGame(game.id);
+    }
+
+
+    function gridScoreText(score) {
+      const value = Number(score) || 0;
+      return value > 0 ? `+${value}` : String(value);
+    }
+
+    function gridRunMoves(run) {
+      return Number.isFinite(run.metrics?.moves) ? run.metrics.moves : Math.max(0, (run.path?.length || 1) - 1);
+    }
+
+    function gridRunShortest(game, run) {
+      return Number.isFinite(run.metrics?.shortestPath) ? run.metrics.shortestPath : Number.isFinite(game.shortestPath) ? game.shortestPath : null;
+    }
+
+    function gridRunStatusText(run, game) {
+      if (!run) return "FIELD READY · awaiting a model run";
+      const legacy = !run.coreRun && !run.metrics;
+      if (run.status === "running") {
+        if (run.progressMessage) return run.progressMessage;
+        const legal = (run.coreRun && game) ? rrLegalMoves(boardOfGame(game), run.coreRun.pos).length : null;
+        return `STEP ${gridRunMoves(run)} · JEV choosing among ${legal ?? "?"} moves`;
+      }
+      if (legacy) {
+        const moves = gridRunMoves(run);
+        if (run.status === "completed") return `EXIT REACHED · legacy score ${gridScoreText(run.score)} · ${moves} moves`;
+        if (run.status === "stopped") return `STOPPED · legacy score ${gridScoreText(run.score)} · ${moves} moves`;
+        if (run.status === "interrupted") return "INTERRUPTED · this run did not reach the exit";
+        return `${String(run.status || "FAILED").toUpperCase()} · ${run.error || "The token did not reach the exit."}`;
+      }
+      const shortest = game ? gridRunShortest(game, run) : null;
+      const moves = gridRunMoves(run);
+      if (run.status === "completed") {
+        const efficiency = shortest && moves ? Math.round((shortest / moves) * 100) : null;
+        return `EXIT REACHED · moves ${moves} (shortest ${shortest ?? "?"}) · efficiency ${efficiency ?? "?"}%`;
+      }
+      if (run.status === "budget") {
+        const furthest = run.metrics?.furthestColumn ?? run.coreRun?.furthestColumn;
+        return `MOVE BUDGET USED · reached column ${Number.isFinite(furthest) ? furthest + 1 : "?"} of ${game ? game.columns : "?"}`;
+      }
+      if (run.status === "stopped") return `STOPPED · ${run.error || "stopped before the exit"}`;
+      if (run.status === "interrupted") return "INTERRUPTED · this run did not reach the exit";
+      return `${String(run.status || "FAILED").toUpperCase()} · ${run.error || "The token did not reach the exit."}`;
+    }
+
+    function boardOfGame(game) {
+      return { rows: game.rows, columns: game.columns, wallRows: game.wallRows, shortestPath: game.shortestPath };
+    }
+
+    function gridCellClasses(game, run, row, col) {
+      const classes = { extra: [], aria: [] };
+      const coreRun = run?.coreRun;
+      if (!coreRun) return classes;
+      const key = gridKey(row, col);
+      if (coreRun.flags?.deadEnds?.[key]) { classes.extra.push("flag-dead-end"); classes.aria.push("known dead end"); }
+      else if (coreRun.flags?.pockets?.[key]) { classes.extra.push("flag-pocket"); classes.aria.push("explored pocket"); }
+      const last = coreRun.lastDecision;
+      if (last && run.status === "running") {
+        const candidate = last.candidates.find((item) => item.row === row && item.col === col);
+        if (candidate) {
+          classes.extra.push("decision-option");
+          if (candidate.id === last.chosen) {
+            classes.extra.push("decision-chosen");
+            classes.aria.push("option chosen");
+            if (!last.forced && candidate.flag) { classes.extra.push("decision-ignored"); classes.aria.push("chose a flagged move"); }
+          } else if (candidate.flag) {
+            classes.extra.push("decision-rejected-flag");
+            classes.aria.push("option rejected");
+          }
+        }
+      }
+      return classes;
+    }
+
+    function createGridGameCard(game, index) {
+      const card = document.createElement("article");
+      card.className = "grid-game-card";
+      card.dataset.gridGameId = game.id;
+      const runs = Array.isArray(game.runs) ? game.runs : [];
+      const latestRun = runs.at(-1) || null;
+      const active = activeGridRuns.has(game.id);
+      const anyBusy = activeGridRuns.size > 0;
+
+      const head = document.createElement("header");
+      head.className = "grid-game-head";
+      const identity = document.createElement("div");
+      const title = document.createElement("h3");
+      title.className = "grid-game-title";
+      title.textContent = `FIELD ${String(index + 1).padStart(2, "0")} · ${game.rows} × ${game.columns}`;
+      const meta = document.createElement("div");
+      meta.className = "grid-game-meta";
+      const generatedAt = game.createdAt ? new Date(game.createdAt).toLocaleString() : "saved field";
+      const wallCount = Number(game.wallCount) || game.wallRows.reduce((sum, row) => sum + [...row].filter((cell) => cell === "#").length, 0);
+      for (const text of [`seed ${game.seed}`, `${wallCount} glowing blockers`, `shortest path ${game.shortestPath}`, generatedAt]) {
+        const item = document.createElement("span");
+        item.textContent = text;
+        meta.append(item);
+      }
+      identity.append(title, meta);
+      const actions = document.createElement("div");
+      actions.className = "grid-game-actions";
+      if (active) {
+        const stopButton = document.createElement("button");
+        stopButton.type = "button";
+        stopButton.className = "quiet-button";
+        stopButton.textContent = "Stop token";
+        stopButton.addEventListener("click", () => stopGridRun(game.id));
+        actions.append(stopButton);
+      } else {
+        const runButton = document.createElement("button");
+        runButton.type = "button";
+        runButton.className = "button";
+        runButton.textContent = runs.length ? "Run this field again" : "Start token";
+        runButton.disabled = anyBusy || !state.provider?.selected_backend;
+        runButton.title = "The JEV model chooses every non-forced move from its fog-of-war map and recent history; code only enforces legality and applies a move when exactly one legal move exists.";
+        runButton.addEventListener("click", () => runGridGame(game.id));
+        actions.append(runButton);
+      }
+      head.append(identity, actions);
+      card.append(head);
+
+      const status = document.createElement("div");
+      status.className = "grid-game-status" + (latestRun?.status === "completed" ? " good" : latestRun?.error || latestRun?.status === "failed" || latestRun?.status === "budget" ? " error" : "");
+      status.textContent = gridRunStatusText(latestRun, game);
+      card.append(status);
+
+      const selectedRun = runs.find((run) => run.id === game.viewRunId) || latestRun;
+      const legacyPath = selectedRun?.path || [];
+      const visits = selectedRun?.coreRun?.visits || null;
+      const visitCounts = new Map();
+      if (visits) {
+        for (const [key, count] of Object.entries(visits)) visitCounts.set(key, count);
+      } else {
+        for (const point of legacyPath) {
+          const key = gridKey(point.row, point.col);
+          visitCounts.set(key, (visitCounts.get(key) || 0) + 1);
+        }
+      }
+      const current = selectedRun?.coreRun?.pos || legacyPath.at(-1) || { row: RR_START_ROW, col: 0 };
+      const boardViewport = document.createElement("div");
+      boardViewport.className = "grid-board-viewport";
+      const board = document.createElement("div");
+      board.className = "grid-board";
+      board.style.setProperty("--grid-cols", String(game.columns));
+      for (let row = 0; row < game.rows; row++) {
+        for (let col = 0; col < game.columns; col++) {
+          const cell = document.createElement("span");
+          const blocked = game.wallRows[row][col] === "#";
+          const cellVisits = visitCounts.get(gridKey(row, col)) || 0;
+          const classes = ["grid-square"];
+          if (blocked) classes.push("wall");
+          else if (cellVisits) classes.push(cellVisits > RR_RED_VISITS ? "visited-red" : "visited");
+          if (row === RR_START_ROW && col === 0) classes.push("spawn");
+          if (col === game.columns - 1) classes.push("exit");
+          if (!blocked && current.row === row && current.col === col) classes.push("token");
+          const markers = gridCellClasses(game, selectedRun, row, col);
+          classes.push(...markers.extra);
+          cell.className = classes.join(" ");
+          if (blocked) cell.style.setProperty("--goo-delay", `${((row * 13 + col * 7) % 23) * 31}ms`);
+          const cellType = blocked ? "radioactive blocker" : cellVisits ? `visited open cell (${cellVisits} visit${cellVisits === 1 ? "" : "s"})` : "open cell";
+          cell.setAttribute("role", "img");
+          cell.setAttribute("aria-label", `${cellType}${markers.aria.length ? ` (${markers.aria.join(", ")})` : ""}, row ${row + 1}, column ${col + 1}${current.row === row && current.col === col ? ", token" : ""}`);
+          board.append(cell);
+        }
+      }
+      boardViewport.append(board);
+      card.append(boardViewport);
+
+      const key = document.createElement("div");
+      key.className = "grid-key";
+      for (const [label, swatch] of [["open", ""], ["radioactive goo", "goo"], ["token / current square", "token"], [`green: visited 1–${RR_RED_VISITS}×, ok`, "visited"], [`red: visited ${RR_RED_VISITS + 1}+×, been here, done that`, "visited-red"], ["yellow: known dead end", "dead-end"], ["explored pocket", "pocket"], ["last decision: chosen / other options", "decision"]]) {
+        const item = document.createElement("span");
+        item.className = "grid-key-item";
+        const sample = document.createElement("span");
+        sample.className = "grid-key-swatch" + (swatch ? ` ${swatch}` : "");
+        if (swatch === "dead-end") sample.textContent = "⚑";
+        const text = document.createElement("span");
+        text.textContent = label;
+        item.append(sample, text);
+        key.append(item);
+      }
+      card.append(key);
+
+      if (runs.length) {
+        const runList = document.createElement("div");
+        runList.className = "grid-run-list";
+        const heading = document.createElement("div");
+        heading.className = "micro-label";
+        heading.textContent = "Runs on this same field";
+        runList.append(heading);
+        const tableWrap = document.createElement("div");
+        tableWrap.className = "grid-run-table";
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        for (const text of ["Model", "Aid", "Status", "Moves / shortest", "Efficiency", "Decisions", "Forced", "Revisits", "Invalid / retries", "Avg ms", "Avg conf", "Flags ignored", "Dead ends / pocket cells", "Duration", ""]) {
+          const th = document.createElement("th");
+          th.textContent = text;
+          headRow.append(th);
+        }
+        thead.append(headRow);
+        table.append(thead);
+        const tbody = document.createElement("tbody");
+        const fmt = (value, suffix = "", digits = 0) => value == null || !Number.isFinite(Number(value)) ? "—" : `${Number(value).toFixed(digits)}${suffix}`;
+        for (const run of runs) {
+          const row = document.createElement("tr");
+          const live = run.status === "running" && run.coreRun ? rrSummarizeRun(run.coreRun, boardOfGame(game)) : null;
+          const metrics = live ? { ...run.metrics, ...live } : run.metrics || {};
+          const runView = live ? { ...run, metrics } : run;
+          const legacy = !run.coreRun && !run.metrics;
+          const decisions = legacy ? run.requestCount || 0 : metrics.modelDecisions ?? run.coreRun?.modelDecisions ?? 0;
+          const duration = run.endedAt && run.startedAt ? formatDuration(new Date(run.endedAt) - new Date(run.startedAt)) : "in progress";
+          const cells = [
+            displayName(run.backendId) || "unknown model",
+            run.memoryAid || run.coreRun?.memoryAid || run.metrics?.memoryAid || "—",
+            String(run.status || "unknown"),
+            legacy && run.score == null ? "—" : legacy
+              ? `${gridRunMoves(runView)} moves · legacy`
+              : `${gridRunMoves(runView)} / ${gridRunShortest(game, runView) ?? "?"}`,
+            legacy
+              ? `${gridScoreText(run.score)} pts`
+              : fmt(metrics.efficiency != null ? metrics.efficiency * 100 : null, "%"),
+            String(decisions),
+            legacy ? "—" : fmt(metrics.forcedMoves ?? run.coreRun?.forcedMoves),
+            legacy ? "—" : fmt(metrics.revisits ?? run.coreRun?.revisits),
+            legacy ? "—" : `${metrics.invalidResponses ?? run.invalidResponses ?? 0} / ${metrics.retries ?? run.retries ?? 0}`,
+            fmt(metrics.avgDecisionMs, " ms"),
+            fmt(metrics.avgConfidence, "", 3),
+            legacy ? "—" : `${metrics.flagsIgnored ?? run.coreRun?.flagsIgnored ?? 0}${metrics.flagsUnseen || run.coreRun?.flagsUnseen ? ` (+${metrics.flagsUnseen ?? run.coreRun?.flagsUnseen} unseen)` : ""}`,
+            legacy ? "—" : `${Object.keys(run.coreRun?.flags?.deadEnds || {}).length} / ${Object.keys(run.coreRun?.flags?.pockets || {}).length}`,
+            duration,
+          ];
+          cells.forEach((text, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = text;
+            if (cellIndex === 1) td.className = `status-${run.status || "unknown"}`;
+            row.append(td);
+          });
+          const actionCell = document.createElement("td");
+          const view = document.createElement("button");
+          view.type = "button";
+          view.textContent = selectedRun?.id === run.id ? "PATH SHOWN" : "Show path";
+          view.disabled = selectedRun?.id === run.id;
+          view.addEventListener("click", () => {
+            game.viewRunId = run.id;
+            saveGridGames();
+            renderGridGame(game);
+          });
+          actionCell.append(view);
+          row.append(actionCell);
+          tbody.append(row);
+        }
+        table.append(tbody);
+        tableWrap.append(table);
+        runList.append(tableWrap);
+        card.append(runList);
+      }
+      return card;
+    }
+
+    function renderGridGames() {
+      const root = $("gridGames");
+      root.replaceChildren();
+      if (!state.gridGames.length) {
+        const empty = document.createElement("div");
+        empty.className = "grid-empty";
+        const mark = document.createElement("div");
+        mark.className = "grid-empty-mark";
+        mark.textContent = "20×";
+        const title = document.createElement("strong");
+        title.textContent = "No fields yet";
+        const detail = document.createElement("span");
+        detail.textContent = "Generate & run builds a seeded field locally (same seed and width always rebuild the same field) and immediately starts a token run. The JEV model chooses every non-forced move from its fog-of-war map of observed cells plus its recent history; code only enforces legality. A run ends at the exit, at the move budget, on Stop, or after three failed attempts at one decision.";
+        empty.append(mark, title, detail);
+        root.append(empty);
+        return;
+      }
+      state.gridGames.forEach((game, index) => root.append(createGridGameCard(game, index)));
+    }
+
+    function renderGridGame(game) {
+      const root = $("gridGames");
+      const existing = [...root.querySelectorAll(".grid-game-card")].find((card) => card.dataset.gridGameId === game.id);
+      const index = state.gridGames.indexOf(game);
+      const replacement = createGridGameCard(game, index);
+      if (existing) {
+        replacement.style.animation = "none";
+        existing.replaceWith(replacement);
+      }
+      else root.append(replacement);
+    }
+
+    function updateGridGameView(game) {
+      const card = [...$("gridGames").querySelectorAll(".grid-game-card")].find((item) => item.dataset.gridGameId === game.id);
+      const run = game.runs.at(-1);
+      if (!card || !run) return;
+      const status = card.querySelector(".grid-game-status");
+      status.textContent = gridRunStatusText(run, game);
+      status.className = "grid-game-status" + (run.status === "completed" ? " good" : run.error || run.status === "failed" || run.status === "budget" ? " error" : "");
+      const selectedRun = game.runs.find((item) => item.id === game.viewRunId) || run;
+      const legacyPath = selectedRun.path || [];
+      const visits = selectedRun.coreRun?.visits || null;
+      const visitCounts = new Map();
+      if (visits) {
+        for (const [key, count] of Object.entries(visits)) visitCounts.set(key, count);
+      } else {
+        for (const point of legacyPath) {
+          const key = gridKey(point.row, point.col);
+          visitCounts.set(key, (visitCounts.get(key) || 0) + 1);
+        }
+      }
+      const current = selectedRun.coreRun?.pos || legacyPath.at(-1) || { row: RR_START_ROW, col: 0 };
+      card.querySelectorAll(".grid-square").forEach((cell, index) => {
+        const row = Math.floor(index / game.columns);
+        const col = index % game.columns;
+        const blocked = game.wallRows[row][col] === "#";
+        const cellVisits = visitCounts.get(gridKey(row, col)) || 0;
+        const occupied = !blocked && current.row === row && current.col === col;
+        cell.classList.toggle("visited", !blocked && cellVisits > 0 && cellVisits <= RR_RED_VISITS && !occupied);
+        cell.classList.toggle("visited-red", !blocked && cellVisits > RR_RED_VISITS && !occupied);
+        cell.classList.toggle("token", occupied);
+        const markers = gridCellClasses(game, selectedRun, row, col);
+        for (const cls of ["flag-dead-end", "flag-pocket", "decision-option", "decision-chosen", "decision-rejected-flag", "decision-ignored"]) {
+          cell.classList.toggle(cls, markers.extra.includes(cls));
+        }
+        const kind = blocked ? "radioactive blocker" : cellVisits ? `visited open cell (${cellVisits} visit${cellVisits === 1 ? "" : "s"})` : "open cell";
+        cell.setAttribute("aria-label", `${kind}${markers.aria.length ? ` (${markers.aria.join(", ")})` : ""}, row ${row + 1}, column ${col + 1}${occupied ? ", token" : ""}`);
+      });
+    }
+
+    function stopGridRun(gameId) {
+      const controller = activeGridRuns.get(gameId);
+      if (controller) controller.abort();
+    }
+
+    async function runGridGame(gameId) {
+      if (activeGridRuns.size) {
+        setGridNotice("Finish or stop the active token run before starting another.", "error");
+        return;
+      }
+      const game = state.gridGames.find((item) => item.id === gameId);
+      if (!game) return;
+      const board = boardOfGame(game);
+      const controller = new AbortController();
+      activeGridRuns.set(game.id, controller);
+      const memoryAidOption = String($("gridMemoryAid")?.value || "");
+      const memoryAid = RR_MEMORY_AIDS.includes(memoryAidOption) ? memoryAidOption : "memory";
+      const coreRun = rrCreateRunState(board, { memoryAid });
+      const run = {
+        id: makeGridId("run"),
+        backendId: state.provider?.selected_backend || null,
+        seed: game.seed,
+        startedAt: new Date().toISOString(),
+        endedAt: null,
+        retries: 0,
+        invalidResponses: 0,
+        error: null,
+        requestCount: 0,
+        memoryAid,
+        coreRun,
+        status: "running",
+      };
+      game.runs.push(run);
+      game.viewRunId = run.id;
+      renderGridGames();
+      $("stopGridRun").hidden = false;
+      setGridNotice(`Token run started on field ${state.gridGames.indexOf(game) + 1}. ${displayName(run.backendId)} chooses every non-forced move; the code applies a move only when exactly one legal move exists.`, "running");
+
+      const sleep = (ms) => new Promise((resolve, reject) => {
+        const timer = setTimeout(resolve, ms);
+        controller.signal.addEventListener("abort", () => {
+          clearTimeout(timer);
+          reject(new DOMException("Token run stopped.", "AbortError"));
+        }, { once: true });
+      });
+      const moveRequest = async (legal) => {
+        run.requestCount += 1;
+        await readGridProvider(run.backendId, controller.signal);
+        const started = performance.now();
+        const response = await sendDecisionRequest({
+          instructions: rrMoveInstructions(coreRun.memoryAid),
+          schema: {
+            move: {
+              type: "choice",
+              choices: legal.map((item) => item.id),
+              criteria: rrMoveCriteria(coreRun, board, legal),
+              instructions: RR_MOVE_INSTRUCTIONS[coreRun.memoryAid] || RR_MOVE_INSTRUCTIONS.memory
+            }
+          },
+          contexts: [rrBuildMoveContext(coreRun, board)]
+        }, controller.signal);
+        const ms = performance.now() - started;
+        let parsed;
+        try {
+          parsed = rrParseMoveValue(response.body, legal.map((item) => item.id));
+        } catch (error) {
+          error.invalid = true;
+          throw error;
+        }
+        return { ...parsed, ms };
+      };
+
+      try {
+        if (!game.wallRows[coreRun.pos.row] || game.wallRows[coreRun.pos.row][coreRun.pos.col] === "#") {
+          throw new Error("The spawn cell is blocked; this saved field is invalid.");
+        }
+        while (coreRun.status === "running") {
+          if (controller.signal.aborted) throw new DOMException("Token run stopped.", "AbortError");
+          const legal = rrLegalMoves(board, coreRun.pos);
+          if (legal.length === 1) {
+            const flag = rrRecordDecision(coreRun, board, legal, { chosenId: legal[0].id, forced: true });
+            rrApplyMove(coreRun, board, legal[0], { forced: true, flag });
+          } else {
+            let outcome = null;
+            let lastError = null;
+            for (let attempt = 0; attempt < 3; attempt++) {
+              try {
+                if (attempt > 0) {
+                  run.progressMessage = `STEP ${coreRun.moves + 1} · retrying JEV decision (attempt ${attempt + 1} of 3)`;
+                  updateGridGameView(game);
+                } else {
+                  run.progressMessage = `STEP ${coreRun.moves + 1} · JEV choosing among ${legal.length} moves`;
+                  updateGridGameView(game);
+                }
+                outcome = await moveRequest(legal);
+                break;
+              } catch (error) {
+                if (controller.signal.aborted || error.name === "AbortError") throw error;
+                if (error.providerFatal) throw error;
+                lastError = error;
+                if (error.invalid) run.invalidResponses += 1;
+                if (attempt < 2) {
+                  run.retries += 1;
+                  await sleep(error.invalid ? (attempt === 0 ? 1000 : 2000) : (attempt === 0 ? 3000 : 6000));
+                }
+              }
+            }
+            if (!outcome) throw lastError || new Error("JEV could not decide this move.");
+            const flag = rrRecordDecision(coreRun, board, legal, { chosenId: outcome.move, forced: false, probabilities: outcome.probabilities });
+            rrApplyMove(coreRun, board, { id: outcome.move }, { forced: false, confidence: outcome.confidence, ms: outcome.ms, flag });
+          }
+          const nextLegal = rrLegalMoves(board, coreRun.pos);
+          const lastStep = coreRun.steps.at(-1);
+          if (lastStep.forced) {
+            run.progressMessage = `STEP ${coreRun.moves} · forced move ${lastStep.dir} · next: ${nextLegal.length} legal move${nextLegal.length === 1 ? "" : "s"}`;
+          } else {
+            const decision = coreRun.lastDecision;
+            const chosen = decision.candidates.find((item) => item.id === decision.chosen);
+            const pct = chosen && chosen.probability != null ? ` (${Math.round(chosen.probability * 100)}%)` : "";
+            const parts = [`STEP ${coreRun.moves} · JEV chose ${lastStep.dir}${pct}`];
+            const rejected = decision.candidates.filter((item) => item.id !== decision.chosen);
+            if (rejected.length) {
+              parts.push(`rejected: ${rejected.map((item) => `${item.id}${item.flag ? ` (${RR_FLAG_NAMES[item.flag]})` : ""}`).join(", ")}`);
+            }
+            const ignored = decision.candidates.find((item) => item.id === decision.chosen && item.flag && item.shown);
+            if (ignored) parts.push(`IGNORED A ${RR_FLAG_NAMES[ignored.flag].toUpperCase()} FLAG`);
+            parts.push(`next: ${nextLegal.length} legal move${nextLegal.length === 1 ? "" : "s"}`);
+            run.progressMessage = parts.join(" · ");
+          }
+          updateGridGameView(game);
+          if (coreRun.moves % 5 === 0) {
+            run.metrics = rrSummarizeRun(coreRun, board);
+            saveGridGames();
+          }
+        }
+        run.status = coreRun.status;
+      } catch (error) {
+        if (controller.signal.aborted || error.name === "AbortError") {
+          run.status = "stopped";
+          run.error = "Stopped before the exit; the last confirmed move stays on the board.";
+        } else {
+          run.status = "failed";
+          run.error = error.message || "JEV could not complete this move.";
+        }
+      } finally {
+        run.endedAt = new Date().toISOString();
+        run.metrics = rrSummarizeRun(coreRun, board);
+        run.metrics.status = run.status;
+        delete run.progressMessage;
+        activeGridRuns.delete(game.id);
+        $("stopGridRun").hidden = true;
+        saveGridGames();
+        renderGridGames();
+        const duration = formatDuration(new Date(run.endedAt) - new Date(run.startedAt));
+        const summary = run.status === "completed"
+          ? `Exit reached · ${run.metrics.moves} moves (shortest ${run.metrics.shortestPath}) · efficiency ${Math.round(run.metrics.efficiency * 100)}% · ${run.metrics.modelDecisions} decisions · ${duration}.`
+          : `${gridRunStatusText(run, game)} · ${duration}.`;
+        setGridNotice(`${displayName(run.backendId)}: ${summary}`, run.status === "completed" ? "" : "error");
+      }
+    }
+
+    async function runDecision(event) {
+      event.preventDefault();
+      let request;
+      try { request = buildRequest(); }
+      catch (error) { $("runNote").textContent = error.message; $("runNote").style.color = "var(--red)"; return; }
+      const caseForRun = state.selected;
+      const editedForRun = state.edited;
+      const providerForRun = state.provider ? { ...state.provider } : null;
+      $("runNote").style.color = "";
+      state.lastRequest = request;
+      const schemaEntries = Object.entries(request.schema);
+      const questionContexts = !editedForRun ? caseForRun?.workflow?.question_contexts : null;
+      const fanOut = fanOutProfile(providerForRun?.selected_backend);
+      const fanOutRun = !!fanOut
+        && caseForRun?.workflow?.type === "parallel-questions"
+        && schemaEntries.length > 1
+        && questionContexts
+        && schemaEntries.every(([name]) => typeof questionContexts[name] === "string" && questionContexts[name].trim());
+      const fanOutCalls = fanOutRun
+        ? schemaEntries.map(([name, definition]) => ({
+            field: name,
+            payload: { ...request, schema: { [name]: fanOut.dropRoutingInstructions ? withoutInstructions(definition) : definition }, contexts: [questionContexts[name]] }
+          }))
+        : [];
+      const batches = [];
+      if (!fanOutRun) {
+        for (let offset = 0; offset < schemaEntries.length; offset += 32) {
+          const fieldBatch = schemaEntries.slice(offset, offset + 32);
+          batches.push({
+            ...request,
+            schema: Object.fromEntries(fieldBatch),
+            contexts: questionContexts
+              ? [fieldBatch.map(([name]) => questionContexts[name]).filter(Boolean).join("\n\n")]
+              : request.contexts
+          });
+        }
+      }
+      const requestPlan = fanOutRun
+        ? {
+            strategy: `${fanOut.label}: one independent question per request, with bounded fan-out.`,
+            request_count: fanOutCalls.length,
+            batch_size: 1,
+            max_concurrency: fanOut.maxInFlight,
+            fields: fanOutCalls.map((call) => call.field),
+            sample_request: fanOutCalls[0]?.payload
+          }
+        : batches.length === 1 ? batches[0] : {
+            strategy: "Concurrent batches; the decision engine accepts at most 32 fields per request.",
+            request_count: batches.length,
+            batches
+          };
+      $("requestPreview").textContent = JSON.stringify(requestPlan, null, 2);
+      $("emptyState").hidden = true;
+      $("resultState").className = "result-state visible";
+      $("resultState").classList.remove("error");
+      $("fieldResults").replaceChildren();
+      $("workflowOutcome").hidden = true;
+      $("answerValue").textContent = "Evaluating…";
+      $("answerMeta").replaceChildren();
+      $("resultGuidance").className = "result-guidance";
+      $("resultGuidance").textContent = fanOutRun
+        ? `0/${fanOutCalls.length} ${fanOut.label} decisions complete · up to ${fanOut.maxInFlight} ${fanOut.unit} in flight. Successful answers will be kept if an individual question fails.`
+        : batches.length === 1
+          ? "One structured decision request is in flight. Keep this page open while the selected model responds."
+          : batches.length + " structured decision requests are running concurrently. Keep this page open while the selected model responds.";
+      $("referenceBox").hidden = true;
+      $("runTime").textContent = "Running";
+      $("runButton").disabled = true;
+      $("runButton").classList.add("running");
+      $("runLabel").textContent = "Running…";
+      const started = performance.now();
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 180000);
+      try {
+        let merged;
+        if (fanOutRun) {
+          const outcomes = await runWithConcurrency(
+            fanOutCalls,
+            fanOut.maxInFlight,
+            (call) => sendDecisionRequest(call.payload, controller.signal),
+            ({ completed, total, succeeded, failed }) => {
+              $("resultGuidance").textContent = `${completed}/${total} ${fanOut.label} decisions complete · ${succeeded} returned, ${failed} failed · max ${fanOut.maxInFlight} ${fanOut.unit} in flight.`;
+            }
+          );
+          const result = { decision: {}, fields: {} };
+          const fieldErrors = [];
+          let responseTemplate = {};
+          let successfulFields = 0;
+          for (let index = 0; index < outcomes.length; index++) {
+            const call = fanOutCalls[index];
+            const outcome = outcomes[index];
+            let errorMessage = outcome.ok ? "" : (outcome.error?.message || `The ${fanOut.label} request failed.`);
+            const part = outcome.ok ? outcome.value.body.results?.[0] : null;
+            const hasDecision = !!part && Object.prototype.hasOwnProperty.call(part.decision || {}, call.field);
+            const hasField = !!part && Object.prototype.hasOwnProperty.call(part.fields || {}, call.field);
+            if (outcome.ok && (!part || (!hasDecision && !hasField))) errorMessage = "The provider returned no value for this field.";
+            if (errorMessage) {
+              result.fields[call.field] = { error: errorMessage };
+              fieldErrors.push({ field: call.field, error: errorMessage });
+              continue;
+            }
+            if (!Object.keys(responseTemplate).length) responseTemplate = outcome.value.body;
+            if (hasDecision) result.decision[call.field] = part.decision[call.field];
+            if (hasField) result.fields[call.field] = part.fields[call.field];
+            else result.fields[call.field] = { value: part.decision[call.field] };
+            successfulFields++;
+          }
+          if (!successfulFields) {
+            const error = new Error(controller.signal.aborted
+              ? `The ${fanOut.label} fan-out timed out before any question completed.`
+              : `All ${fanOutCalls.length} ${fanOut.label} question requests failed.`);
+            if (controller.signal.aborted) error.name = "AbortError";
+            throw error;
+          }
+          merged = {
+            ...responseTemplate,
+            results: [result],
+            request_count: fanOutCalls.length,
+            max_concurrency: fanOut.maxInFlight,
+            batch_latencies_ms: outcomes.map((item) => Number(item.elapsed.toFixed(1))),
+            field_errors: fieldErrors
+          };
+        } else {
+          const responses = await Promise.all(batches.map((batch) => sendDecisionRequest(batch, controller.signal)));
+          merged = responses[0].body;
+          if (responses.length > 1) {
+            const result = { ...responses[0].body.results[0], decision: {}, fields: {} };
+            for (const response of responses) {
+              const part = response.body.results?.[0] || {};
+              Object.assign(result.decision, part.decision || {});
+              Object.assign(result.fields, part.fields || {});
+            }
+            merged = {
+              ...responses[0].body,
+              results: [result],
+              request_count: responses.length,
+              batch_latencies_ms: responses.map((item) => Number(item.elapsed.toFixed(1)))
+            };
+          }
+        }
+        const elapsed = performance.now() - started;
+        renderResult(merged, request, elapsed);
+        saveParallelRun(merged, request, elapsed, caseForRun, editedForRun, providerForRun);
+        const failedCount = merged.field_errors?.length || 0;
+        $("runNote").textContent = failedCount
+          ? `Completed with ${failedCount} failed question${failedCount === 1 ? "" : "s"}; successful answers were retained.`
+          : "Completed via the current menu-bar selection.";
+        if (failedCount) $("runNote").style.color = "var(--amber)";
+      } catch (error) {
+        controller.abort();
+        const message = error.name === "AbortError" ? "The request timed out after three minutes." : error.message || "Could not reach the JEV gateway.";
+        $("answerValue").textContent = "Request failed";
+        $("answerBlock").className = "answer-block";
+        $("runTime").textContent = `${(performance.now() - started).toFixed(0)} ms`;
+        $("resultGuidance").className = "result-guidance error-text";
+        $("resultGuidance").textContent = message;
+        $("fieldResults").replaceChildren();
+        $("workflowOutcome").hidden = true;
+        $("responsePreview").textContent = JSON.stringify(error.responseBody || { error: message }, null, 2);
+        $("resultState").className = "result-state visible error";
+        $("runNote").textContent = "Request failed; check the gateway status or log.";
+        $("runNote").style.color = "var(--red)";
+      } finally {
+        clearTimeout(timeout);
+        $("runButton").disabled = false;
+        $("runButton").classList.remove("running");
+        $("runLabel").textContent = "Run decision";
+        await refreshProvider();
+      }
+    }
+
+    async function loadExamples() {
+      try {
+        const response = await fetch("/examples", { cache: "no-store" });
+        if (!response.ok) throw new Error(`Example catalog returned HTTP ${response.status}.`);
+        const payload = await response.json();
+        state.suites = payload.suites || [];
+        renderLibrary();
+        const first = state.suites[0]?.cases?.[0];
+        if (first) selectCase(first);
+      } catch (error) {
+        $("suites").textContent = error.message || "Could not load examples.";
+        $("caseCount").textContent = "offline";
+      }
+    }
+
+    for (const [panel, id] of [["library", "librarySplitter"], ["results", "resultsSplitter"]]) {
+      const splitter = $(id);
+      splitter.addEventListener("pointerdown", (event) => startPanelResize(event, panel));
+      splitter.addEventListener("keydown", (event) => adjustPanelWithKeyboard(event, panel));
+    }
+    window.addEventListener("resize", applyPanelWidths);
+    applyPanelWidths();
+    $("testForm").addEventListener("submit", runDecision);
+    $("parallelReportButton").addEventListener("click", () => setReportView(true));
+    $("gridNavigationButton").addEventListener("click", () => setMainPage(state.screen === "grid" ? "workbench" : "grid"));
+    $("newGridGame").addEventListener("click", generateGridGame);
+    $("stopGridRun").addEventListener("click", () => {
+      for (const controller of activeGridRuns.values()) controller.abort();
+    });
+    $("exportGridJson").addEventListener("click", exportGridJson);
+    $("backFromGrid").addEventListener("click", () => setMainPage("workbench"));
+    $("backToWorkbench").addEventListener("click", () => setReportView(false));
+    $("clearParallelReport").addEventListener("click", () => {
+      if (!state.reportRuns.length || !window.confirm("Clear all saved parallel run results from this browser?")) return;
+      state.reportRuns = [];
+      try { localStorage.removeItem(parallelReportKey); } catch {}
+      renderParallelReport();
+    });
+    $("reportRunCount").textContent = String(state.reportRuns.length);
+    $("refreshStatus").addEventListener("click", refreshProvider);
+    $("newCase").addEventListener("click", newCustomCase);
+    $("searchCases").addEventListener("input", (event) => renderLibrary(event.target.value));
+    $("primitive").addEventListener("change", updatePrimitiveControls);
+    for (const element of ["question", "context", "choices", "scoreCriteria", "trueCriteria", "falseCriteria", "guidance"]) {
+      $(element).addEventListener("input", markEdited);
+    }
+    refreshProvider();
+    migrateGridGames();
+    loadExamples();
+  </script>
+</body>
+</html>

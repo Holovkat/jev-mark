@@ -1,0 +1,24 @@
+# secrets — never publish
+.secure/
+
+# external checkout & build artifacts
+llama.cpp/
+build/
+.build/
+
+# python runtime
+.venv-clm/
+**/__pycache__/
+*.pyc
+
+# local logs & scratch
+logs/
+server.log
+
+# browser/test tooling artifacts
+.playwright-cli/
+.playwright-mcp/
+output/playwright/
+
+# macOS
+.DS_Store

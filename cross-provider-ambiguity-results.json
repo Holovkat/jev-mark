@@ -1,0 +1,5375 @@
+{
+  "seed": 20260922,
+  "suite": "ambiguity",
+  "rounds": 3,
+  "models": [
+    "gemma4:12b",
+    "granite4.2:latest",
+    "ornith-1.5:9b",
+    "SparkLLM/Spark-X2.5-4B:latest"
+  ],
+  "profiles": [
+    {
+      "id": "typesafe-env-dev",
+      "name": "TypeSafe env.dev",
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "model": "jev-latest"
+    }
+  ],
+  "cases": [
+    {
+      "id": "tallest",
+      "question": "A is taller than B, and C is taller than B. Who is tallest?",
+      "reference_answer": "cannot determine",
+      "rubric": "Do not infer a relationship between A and C that is not stated.",
+      "choices": [
+        "A",
+        "B",
+        "C",
+        "cannot determine"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_6916",
+          "response": "We know that A is taller than B, and C is also taller than B, but there is no information provided about the relationship between A and C. Since we cannot compare A and C, it is impossible to determine who is the tallest.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_2676",
+          "response": "Both A and C are taller than B, but there is no information provided to compare the heights of A and C. Therefore, it is impossible to determine who is the tallest.\n\nFINAL: C cannot determine"
+        },
+        {
+          "id": "candidate_9292",
+          "response": "We know A is taller than B and C is taller than B, but there is no information comparing A and C directly. Without knowing whether A is taller than C or vice versa, we cannot determine who is tallest.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_1126",
+          "response": "We know A is taller than B, and C is taller than B, but there's no information comparing A and C directly. Without knowing whether A is taller than C or vice versa, we cannot determine who is the tallest.\n\nFINAL: C"
+        }
+      ]
+    },
+    {
+      "id": "coffee-safety",
+      "question": "A cup of coffee has been sitting on a desk for two hours. Is it safe to drink?",
+      "reference_answer": "cannot determine",
+      "rubric": "The answer depends on temperature, ingredients, contamination, and other missing facts.",
+      "choices": [
+        "yes",
+        "no",
+        "cannot determine"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_9381",
+          "response": "Coffee left out for two hours can develop bacteria and off flavors, which means it is not safe to drink.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_2236",
+          "response": "Whether the coffee is safe to drink depends on factors like the environment, the ingredients added (like milk or cream), and the temperature. Without knowing these specific details, it is impossible to determine if it is safe.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_9509",
+          "response": "Coffee left at room temperature for two hours can harbor bacteria that may grow and cause illness if consumed. Whether it is safe to drink depends on factors like ambient temperature, cleanliness of the cup, and individual health. Without specific information about temperature, contamination, or storage conditions, safety cannot be determined.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_1636",
+          "response": "A cup of coffee left on a desk for two hours is generally safe to drink, as it is not in a temperature danger zone long enough to support significant bacterial growth, especially if it was covered or in a clean environment. However, if it was left uncovered in a warm room, it may have started to cool and could harbor some bacteria, but it is unlikely to be harmful.\n\nFINAL: yes"
+        }
+      ]
+    },
+    {
+      "id": "telescope",
+      "question": "I saw the man with the telescope. Who had the telescope?",
+      "reference_answer": "cannot determine",
+      "rubric": "The sentence is grammatically ambiguous; either person could have the telescope.",
+      "choices": [
+        "I did",
+        "the man did",
+        "cannot determine"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_2069",
+          "response": "The scenario only states that you saw the man using a telescope, but it does not provide any information about whether the telescope belonged to you or to the man. Since there is no way to confirm ownership from the given details, the correct choice is the one that reflects this uncertainty.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_8513",
+          "response": "The sentence is syntactically ambiguous because \"with the telescope\" could modify either the verb \"saw\" or the noun \"man.\" Without further context, it is impossible to know if I used the telescope to see him or if he was holding it.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_7793",
+          "response": "The sentence \"I saw the man with the telescope\" is ambiguous; it could mean either the speaker saw the man while using a telescope, or the speaker saw the man who had the telescope. Without additional context, it is unclear who possessed or used the telescope. Therefore, based solely on the given sentence, we cannot determine who had the telescope.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_1988",
+          "response": "The question states that I saw the man with the telescope, which means the telescope was with the man. Since the phrasing places the telescope alongside the man, it indicates the man had the telescope.\n\nFINAL: the man did"
+        }
+      ]
+    },
+    {
+      "id": "airport",
+      "question": "Your flight leaves at 11:00. The drive normally takes 30 minutes, but traffic and airport security are unknown. Should you leave at 9:00 or 9:30?",
+      "reference_answer": "cannot determine from the facts",
+      "rubric": "A reliable departure time requires traffic, airport, check-in, and baggage assumptions.",
+      "choices": [
+        "9:00",
+        "9:30",
+        "cannot determine from the facts"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_9440",
+          "response": "The flight departs at 11:00, and the drive normally takes 30 minutes, which would require leaving at 10:30. Since the actual travel time is uncertain due to traffic and security, leaving at either 9:00 or 9:30 would not guarantee a timely arrival.\n\nFINAL: cannot determine from the facts"
+        },
+        {
+          "id": "candidate_4540",
+          "response": "While the drive only takes 30 minutes, the time required for airport security and potential traffic is unknown. Leaving at 9:00 provides a necessary buffer for these unpredictable factors.\n\nFINAL: 9:00"
+        },
+        {
+          "id": "candidate_3493",
+          "response": "The flight leaves at 11:00, and the drive normally takes 30 minutes. However, traffic and airport security are unknown, which could add extra time. Since conditions are uncertain, leaving at 9:30 provides more buffer than 9:00.\n\nFINAL: cannot determine from the facts"
+        },
+        {
+          "id": "candidate_9746",
+          "response": "Given the uncertainty around traffic and airport security, leaving earlier at 9:00 provides a larger buffer of time to absorb unexpected delays, reducing the risk of missing your 11:00 flight.\n\nFINAL: 9:00"
+        }
+      ]
+    },
+    {
+      "id": "road-sign",
+      "question": "A sign says 'No entry except local access'. You need to visit a friend who lives on that street. May you enter?",
+      "reference_answer": "depends on the legal meaning of local access",
+      "rubric": "Interpretation depends on the jurisdiction and whether visiting a resident qualifies as local access.",
+      "choices": [
+        "yes",
+        "no",
+        "depends on the legal meaning of local access"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_9547",
+          "response": "The sign explicitly permits entry only for local access, which typically includes visitors to a friend's home on that street. Since your visit to a friend qualifies as local access, you are allowed to enter.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_2769",
+          "response": "The term \"local access\" typically refers to residents, workers, or people with a specific purpose in the immediate area. Since visiting a friend who lives on that street constitutes a specific local purpose, you would generally be permitted to enter.\n\nFINAL: yes"
+        },
+        {
+          "id": "candidate_9850",
+          "response": "The sign \"No entry except local access\" typically restricts entry to non-local individuals, implying that only residents or those with a legitimate local reason (e.g., living nearby, servicing the area) may enter. Since the user needs to visit a friend who lives on that street, they are likely a local access person (visiting a resident), which generally permits entry under \"local access.\" However, without explicit local definition (e.g., \"residents only\" vs. \"service personnel\"), the precise allowance hinges on the legal interpretation of \"local access.\"  \nFINAL: depends on the legal meaning of local access"
+        },
+        {
+          "id": "candidate_4355",
+          "response": "If your friend lives on that street, you likely qualify as a local resident or visitor with legitimate access, so \"local access\" would typically permit your entry. However, the exact interpretation can vary depending on how local authorities define \"local access\" and whether your visit counts as a legitimate local purpose.\n\nFINAL: yes"
+        }
+      ]
+    },
+    {
+      "id": "lights-off",
+      "question": "The lights are off in a building. Is the building empty?",
+      "reference_answer": "cannot determine",
+      "rubric": "Lights being off does not establish occupancy.",
+      "choices": [
+        "yes",
+        "no",
+        "cannot determine"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_7337",
+          "response": "The lights being off in a building does not necessarily mean there are no people inside, as lights could be off for maintenance, security, or other reasons. Therefore, we cannot conclude the building is empty based solely on this information.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_3815",
+          "response": "The fact that the lights are off does not provide information about the presence of people inside the building. People could be present but not using lights, or the building could be unoccupied. Therefore, it is impossible to determine if the building is empty.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_5747",
+          "response": "The fact that the lights are off does not necessarily mean the building is empty; people could be inside with lights off, or the building could be unoccupied for other reasons. Without additional information about occupancy, we cannot conclude the building is empty.  \nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_5203",
+          "response": "The lights being off does not necessarily mean the building is empty, as people could be present but simply not using the lights\u2014for example, during nighttime hours, in unoccupied rooms, or if the building is designed to conserve energy.\n\nFINAL: no"
+        }
+      ]
+    },
+    {
+      "id": "store-closing",
+      "question": "A store is advertised as open from 9:00 to 17:00. If you arrive exactly at 17:00, can you shop?",
+      "reference_answer": "cannot determine",
+      "rubric": "The closing policy, clock tolerance, and whether entry is allowed at closing are unstated.",
+      "choices": [
+        "yes",
+        "no",
+        "cannot determine"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_6093",
+          "response": "The advertisement states the store is open from 9:00 to 17:00. Arriving exactly at 17:00 means you are at the very end of the stated operating hours. Since the store closes at 17:00, you would not be able to shop at that exact time.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_2658",
+          "response": "The store's closing time is 17:00, which typically marks the moment the store ceases operations for the day. Since 17:00 is the exact moment of closing, it is not guaranteed that the store will still be open to serve customers at that precise time.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_7405",
+          "response": "The store's advertised hours are 9:00 to 17:00, which typically means it is open until 17:00 but may close at or after 17:00. Arriving exactly at 17:00 depends on whether the closing time includes the exact hour or if 17:00 is considered the start of closing. Without explicit wording like \"until 17:00 inclusive\" or \"open until 17:00,\" it's ambiguous whether the door is still open precisely at 17:00.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_7023",
+          "response": "The store's advertised hours are 9:00 to 17:00, which typically means it closes at 17:00. Arriving exactly at 17:00 means the store would be closing, so you likely cannot shop.\n\nFINAL: no"
+        }
+      ]
+    },
+    {
+      "id": "medication",
+      "question": "A label says to take a medicine twice daily. Is 8:00 and 20:00 always the correct schedule?",
+      "reference_answer": "follow the prescriber or label instructions",
+      "rubric": "Twice daily does not justify inventing a universal schedule; medication-specific instructions control.",
+      "choices": [
+        "yes",
+        "no",
+        "follow the prescriber or label instructions"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_2046",
+          "response": "The label only specifies that the medicine should be taken twice daily, which means the exact times are flexible as long as the two doses are spaced apart by 24 hours. Therefore, 8:00 and 20:00 are just one possible schedule, not the only correct one.\n\nFINAL: follow the prescriber or label instructions"
+        },
+        {
+          "id": "candidate_2881",
+          "response": "While 8:00 and 20:00 is a common way to split a twice-daily dose, the \"correct\" schedule depends on the specific medication's requirements and the patient's routine. Some medications require specific intervals or timing relative to meals, so the prescriber's instructions should always take precedence over a general label.\n\nFINAL: follow the prescriber or label instructions"
+        },
+        {
+          "id": "candidate_2948",
+          "response": "The label instructing \"twice daily\" does not specify exact times; it only requires taking the medication twice each day. Therefore, 8:00 and 20:00 is not always correct, as any two times that roughly cover the 24-hour period (e.g., morning and evening) would satisfy \"twice daily,\" though consistency and adherence to the prescriber's intent are important.\n\nFINAL: follow the prescriber or label instructions"
+        },
+        {
+          "id": "candidate_7739",
+          "response": "No, 8:00 and 20:00 are not always the correct schedule. The exact timing should follow the prescriber's or label's specific instructions, which may account for factors like the medication's purpose, the patient's condition, or individualized dosing needs.\n\nFINAL: no"
+        }
+      ]
+    },
+    {
+      "id": "fastest-route",
+      "question": "Route A is shorter than Route B. Is Route A always faster?",
+      "reference_answer": "no",
+      "rubric": "Traffic, speed limits, road type, and delays can make a longer route faster.",
+      "choices": [
+        "yes",
+        "no",
+        "cannot determine"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_6108",
+          "response": "A shorter route typically takes less distance, but speed depends on factors like traffic, road conditions, and speed limits, which are not specified here. Therefore, we cannot conclude that a shorter route is always faster.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_9147",
+          "response": "A shorter distance does not guarantee a faster travel time because factors like speed limits, traffic conditions, and road quality vary. Therefore, it cannot be determined if Route A is always faster based solely on its length.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_4369",
+          "response": "Route length does not necessarily determine travel time, as factors like speed limits, traffic, stops, and mode of transportation affect speed. A shorter route may still take longer if it includes many intersections, low-speed zones, or delays. Therefore, being shorter does not guarantee that Route A is always faster.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_4987",
+          "response": "No. A shorter route isn't necessarily faster because speed depends on factors like traffic, road conditions, and the type of surface, not just distance. A longer route with fewer obstacles could actually be quicker than a shorter one with delays.\n\nFINAL: no"
+        }
+      ]
+    },
+    {
+      "id": "empty-box",
+      "question": "A sealed box is light when lifted. Is it empty?",
+      "reference_answer": "cannot determine",
+      "rubric": "A light box may contain light contents; weight alone does not establish emptiness.",
+      "choices": [
+        "yes",
+        "no",
+        "cannot determine"
+      ],
+      "candidates": [
+        {
+          "id": "candidate_2139",
+          "response": "A sealed box being light when lifted only indicates its overall weight is low, but it could still contain very light objects like feathers or small, light items. Without knowing the specific contents or the box's material, we cannot definitively conclude whether it is empty.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_6127",
+          "response": "The box contains something that has very little mass, such as air or a vacuum. Therefore, the box is not technically empty.\n\nFINAL: no"
+        },
+        {
+          "id": "candidate_5582",
+          "response": "The fact that a sealed box is light when lifted does not necessarily indicate whether it is empty; weight depends on the contents and the box's material, among other factors. A sealed box could contain light materials (e.g., air, foam) and still feel light, or it could be empty. Without additional information about the box's composition or typical contents, we cannot conclude it is empty solely based on being light.\n\nFINAL: cannot determine"
+        },
+        {
+          "id": "candidate_1288",
+          "response": "A sealed box being light when lifted suggests it may be empty, but lightness alone doesn't guarantee emptiness\u2014it could contain low-density materials like foam, air-filled packaging, or lightweight substances. Without additional information about the box's contents or weight expectations, we cannot definitively conclude it's empty.\n\nFINAL: cannot determine"
+        }
+      ]
+    }
+  ],
+  "candidate_metadata": {
+    "tallest": {
+      "candidate_6916": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_2676": {
+        "model": "gemma4:12b",
+        "final_choice": null,
+        "correct": null
+      },
+      "candidate_9292": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_1126": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "C",
+        "correct": false
+      }
+    },
+    "coffee-safety": {
+      "candidate_9381": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "no",
+        "correct": false
+      },
+      "candidate_2236": {
+        "model": "gemma4:12b",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_9509": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_1636": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "yes",
+        "correct": false
+      }
+    },
+    "telescope": {
+      "candidate_2069": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_8513": {
+        "model": "gemma4:12b",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_7793": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_1988": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "the man did",
+        "correct": false
+      }
+    },
+    "airport": {
+      "candidate_9440": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "cannot determine from the facts",
+        "correct": true
+      },
+      "candidate_4540": {
+        "model": "gemma4:12b",
+        "final_choice": "9:00",
+        "correct": false
+      },
+      "candidate_3493": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine from the facts",
+        "correct": true
+      },
+      "candidate_9746": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "9:00",
+        "correct": false
+      }
+    },
+    "road-sign": {
+      "candidate_9547": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "yes",
+        "correct": false
+      },
+      "candidate_2769": {
+        "model": "gemma4:12b",
+        "final_choice": "yes",
+        "correct": false
+      },
+      "candidate_9850": {
+        "model": "granite4.2:latest",
+        "final_choice": "depends on the legal meaning of local access",
+        "correct": true
+      },
+      "candidate_4355": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "yes",
+        "correct": false
+      }
+    },
+    "lights-off": {
+      "candidate_7337": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_3815": {
+        "model": "gemma4:12b",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_5747": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_5203": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "no",
+        "correct": false
+      }
+    },
+    "store-closing": {
+      "candidate_6093": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "no",
+        "correct": false
+      },
+      "candidate_2658": {
+        "model": "gemma4:12b",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_7405": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_7023": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "no",
+        "correct": false
+      }
+    },
+    "medication": {
+      "candidate_2046": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "follow the prescriber or label instructions",
+        "correct": true
+      },
+      "candidate_2881": {
+        "model": "gemma4:12b",
+        "final_choice": "follow the prescriber or label instructions",
+        "correct": true
+      },
+      "candidate_2948": {
+        "model": "granite4.2:latest",
+        "final_choice": "follow the prescriber or label instructions",
+        "correct": true
+      },
+      "candidate_7739": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "no",
+        "correct": false
+      }
+    },
+    "fastest-route": {
+      "candidate_6108": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "cannot determine",
+        "correct": false
+      },
+      "candidate_9147": {
+        "model": "gemma4:12b",
+        "final_choice": "no",
+        "correct": true
+      },
+      "candidate_4369": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine",
+        "correct": false
+      },
+      "candidate_4987": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "no",
+        "correct": true
+      }
+    },
+    "empty-box": {
+      "candidate_2139": {
+        "model": "SparkLLM/Spark-X2.5-4B:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_6127": {
+        "model": "gemma4:12b",
+        "final_choice": "no",
+        "correct": false
+      },
+      "candidate_5582": {
+        "model": "granite4.2:latest",
+        "final_choice": "cannot determine",
+        "correct": true
+      },
+      "candidate_1288": {
+        "model": "ornith-1.5:9b",
+        "final_choice": "cannot determine",
+        "correct": true
+      }
+    }
+  },
+  "results": [
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "tallest",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_6916",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "correct",
+          "candidate_1126": "incorrect",
+          "candidate_6916": "correct",
+          "candidate_9292": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_6916",
+          "probability": 0.6719859838485718,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999998211860657,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2676": {
+          "value": "correct",
+          "probability": 0.9966075420379639,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1126": {
+          "value": "incorrect",
+          "probability": 0.5558962821960449,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6916": {
+          "value": "correct",
+          "probability": 0.9999627470970154,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9292": {
+          "value": "correct",
+          "probability": 0.9999979138374329,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 367,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2033.9,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "coffee-safety",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_2236",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "incorrect",
+          "candidate_2236": "correct",
+          "candidate_9381": "incorrect",
+          "candidate_9509": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2236",
+          "probability": 0.9709329605102539,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1636": {
+          "value": "incorrect",
+          "probability": 0.9999986886978149,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2236": {
+          "value": "correct",
+          "probability": 0.9999181032180786,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9381": {
+          "value": "incorrect",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9509": {
+          "value": "correct",
+          "probability": 0.999964714050293,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 394,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2077.5,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "telescope",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7793",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_1988": "incorrect",
+          "candidate_7793": "correct",
+          "candidate_2069": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7793",
+          "probability": 0.9714928865432739,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8513": {
+          "value": "correct",
+          "probability": 0.9999997019767761,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1988": {
+          "value": "incorrect",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7793": {
+          "value": "correct",
+          "probability": 0.9999833703041077,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2069": {
+          "value": "correct",
+          "probability": 0.9992222785949707,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 404,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2071.2,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "airport",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_9440",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4540": "incorrect",
+          "candidate_9746": "incorrect",
+          "candidate_9440": "correct",
+          "candidate_3493": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9440",
+          "probability": 0.9999861121177673,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4540": {
+          "value": "incorrect",
+          "probability": 0.9999977946281433,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9746": {
+          "value": "incorrect",
+          "probability": 0.9999485611915588,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9440": {
+          "value": "correct",
+          "probability": 0.999765932559967,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3493": {
+          "value": "incorrect",
+          "probability": 0.9948404431343079,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 441,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2145.2,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "road-sign",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_9850",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "partial",
+          "candidate_9850": "correct",
+          "candidate_4355": "partial",
+          "candidate_9547": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9850",
+          "probability": 0.999998927116394,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999999403953552,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2769": {
+          "value": "partial",
+          "probability": 0.9444760680198669,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9850": {
+          "value": "correct",
+          "probability": 0.9999893307685852,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4355": {
+          "value": "partial",
+          "probability": 0.9102966785430908,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9547": {
+          "value": "incorrect",
+          "probability": 0.9167249202728271,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 473,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2222.1,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "lights-off",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7337",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_5747": "correct",
+          "candidate_5203": "incorrect",
+          "candidate_3815": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7337",
+          "probability": 0.9097979068756104,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7337": {
+          "value": "correct",
+          "probability": 0.9999998211860657,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5747": {
+          "value": "correct",
+          "probability": 0.9974151253700256,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5203": {
+          "value": "incorrect",
+          "probability": 0.9997861385345459,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3815": {
+          "value": "correct",
+          "probability": 0.9999945759773254,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 370,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 1999.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "store-closing",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_2658",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2658": "correct",
+          "candidate_6093": "incorrect",
+          "candidate_7023": "incorrect",
+          "candidate_7405": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2658",
+          "probability": 0.9993706345558167,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2658": {
+          "value": "correct",
+          "probability": 0.9999766945838928,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6093": {
+          "value": "incorrect",
+          "probability": 0.9999999403953552,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7023": {
+          "value": "incorrect",
+          "probability": 0.9999905824661255,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7405": {
+          "value": "correct",
+          "probability": 0.9999430775642395,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 521,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2413.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "medication",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_2881",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2046": "correct",
+          "candidate_2881": "correct",
+          "candidate_2948": "correct",
+          "candidate_7739": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2881",
+          "probability": 0.9998596906661987,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.999999463558197,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2046": {
+          "value": "correct",
+          "probability": 0.9705987572669983,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2881": {
+          "value": "correct",
+          "probability": 0.9999887943267822,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2948": {
+          "value": "correct",
+          "probability": 0.9359766244888306,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7739": {
+          "value": "incorrect",
+          "probability": 0.9634031653404236,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 509,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2280.1,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "fastest-route",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4369": "partial",
+          "candidate_6108": "partial",
+          "candidate_9147": "correct",
+          "candidate_4987": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4987",
+          "probability": 0.999969482421875,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4369": {
+          "value": "partial",
+          "probability": 0.9331924319267273,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6108": {
+          "value": "partial",
+          "probability": 0.9050904512405396,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9147": {
+          "value": "correct",
+          "probability": 0.983742892742157,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4987": {
+          "value": "correct",
+          "probability": 0.9999991655349731,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 381,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2000.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "empty-box",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_5582",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_5582",
+          "probability": 0.9953233003616333,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5582": {
+          "value": "correct",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1288": {
+          "value": "correct",
+          "probability": 0.9993953704833984,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2139": {
+          "value": "correct",
+          "probability": 0.9999538064002991,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6127": {
+          "value": "incorrect",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 414,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2082.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "tallest",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_6916",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9292": "correct",
+          "candidate_1126": "incorrect",
+          "candidate_2676": "incorrect",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_6916",
+          "probability": 0.8965077996253967,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9292": {
+          "value": "correct",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1126": {
+          "value": "incorrect",
+          "probability": 0.9999857544898987,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2676": {
+          "value": "incorrect",
+          "probability": 0.7158941030502319,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6916": {
+          "value": "correct",
+          "probability": 0.9999945759773254,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 367,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 1997.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "coffee-safety",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_2236",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9509": "correct",
+          "candidate_1636": "incorrect",
+          "candidate_2236": "correct",
+          "candidate_9381": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2236",
+          "probability": 0.7901014089584351,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9509": {
+          "value": "correct",
+          "probability": 0.9999987483024597,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1636": {
+          "value": "incorrect",
+          "probability": 0.9999980926513672,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2236": {
+          "value": "correct",
+          "probability": 0.9999871850013733,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9381": {
+          "value": "incorrect",
+          "probability": 0.9999999403953552,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 394,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2076.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "telescope",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7793",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2069": "correct",
+          "candidate_7793": "correct",
+          "candidate_1988": "incorrect",
+          "candidate_8513": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7793",
+          "probability": 0.9986993074417114,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2069": {
+          "value": "correct",
+          "probability": 0.9999976754188538,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7793": {
+          "value": "correct",
+          "probability": 0.9999856352806091,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1988": {
+          "value": "incorrect",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8513": {
+          "value": "correct",
+          "probability": 0.9999966025352478,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 404,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2084.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "airport",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9440",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9440": "correct",
+          "candidate_4540": "incorrect",
+          "candidate_9746": "incorrect",
+          "candidate_3493": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9440",
+          "probability": 0.9999886751174927,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9440": {
+          "value": "correct",
+          "probability": 0.9998960494995117,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4540": {
+          "value": "incorrect",
+          "probability": 0.9999940991401672,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9746": {
+          "value": "incorrect",
+          "probability": 0.9999993443489075,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3493": {
+          "value": "incorrect",
+          "probability": 0.9848057627677917,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 441,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2147.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "road-sign",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9850",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "partial",
+          "candidate_4355": "partial",
+          "candidate_9547": "incorrect",
+          "candidate_9850": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9850",
+          "probability": 0.9999933838844299,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2769": {
+          "value": "partial",
+          "probability": 0.941636323928833,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4355": {
+          "value": "partial",
+          "probability": 0.937322735786438,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9547": {
+          "value": "incorrect",
+          "probability": 0.8820849061012268,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9850": {
+          "value": "correct",
+          "probability": 0.9999933242797852,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 473,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2219.7,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "lights-off",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7337",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_3815": "correct",
+          "candidate_5203": "incorrect",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7337",
+          "probability": 0.8386042714118958,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7337": {
+          "value": "correct",
+          "probability": 0.9999998211860657,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3815": {
+          "value": "correct",
+          "probability": 0.9998683929443359,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5203": {
+          "value": "incorrect",
+          "probability": 0.9999961853027344,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5747": {
+          "value": "correct",
+          "probability": 0.9999679923057556,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 370,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 1995.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "store-closing",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7405",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6093": "incorrect",
+          "candidate_7023": "incorrect",
+          "candidate_7405": "correct",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7405",
+          "probability": 0.9665342569351196,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6093": {
+          "value": "incorrect",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7023": {
+          "value": "incorrect",
+          "probability": 0.9999712705612183,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7405": {
+          "value": "correct",
+          "probability": 0.9999136328697205,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2658": {
+          "value": "correct",
+          "probability": 0.999467670917511,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 521,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2403.3,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "medication",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_2881",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2948": "correct",
+          "candidate_2046": "correct",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2881",
+          "probability": 0.6522793769836426,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999993443489075,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7739": {
+          "value": "correct",
+          "probability": 0.9965584874153137,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2948": {
+          "value": "correct",
+          "probability": 0.9972705245018005,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2046": {
+          "value": "correct",
+          "probability": 0.8657457828521729,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2881": {
+          "value": "correct",
+          "probability": 0.9998767375946045,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 509,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2277.3,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "fastest-route",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_4369": "incorrect",
+          "candidate_6108": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4987",
+          "probability": 0.9983352422714233,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4987": {
+          "value": "correct",
+          "probability": 0.9999995827674866,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9147": {
+          "value": "correct",
+          "probability": 0.9841638207435608,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4369": {
+          "value": "incorrect",
+          "probability": 0.9994750618934631,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6108": {
+          "value": "incorrect",
+          "probability": 0.9996769428253174,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 381,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2004.4,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "empty-box",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1288",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6127": "incorrect",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_5582": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_1288",
+          "probability": 0.9990071058273315,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6127": {
+          "value": "incorrect",
+          "probability": 0.9999987483024597,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1288": {
+          "value": "correct",
+          "probability": 0.9999502897262573,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2139": {
+          "value": "correct",
+          "probability": 0.9908790588378906,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5582": {
+          "value": "correct",
+          "probability": 0.9999982118606567,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 414,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2076.1,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "tallest",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9292",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "correct",
+          "candidate_9292": "correct",
+          "candidate_1126": "incorrect",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9292",
+          "probability": 0.9968177676200867,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2676": {
+          "value": "correct",
+          "probability": 0.9999527931213379,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9292": {
+          "value": "correct",
+          "probability": 0.999908983707428,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1126": {
+          "value": "incorrect",
+          "probability": 0.9998436570167542,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6916": {
+          "value": "correct",
+          "probability": 0.9999885559082031,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 367,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 1999.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "coffee-safety",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_2236",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "incorrect",
+          "candidate_9509": "correct",
+          "candidate_9381": "incorrect",
+          "candidate_2236": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2236",
+          "probability": 0.694203794002533,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1636": {
+          "value": "incorrect",
+          "probability": 0.9999986886978149,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9509": {
+          "value": "correct",
+          "probability": 0.9999265670776367,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9381": {
+          "value": "incorrect",
+          "probability": 0.9999999403953552,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2236": {
+          "value": "correct",
+          "probability": 0.9999936819076538,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 394,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2069.3,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "telescope",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7793",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_7793": "correct",
+          "candidate_2069": "correct",
+          "candidate_1988": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7793",
+          "probability": 0.998231828212738,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_8513": {
+          "value": "correct",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7793": {
+          "value": "correct",
+          "probability": 0.9999801516532898,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2069": {
+          "value": "correct",
+          "probability": 0.5456647872924805,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1988": {
+          "value": "incorrect",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 404,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2070.9,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "airport",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9440",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9746": "incorrect",
+          "candidate_3493": "incorrect",
+          "candidate_4540": "incorrect",
+          "candidate_9440": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9440",
+          "probability": 0.9992669820785522,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9746": {
+          "value": "incorrect",
+          "probability": 0.999984860420227,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3493": {
+          "value": "incorrect",
+          "probability": 0.9459186792373657,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4540": {
+          "value": "incorrect",
+          "probability": 0.9995716214179993,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9440": {
+          "value": "correct",
+          "probability": 0.999901294708252,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 441,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2142.6,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "road-sign",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9850",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4355": "partial",
+          "candidate_2769": "partial",
+          "candidate_9850": "correct",
+          "candidate_9547": "partial"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_9850",
+          "probability": 0.9999997615814209,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4355": {
+          "value": "partial",
+          "probability": 0.9804402589797974,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2769": {
+          "value": "partial",
+          "probability": 0.8432122468948364,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9850": {
+          "value": "correct",
+          "probability": 0.9999943375587463,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9547": {
+          "value": "partial",
+          "probability": 0.5443359017372131,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 473,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2219.8,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "lights-off",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_3815",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_3815": "correct",
+          "candidate_5203": "incorrect",
+          "candidate_7337": "correct",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_3815",
+          "probability": 0.9880016446113586,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_3815": {
+          "value": "correct",
+          "probability": 0.9999997019767761,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5203": {
+          "value": "incorrect",
+          "probability": 0.9983221888542175,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7337": {
+          "value": "correct",
+          "probability": 0.9977388978004456,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5747": {
+          "value": "correct",
+          "probability": 0.9999083876609802,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 370,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2001.0,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "store-closing",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7405",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7405": "correct",
+          "candidate_7023": "incorrect",
+          "candidate_6093": "incorrect",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_7405",
+          "probability": 0.9980725646018982,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7405": {
+          "value": "correct",
+          "probability": 0.9999973177909851,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7023": {
+          "value": "incorrect",
+          "probability": 0.9999999403953552,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6093": {
+          "value": "incorrect",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2658": {
+          "value": "correct",
+          "probability": 0.9999892115592957,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 521,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2405.3,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "medication",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_2881",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2046": "correct",
+          "candidate_2948": "correct",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_2881",
+          "probability": 0.941447913646698,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999993443489075,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_7739": {
+          "value": "correct",
+          "probability": 0.9910513162612915,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2046": {
+          "value": "correct",
+          "probability": 0.56104576587677,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2948": {
+          "value": "correct",
+          "probability": 0.9614430069923401,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2881": {
+          "value": "correct",
+          "probability": 0.999923825263977,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 509,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 2281.2,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "fastest-route",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_6108": "incorrect",
+          "candidate_4369": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_4987",
+          "probability": 0.9944206476211548,
+          "scored_nodes": 3,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 0.9999999403953552,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4987": {
+          "value": "correct",
+          "probability": 0.9999990463256836,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_9147": {
+          "value": "correct",
+          "probability": 0.9874742031097412,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6108": {
+          "value": "incorrect",
+          "probability": 0.9842243194580078,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_4369": {
+          "value": "incorrect",
+          "probability": 0.9453125596046448,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 381,
+        "scored_rows": 77
+      },
+      "api_model": null,
+      "elapsed_ms": 1999.2,
+      "error": null
+    },
+    {
+      "provider": "local-jev",
+      "config_id": null,
+      "model": "gemma4:12b",
+      "case_id": "empty-box",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_5582",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "incorrect",
+          "candidate_1288": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "value": "candidate_5582",
+          "probability": 0.9939835071563721,
+          "scored_nodes": 2,
+          "tree": true
+        },
+        "confidence": {
+          "value": "high",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_5582": {
+          "value": "correct",
+          "probability": 0.9999998807907104,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_2139": {
+          "value": "correct",
+          "probability": 0.9997673630714417,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_6127": {
+          "value": "incorrect",
+          "probability": 1.0,
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "verdict_candidate_1288": {
+          "value": "correct",
+          "probability": 0.9999921917915344,
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 414,
+        "scored_rows": 69
+      },
+      "api_model": null,
+      "elapsed_ms": 2073.6,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "tallest",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_6916",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "partial",
+          "candidate_1126": "incorrect",
+          "candidate_6916": "correct",
+          "candidate_9292": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_6916",
+          "confidence": 0.49,
+          "probabilities": {
+            "candidate_1126": 0.0,
+            "candidate_2676": 0.0,
+            "candidate_6916": 0.59,
+            "abstain": 0.04,
+            "candidate_9292": 0.37
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.93,
+          "probabilities": {
+            "high": 0.95,
+            "low": 0.02,
+            "medium": 0.03
+          }
+        },
+        "verdict_candidate_2676": {
+          "choice": "partial",
+          "confidence": 0.21,
+          "probabilities": {
+            "partial": 0.41,
+            "correct": 0.33,
+            "incorrect": 0.26,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_1126": {
+          "choice": "incorrect",
+          "confidence": 0.74,
+          "probabilities": {
+            "partial": 0.13,
+            "correct": 0.06,
+            "incorrect": 0.81,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_6916": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_9292": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1515,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 786.3,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "coffee-safety",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_2236",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "incorrect",
+          "candidate_2236": "correct",
+          "candidate_9381": "incorrect",
+          "candidate_9509": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_2236",
+          "confidence": 0.66,
+          "probabilities": {
+            "abstain": 0.02,
+            "candidate_2236": 0.73,
+            "candidate_1636": 0.0,
+            "candidate_9509": 0.25,
+            "candidate_9381": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.93,
+          "probabilities": {
+            "low": 0.03,
+            "high": 0.95,
+            "medium": 0.02
+          }
+        },
+        "verdict_candidate_1636": {
+          "choice": "incorrect",
+          "confidence": 0.9,
+          "probabilities": {
+            "partial": 0.08,
+            "correct": 0.0,
+            "incorrect": 0.92,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2236": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_9381": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 0.0,
+            "incorrect": 1.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_9509": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1543,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 696.2,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "telescope",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_8513",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_1988": "incorrect",
+          "candidate_7793": "correct",
+          "candidate_2069": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_8513",
+          "confidence": 0.43,
+          "probabilities": {
+            "abstain": 0.11,
+            "candidate_7793": 0.33,
+            "candidate_2069": 0.01,
+            "candidate_1988": 0.0,
+            "candidate_8513": 0.54
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.98,
+          "probabilities": {
+            "high": 0.98,
+            "medium": 0.01,
+            "low": 0.01
+          }
+        },
+        "verdict_candidate_8513": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_1988": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 0.0,
+            "incorrect": 1.0
+          }
+        },
+        "verdict_candidate_7793": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_2069": {
+          "choice": "correct",
+          "confidence": 0.94,
+          "probabilities": {
+            "partial": 0.04,
+            "unverifiable": 0.0,
+            "correct": 0.95,
+            "incorrect": 0.01
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1558,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 650.0,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "airport",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_9440",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4540": "incorrect",
+          "candidate_9746": "incorrect",
+          "candidate_9440": "correct",
+          "candidate_3493": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9440",
+          "confidence": 0.98,
+          "probabilities": {
+            "candidate_4540": 0.0,
+            "abstain": 0.01,
+            "candidate_9746": 0.0,
+            "candidate_9440": 0.98,
+            "candidate_3493": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.88,
+          "probabilities": {
+            "medium": 0.03,
+            "low": 0.05,
+            "high": 0.92
+          }
+        },
+        "verdict_candidate_4540": {
+          "choice": "incorrect",
+          "confidence": 0.9,
+          "probabilities": {
+            "partial": 0.07,
+            "incorrect": 0.93,
+            "unverifiable": 0.0,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_9746": {
+          "choice": "incorrect",
+          "confidence": 0.93,
+          "probabilities": {
+            "partial": 0.05,
+            "incorrect": 0.95,
+            "unverifiable": 0.0,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_9440": {
+          "choice": "correct",
+          "confidence": 0.93,
+          "probabilities": {
+            "partial": 0.04,
+            "incorrect": 0.01,
+            "unverifiable": 0.0,
+            "correct": 0.95
+          }
+        },
+        "verdict_candidate_3493": {
+          "choice": "incorrect",
+          "confidence": 0.23,
+          "probabilities": {
+            "partial": 0.4,
+            "incorrect": 0.42,
+            "unverifiable": 0.0,
+            "correct": 0.18
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1590,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 657.0,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "road-sign",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_9850",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "incorrect",
+          "candidate_9850": "correct",
+          "candidate_4355": "partial",
+          "candidate_9547": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9850",
+          "confidence": 1.0,
+          "probabilities": {
+            "candidate_4355": 0.0,
+            "candidate_2769": 0.0,
+            "candidate_9547": 0.0,
+            "abstain": 0.0,
+            "candidate_9850": 1.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.33,
+          "probabilities": {
+            "medium": 0.22,
+            "low": 0.23,
+            "high": 0.55
+          }
+        },
+        "verdict_candidate_2769": {
+          "choice": "incorrect",
+          "confidence": 0.41,
+          "probabilities": {
+            "partial": 0.44,
+            "correct": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.56
+          }
+        },
+        "verdict_candidate_9850": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_4355": {
+          "choice": "partial",
+          "confidence": 0.66,
+          "probabilities": {
+            "partial": 0.75,
+            "correct": 0.03,
+            "unverifiable": 0.0,
+            "incorrect": 0.22
+          }
+        },
+        "verdict_candidate_9547": {
+          "choice": "incorrect",
+          "confidence": 0.81,
+          "probabilities": {
+            "partial": 0.14,
+            "correct": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.86
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1622,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 663.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "lights-off",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7337",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_5747": "correct",
+          "candidate_5203": "incorrect",
+          "candidate_3815": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7337",
+          "confidence": 0.2,
+          "probabilities": {
+            "candidate_5747": 0.31,
+            "candidate_3815": 0.16,
+            "abstain": 0.16,
+            "candidate_7337": 0.36,
+            "candidate_5203": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.96,
+          "probabilities": {
+            "medium": 0.02,
+            "high": 0.97,
+            "low": 0.01
+          }
+        },
+        "verdict_candidate_7337": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_5747": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_5203": {
+          "choice": "incorrect",
+          "confidence": 0.9,
+          "probabilities": {
+            "correct": 0.0,
+            "incorrect": 0.93,
+            "partial": 0.07,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_3815": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1526,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 733.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "store-closing",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7405",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2658": "correct",
+          "candidate_6093": "incorrect",
+          "candidate_7023": "incorrect",
+          "candidate_7405": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7405",
+          "confidence": 0.37,
+          "probabilities": {
+            "candidate_2658": 0.49,
+            "abstain": 0.01,
+            "candidate_7405": 0.5,
+            "candidate_7023": 0.0,
+            "candidate_6093": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.9,
+          "probabilities": {
+            "medium": 0.01,
+            "high": 0.93,
+            "low": 0.05
+          }
+        },
+        "verdict_candidate_2658": {
+          "choice": "correct",
+          "confidence": 0.98,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.99,
+            "incorrect": 0.0,
+            "partial": 0.01
+          }
+        },
+        "verdict_candidate_6093": {
+          "choice": "incorrect",
+          "confidence": 0.99,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 0.0,
+            "incorrect": 1.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_7023": {
+          "choice": "incorrect",
+          "confidence": 0.95,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.0,
+            "incorrect": 0.96,
+            "partial": 0.04
+          }
+        },
+        "verdict_candidate_7405": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.99,
+            "incorrect": 0.0,
+            "partial": 0.01
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1667,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 639.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "medication",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_7739",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2046": "partial",
+          "candidate_2881": "correct",
+          "candidate_2948": "correct",
+          "candidate_7739": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7739",
+          "confidence": 0.34,
+          "probabilities": {
+            "candidate_2046": 0.04,
+            "candidate_2881": 0.46,
+            "candidate_2948": 0.03,
+            "candidate_7739": 0.47,
+            "abstain": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.8,
+          "probabilities": {
+            "high": 0.87,
+            "low": 0.01,
+            "medium": 0.12
+          }
+        },
+        "verdict_candidate_2046": {
+          "choice": "partial",
+          "confidence": 0.28,
+          "probabilities": {
+            "incorrect": 0.12,
+            "unverifiable": 0.0,
+            "partial": 0.47000000000000003,
+            "correct": 0.41
+          }
+        },
+        "verdict_candidate_2881": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.02,
+            "correct": 0.98
+          }
+        },
+        "verdict_candidate_2948": {
+          "choice": "correct",
+          "confidence": 0.62,
+          "probabilities": {
+            "incorrect": 0.02,
+            "unverifiable": 0.0,
+            "partial": 0.27,
+            "correct": 0.71
+          }
+        },
+        "verdict_candidate_7739": {
+          "choice": "correct",
+          "confidence": 0.78,
+          "probabilities": {
+            "incorrect": 0.05,
+            "unverifiable": 0.0,
+            "partial": 0.11,
+            "correct": 0.84
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1658,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 681.3,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "fastest-route",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4369": "partial",
+          "candidate_6108": "partial",
+          "candidate_9147": "correct",
+          "candidate_4987": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4987",
+          "confidence": 0.96,
+          "probabilities": {
+            "candidate_9147": 0.03,
+            "abstain": 0.0,
+            "candidate_6108": 0.0,
+            "candidate_4369": 0.0,
+            "candidate_4987": 0.97
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.95,
+          "probabilities": {
+            "high": 0.97,
+            "medium": 0.03,
+            "low": 0.0
+          }
+        },
+        "verdict_candidate_4369": {
+          "choice": "partial",
+          "confidence": 0.5,
+          "probabilities": {
+            "partial": 0.62,
+            "unverifiable": 0.0,
+            "correct": 0.24,
+            "incorrect": 0.14
+          }
+        },
+        "verdict_candidate_6108": {
+          "choice": "partial",
+          "confidence": 0.56,
+          "probabilities": {
+            "partial": 0.68,
+            "unverifiable": 0.0,
+            "correct": 0.24,
+            "incorrect": 0.08
+          }
+        },
+        "verdict_candidate_9147": {
+          "choice": "correct",
+          "confidence": 0.93,
+          "probabilities": {
+            "partial": 0.05,
+            "unverifiable": 0.0,
+            "correct": 0.94,
+            "incorrect": 0.01
+          }
+        },
+        "verdict_candidate_4987": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1528,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 657.5,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "empty-box",
+      "round": 0,
+      "decision": {
+        "winner": "candidate_5582",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_5582",
+          "confidence": 0.64,
+          "probabilities": {
+            "candidate_6127": 0.0,
+            "candidate_2139": 0.03,
+            "candidate_5582": 0.72,
+            "candidate_1288": 0.06,
+            "abstain": 0.19
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.96,
+          "probabilities": {
+            "high": 0.97,
+            "low": 0.02,
+            "medium": 0.01
+          }
+        },
+        "verdict_candidate_5582": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_1288": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2139": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_6127": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "correct": 0.0,
+            "incorrect": 1.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1561,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 644.2,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "tallest",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9292",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9292": "correct",
+          "candidate_1126": "incorrect",
+          "candidate_2676": "partial",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9292",
+          "confidence": 0.82,
+          "probabilities": {
+            "candidate_6916": 0.07,
+            "candidate_2676": 0.0,
+            "candidate_9292": 0.86,
+            "abstain": 0.07,
+            "candidate_1126": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.88,
+          "probabilities": {
+            "high": 0.91,
+            "medium": 0.06,
+            "low": 0.03
+          }
+        },
+        "verdict_candidate_9292": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_1126": {
+          "choice": "incorrect",
+          "confidence": 0.94,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.0,
+            "incorrect": 0.95,
+            "partial": 0.05
+          }
+        },
+        "verdict_candidate_2676": {
+          "choice": "partial",
+          "confidence": 0.42,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.27,
+            "incorrect": 0.17,
+            "partial": 0.56
+          }
+        },
+        "verdict_candidate_6916": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1515,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 672.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "coffee-safety",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9509",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9509": "correct",
+          "candidate_1636": "incorrect",
+          "candidate_2236": "correct",
+          "candidate_9381": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9509",
+          "confidence": 0.48,
+          "probabilities": {
+            "candidate_1636": 0.01,
+            "candidate_9509": 0.58,
+            "candidate_2236": 0.34,
+            "abstain": 0.07,
+            "candidate_9381": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.91,
+          "probabilities": {
+            "medium": 0.02,
+            "high": 0.94,
+            "low": 0.04
+          }
+        },
+        "verdict_candidate_9509": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_1636": {
+          "choice": "incorrect",
+          "confidence": 0.93,
+          "probabilities": {
+            "correct": 0.0,
+            "partial": 0.05,
+            "unverifiable": 0.0,
+            "incorrect": 0.95
+          }
+        },
+        "verdict_candidate_2236": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_9381": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0,
+            "incorrect": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1543,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 669.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "telescope",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7793",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2069": "correct",
+          "candidate_7793": "correct",
+          "candidate_1988": "incorrect",
+          "candidate_8513": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7793",
+          "confidence": 0.41,
+          "probabilities": {
+            "candidate_8513": 0.33,
+            "abstain": 0.08,
+            "candidate_2069": 0.06,
+            "candidate_1988": 0.01,
+            "candidate_7793": 0.52
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.97,
+          "probabilities": {
+            "medium": 0.01,
+            "low": 0.01,
+            "high": 0.98
+          }
+        },
+        "verdict_candidate_2069": {
+          "choice": "correct",
+          "confidence": 0.96,
+          "probabilities": {
+            "correct": 0.96,
+            "partial": 0.03,
+            "incorrect": 0.01,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_7793": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_1988": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 0.0,
+            "partial": 0.0,
+            "incorrect": 1.0,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_8513": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1558,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 706.8,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "airport",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9440",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9440": "correct",
+          "candidate_4540": "incorrect",
+          "candidate_9746": "incorrect",
+          "candidate_3493": "partial"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9440",
+          "confidence": 0.93,
+          "probabilities": {
+            "candidate_3493": 0.0,
+            "candidate_9440": 0.95,
+            "candidate_9746": 0.02,
+            "abstain": 0.03,
+            "candidate_4540": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.81,
+          "probabilities": {
+            "medium": 0.05,
+            "low": 0.08,
+            "high": 0.87
+          }
+        },
+        "verdict_candidate_9440": {
+          "choice": "correct",
+          "confidence": 0.84,
+          "probabilities": {
+            "incorrect": 0.02,
+            "correct": 0.88,
+            "unverifiable": 0.0,
+            "partial": 0.1
+          }
+        },
+        "verdict_candidate_4540": {
+          "choice": "incorrect",
+          "confidence": 0.93,
+          "probabilities": {
+            "correct": 0.0,
+            "incorrect": 0.95,
+            "unverifiable": 0.0,
+            "partial": 0.05
+          }
+        },
+        "verdict_candidate_9746": {
+          "choice": "incorrect",
+          "confidence": 0.95,
+          "probabilities": {
+            "incorrect": 0.96,
+            "correct": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.04
+          }
+        },
+        "verdict_candidate_3493": {
+          "choice": "partial",
+          "confidence": 0.16,
+          "probabilities": {
+            "correct": 0.29,
+            "incorrect": 0.34,
+            "unverifiable": 0.0,
+            "partial": 0.37
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1590,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 662.6,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "road-sign",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_9850",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2769": "incorrect",
+          "candidate_4355": "partial",
+          "candidate_9547": "incorrect",
+          "candidate_9850": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9850",
+          "confidence": 1.0,
+          "probabilities": {
+            "candidate_9547": 0.0,
+            "candidate_4355": 0.0,
+            "abstain": 0.0,
+            "candidate_2769": 0.0,
+            "candidate_9850": 1.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.43,
+          "probabilities": {
+            "medium": 0.17,
+            "high": 0.62,
+            "low": 0.21
+          }
+        },
+        "verdict_candidate_2769": {
+          "choice": "incorrect",
+          "confidence": 0.37,
+          "probabilities": {
+            "incorrect": 0.52,
+            "correct": 0.01,
+            "unverifiable": 0.0,
+            "partial": 0.47
+          }
+        },
+        "verdict_candidate_4355": {
+          "choice": "partial",
+          "confidence": 0.69,
+          "probabilities": {
+            "incorrect": 0.11,
+            "correct": 0.12,
+            "partial": 0.77,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_9547": {
+          "choice": "incorrect",
+          "confidence": 0.58,
+          "probabilities": {
+            "correct": 0.01,
+            "incorrect": 0.68,
+            "partial": 0.31,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_9850": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.99,
+            "unverifiable": 0.0,
+            "partial": 0.01
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1622,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 676.2,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "lights-off",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_3815",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7337": "correct",
+          "candidate_3815": "correct",
+          "candidate_5203": "incorrect",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_3815",
+          "confidence": 0.25,
+          "probabilities": {
+            "candidate_5747": 0.07,
+            "candidate_7337": 0.37,
+            "candidate_3815": 0.39,
+            "abstain": 0.16,
+            "candidate_5203": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.96,
+          "probabilities": {
+            "high": 0.97,
+            "medium": 0.02,
+            "low": 0.01
+          }
+        },
+        "verdict_candidate_7337": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_3815": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_5203": {
+          "choice": "incorrect",
+          "confidence": 0.93,
+          "probabilities": {
+            "incorrect": 0.95,
+            "unverifiable": 0.0,
+            "partial": 0.05,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_5747": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1526,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 710.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "store-closing",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7405",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6093": "incorrect",
+          "candidate_7023": "incorrect",
+          "candidate_7405": "correct",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7405",
+          "confidence": 0.83,
+          "probabilities": {
+            "candidate_7023": 0.0,
+            "candidate_2658": 0.12,
+            "candidate_6093": 0.0,
+            "candidate_7405": 0.87,
+            "abstain": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.93,
+          "probabilities": {
+            "low": 0.04,
+            "medium": 0.01,
+            "high": 0.95
+          }
+        },
+        "verdict_candidate_6093": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_7023": {
+          "choice": "incorrect",
+          "confidence": 0.92,
+          "probabilities": {
+            "incorrect": 0.94,
+            "unverifiable": 0.0,
+            "partial": 0.06,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_7405": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.01,
+            "correct": 0.99
+          }
+        },
+        "verdict_candidate_2658": {
+          "choice": "correct",
+          "confidence": 0.92,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.06,
+            "correct": 0.94
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1667,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 673.6,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "medication",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_7739",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2948": "correct",
+          "candidate_2046": "partial",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7739",
+          "confidence": 0.35,
+          "probabilities": {
+            "candidate_2948": 0.17,
+            "candidate_7739": 0.49,
+            "candidate_2046": 0.01,
+            "candidate_2881": 0.33,
+            "abstain": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.86,
+          "probabilities": {
+            "high": 0.91,
+            "low": 0.01,
+            "medium": 0.08
+          }
+        },
+        "verdict_candidate_7739": {
+          "choice": "correct",
+          "confidence": 0.94,
+          "probabilities": {
+            "partial": 0.02,
+            "correct": 0.96,
+            "incorrect": 0.02,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2948": {
+          "choice": "correct",
+          "confidence": 0.58,
+          "probabilities": {
+            "partial": 0.28,
+            "correct": 0.69,
+            "incorrect": 0.03,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2046": {
+          "choice": "partial",
+          "confidence": 0.4,
+          "probabilities": {
+            "partial": 0.55,
+            "correct": 0.29,
+            "incorrect": 0.16,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_2881": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "partial": 0.02,
+            "correct": 0.98,
+            "incorrect": 0.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1658,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 680.5,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "fastest-route",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_4369": "partial",
+          "candidate_6108": "partial"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4987",
+          "confidence": 0.74,
+          "probabilities": {
+            "candidate_6108": 0.0,
+            "abstain": 0.0,
+            "candidate_4369": 0.0,
+            "candidate_9147": 0.21,
+            "candidate_4987": 0.79
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.91,
+          "probabilities": {
+            "low": 0.01,
+            "medium": 0.05,
+            "high": 0.94
+          }
+        },
+        "verdict_candidate_4987": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_9147": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "partial": 0.01,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 0.99
+          }
+        },
+        "verdict_candidate_4369": {
+          "choice": "partial",
+          "confidence": 0.33,
+          "probabilities": {
+            "partial": 0.5,
+            "incorrect": 0.2,
+            "unverifiable": 0.0,
+            "correct": 0.3
+          }
+        },
+        "verdict_candidate_6108": {
+          "choice": "partial",
+          "confidence": 0.47,
+          "probabilities": {
+            "partial": 0.61,
+            "incorrect": 0.18,
+            "unverifiable": 0.0,
+            "correct": 0.21
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1528,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 631.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "empty-box",
+      "round": 1,
+      "decision": {
+        "winner": "candidate_1288",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_6127": "incorrect",
+          "candidate_1288": "correct",
+          "candidate_2139": "correct",
+          "candidate_5582": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_1288",
+          "confidence": 0.46,
+          "probabilities": {
+            "candidate_2139": 0.03,
+            "candidate_5582": 0.33,
+            "candidate_1288": 0.5599999999999999,
+            "candidate_6127": 0.01,
+            "abstain": 0.07
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.98,
+          "probabilities": {
+            "medium": 0.01,
+            "high": 0.98,
+            "low": 0.01
+          }
+        },
+        "verdict_candidate_6127": {
+          "choice": "incorrect",
+          "confidence": 0.98,
+          "probabilities": {
+            "correct": 0.0,
+            "incorrect": 0.99,
+            "unverifiable": 0.0,
+            "partial": 0.01
+          }
+        },
+        "verdict_candidate_1288": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2139": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_5582": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "partial": 0.0,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1561,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 698.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "tallest",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9292",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_2676": "partial",
+          "candidate_9292": "correct",
+          "candidate_1126": "incorrect",
+          "candidate_6916": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9292",
+          "confidence": 0.76,
+          "probabilities": {
+            "candidate_6916": 0.13,
+            "candidate_9292": 0.8,
+            "candidate_1126": 0.0,
+            "abstain": 0.06,
+            "candidate_2676": 0.01
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.93,
+          "probabilities": {
+            "high": 0.96,
+            "medium": 0.03,
+            "low": 0.01
+          }
+        },
+        "verdict_candidate_2676": {
+          "choice": "partial",
+          "confidence": 0.41,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.27,
+            "partial": 0.56,
+            "incorrect": 0.17
+          }
+        },
+        "verdict_candidate_9292": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        },
+        "verdict_candidate_1126": {
+          "choice": "incorrect",
+          "confidence": 0.91,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 0.02,
+            "partial": 0.05,
+            "incorrect": 0.93
+          }
+        },
+        "verdict_candidate_6916": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "correct": 1.0,
+            "partial": 0.0,
+            "incorrect": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1515,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 650.8,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "coffee-safety",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9509",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_1636": "incorrect",
+          "candidate_9509": "correct",
+          "candidate_9381": "incorrect",
+          "candidate_2236": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9509",
+          "confidence": 0.63,
+          "probabilities": {
+            "candidate_9381": 0.0,
+            "candidate_9509": 0.71,
+            "candidate_2236": 0.27,
+            "candidate_1636": 0.0,
+            "abstain": 0.02
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.95,
+          "probabilities": {
+            "high": 0.97,
+            "low": 0.02,
+            "medium": 0.01
+          }
+        },
+        "verdict_candidate_1636": {
+          "choice": "incorrect",
+          "confidence": 0.88,
+          "probabilities": {
+            "incorrect": 0.91,
+            "unverifiable": 0.0,
+            "partial": 0.09,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_9509": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.01,
+            "correct": 0.99
+          }
+        },
+        "verdict_candidate_9381": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_2236": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1543,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 684.1,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "telescope",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7793",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_8513": "correct",
+          "candidate_7793": "correct",
+          "candidate_2069": "correct",
+          "candidate_1988": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7793",
+          "confidence": 0.4,
+          "probabilities": {
+            "candidate_1988": 0.0,
+            "candidate_2069": 0.01,
+            "candidate_8513": 0.42,
+            "abstain": 0.05,
+            "candidate_7793": 0.52
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.97,
+          "probabilities": {
+            "medium": 0.01,
+            "low": 0.01,
+            "high": 0.98
+          }
+        },
+        "verdict_candidate_8513": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_7793": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_2069": {
+          "choice": "correct",
+          "confidence": 0.89,
+          "probabilities": {
+            "incorrect": 0.01,
+            "unverifiable": 0.0,
+            "partial": 0.07,
+            "correct": 0.92
+          }
+        },
+        "verdict_candidate_1988": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1558,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 653.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "airport",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9440",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_9746": "incorrect",
+          "candidate_3493": "partial",
+          "candidate_4540": "incorrect",
+          "candidate_9440": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9440",
+          "confidence": 0.9,
+          "probabilities": {
+            "candidate_3493": 0.03,
+            "candidate_4540": 0.01,
+            "candidate_9746": 0.01,
+            "abstain": 0.03,
+            "candidate_9440": 0.92
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.86,
+          "probabilities": {
+            "medium": 0.03,
+            "high": 0.91,
+            "low": 0.06
+          }
+        },
+        "verdict_candidate_9746": {
+          "choice": "incorrect",
+          "confidence": 0.9,
+          "probabilities": {
+            "correct": 0.0,
+            "incorrect": 0.93,
+            "unverifiable": 0.0,
+            "partial": 0.07
+          }
+        },
+        "verdict_candidate_3493": {
+          "choice": "partial",
+          "confidence": 0.23,
+          "probabilities": {
+            "incorrect": 0.26,
+            "correct": 0.31,
+            "unverifiable": 0.0,
+            "partial": 0.43
+          }
+        },
+        "verdict_candidate_4540": {
+          "choice": "incorrect",
+          "confidence": 0.89,
+          "probabilities": {
+            "correct": 0.0,
+            "incorrect": 0.92,
+            "unverifiable": 0.0,
+            "partial": 0.08
+          }
+        },
+        "verdict_candidate_9440": {
+          "choice": "correct",
+          "confidence": 0.91,
+          "probabilities": {
+            "correct": 0.93,
+            "incorrect": 0.01,
+            "unverifiable": 0.0,
+            "partial": 0.05
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1590,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 694.4,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "road-sign",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_9850",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4355": "partial",
+          "candidate_2769": "partial",
+          "candidate_9850": "correct",
+          "candidate_9547": "incorrect"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_9850",
+          "confidence": 1.0,
+          "probabilities": {
+            "candidate_9547": 0.0,
+            "candidate_9850": 1.0,
+            "candidate_4355": 0.0,
+            "candidate_2769": 0.0,
+            "abstain": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.29,
+          "probabilities": {
+            "medium": 0.21,
+            "low": 0.26,
+            "high": 0.53
+          }
+        },
+        "verdict_candidate_4355": {
+          "choice": "partial",
+          "confidence": 0.72,
+          "probabilities": {
+            "partial": 0.8,
+            "unverifiable": 0.0,
+            "incorrect": 0.17,
+            "correct": 0.03
+          }
+        },
+        "verdict_candidate_2769": {
+          "choice": "partial",
+          "confidence": 0.51,
+          "probabilities": {
+            "correct": 0.01,
+            "incorrect": 0.36,
+            "unverifiable": 0.0,
+            "partial": 0.63
+          }
+        },
+        "verdict_candidate_9850": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9547": {
+          "choice": "incorrect",
+          "confidence": 0.65,
+          "probabilities": {
+            "partial": 0.26,
+            "incorrect": 0.74,
+            "unverifiable": 0.0,
+            "correct": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1622,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 733.5,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "lights-off",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_3815",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_3815": "correct",
+          "candidate_5203": "incorrect",
+          "candidate_7337": "correct",
+          "candidate_5747": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_3815",
+          "confidence": 0.6,
+          "probabilities": {
+            "candidate_5203": 0.01,
+            "candidate_3815": 0.67,
+            "abstain": 0.14,
+            "candidate_5747": 0.13,
+            "candidate_7337": 0.05
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.96,
+          "probabilities": {
+            "low": 0.01,
+            "medium": 0.02,
+            "high": 0.97
+          }
+        },
+        "verdict_candidate_3815": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_5203": {
+          "choice": "incorrect",
+          "confidence": 0.93,
+          "probabilities": {
+            "incorrect": 0.95,
+            "unverifiable": 0.0,
+            "partial": 0.05,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_7337": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_5747": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "correct": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1526,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 694.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "store-closing",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7405",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7405": "correct",
+          "candidate_7023": "incorrect",
+          "candidate_6093": "incorrect",
+          "candidate_2658": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7405",
+          "confidence": 0.68,
+          "probabilities": {
+            "candidate_6093": 0.0,
+            "abstain": 0.02,
+            "candidate_2658": 0.24,
+            "candidate_7405": 0.74,
+            "candidate_7023": 0.0
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.88,
+          "probabilities": {
+            "low": 0.06,
+            "high": 0.92,
+            "medium": 0.02
+          }
+        },
+        "verdict_candidate_7405": {
+          "choice": "correct",
+          "confidence": 0.99,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 0.0,
+            "correct": 1.0
+          }
+        },
+        "verdict_candidate_7023": {
+          "choice": "incorrect",
+          "confidence": 0.98,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.01,
+            "incorrect": 0.99,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_6093": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.0,
+            "incorrect": 1.0,
+            "correct": 0.0
+          }
+        },
+        "verdict_candidate_2658": {
+          "choice": "correct",
+          "confidence": 0.94,
+          "probabilities": {
+            "unverifiable": 0.0,
+            "partial": 0.04,
+            "incorrect": 0.0,
+            "correct": 0.96
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1667,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 718.8,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "medication",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_7739",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_7739": "correct",
+          "candidate_2046": "partial",
+          "candidate_2948": "correct",
+          "candidate_2881": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_7739",
+          "confidence": 0.38,
+          "probabilities": {
+            "candidate_7739": 0.5,
+            "abstain": 0.01,
+            "candidate_2948": 0.04,
+            "candidate_2881": 0.4,
+            "candidate_2046": 0.05
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.85,
+          "probabilities": {
+            "medium": 0.09,
+            "low": 0.01,
+            "high": 0.9
+          }
+        },
+        "verdict_candidate_7739": {
+          "choice": "correct",
+          "confidence": 0.93,
+          "probabilities": {
+            "partial": 0.04,
+            "incorrect": 0.01,
+            "unverifiable": 0.0,
+            "correct": 0.95
+          }
+        },
+        "verdict_candidate_2046": {
+          "choice": "partial",
+          "confidence": 0.37,
+          "probabilities": {
+            "partial": 0.53,
+            "incorrect": 0.22,
+            "unverifiable": 0.0,
+            "correct": 0.25
+          }
+        },
+        "verdict_candidate_2948": {
+          "choice": "correct",
+          "confidence": 0.42,
+          "probabilities": {
+            "partial": 0.4,
+            "incorrect": 0.03,
+            "unverifiable": 0.0,
+            "correct": 0.57
+          }
+        },
+        "verdict_candidate_2881": {
+          "choice": "correct",
+          "confidence": 0.97,
+          "probabilities": {
+            "partial": 0.02,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "correct": 0.98
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1658,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 669.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "fastest-route",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_4987",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_4987": "correct",
+          "candidate_9147": "correct",
+          "candidate_6108": "partial",
+          "candidate_4369": "partial"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_4987",
+          "confidence": 0.74,
+          "probabilities": {
+            "candidate_4369": 0.0,
+            "candidate_6108": 0.0,
+            "candidate_9147": 0.2,
+            "abstain": 0.0,
+            "candidate_4987": 0.8
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.92,
+          "probabilities": {
+            "medium": 0.05,
+            "high": 0.94,
+            "low": 0.01
+          }
+        },
+        "verdict_candidate_4987": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_9147": {
+          "choice": "correct",
+          "confidence": 0.98,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 0.98,
+            "partial": 0.02,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_6108": {
+          "choice": "partial",
+          "confidence": 0.52,
+          "probabilities": {
+            "correct": 0.08,
+            "incorrect": 0.28,
+            "partial": 0.64,
+            "unverifiable": 0.0
+          }
+        },
+        "verdict_candidate_4369": {
+          "choice": "partial",
+          "confidence": 0.37,
+          "probabilities": {
+            "incorrect": 0.17,
+            "correct": 0.3,
+            "partial": 0.53,
+            "unverifiable": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1528,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 717.9,
+      "error": null
+    },
+    {
+      "provider": "typesafe:typesafe-env-dev",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "case_id": "empty-box",
+      "round": 2,
+      "decision": {
+        "winner": "candidate_5582",
+        "confidence": "high",
+        "verdicts": {
+          "candidate_5582": "correct",
+          "candidate_2139": "correct",
+          "candidate_6127": "incorrect",
+          "candidate_1288": "correct"
+        }
+      },
+      "fields": {
+        "winner": {
+          "choice": "candidate_5582",
+          "confidence": 0.67,
+          "probabilities": {
+            "candidate_6127": 0.01,
+            "candidate_5582": 0.73,
+            "abstain": 0.13,
+            "candidate_1288": 0.07,
+            "candidate_2139": 0.06
+          }
+        },
+        "confidence": {
+          "choice": "high",
+          "confidence": 0.96,
+          "probabilities": {
+            "low": 0.01,
+            "medium": 0.01,
+            "high": 0.98
+          }
+        },
+        "verdict_candidate_5582": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_2139": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 0.0,
+            "correct": 1.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_6127": {
+          "choice": "incorrect",
+          "confidence": 1.0,
+          "probabilities": {
+            "incorrect": 1.0,
+            "correct": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        },
+        "verdict_candidate_1288": {
+          "choice": "correct",
+          "confidence": 1.0,
+          "probabilities": {
+            "correct": 1.0,
+            "incorrect": 0.0,
+            "unverifiable": 0.0,
+            "partial": 0.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 1561,
+        "output_tokens": 322
+      },
+      "api_model": "jev-1.13.0",
+      "elapsed_ms": 739.1,
+      "error": null
+    }
+  ],
+  "summaries": {
+    "local-jev": {
+      "provider": "local-jev",
+      "cases": 10,
+      "rounds": 3,
+      "winner_correct": 10,
+      "winner_known": 10,
+      "winner_accuracy": 1.0,
+      "abstentions": 0,
+      "errors": 0,
+      "order_stable_cases": 6,
+      "verdict_matches": 35,
+      "verdict_total": 40,
+      "verdict_accuracy": 0.875,
+      "mean_ms": 2129.0,
+      "median_ms": 2077.1,
+      "p95_ms": 2403.3,
+      "quality_shape": {
+        "all_candidates_correct": 0,
+        "mixed_candidate_quality": 10,
+        "no_candidate_correct": 0
+      },
+      "case_results": [
+        {
+          "case_id": "tallest",
+          "winner": "candidate_6916",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_6916",
+            "candidate_6916",
+            "candidate_9292"
+          ],
+          "verdicts": {
+            "candidate_6916": "correct",
+            "candidate_2676": "correct",
+            "candidate_9292": "correct",
+            "candidate_1126": "incorrect"
+          }
+        },
+        {
+          "case_id": "coffee-safety",
+          "winner": "candidate_2236",
+          "winner_model": "gemma4:12b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_2236",
+            "candidate_2236",
+            "candidate_2236"
+          ],
+          "verdicts": {
+            "candidate_9381": "incorrect",
+            "candidate_2236": "correct",
+            "candidate_9509": "correct",
+            "candidate_1636": "incorrect"
+          }
+        },
+        {
+          "case_id": "telescope",
+          "winner": "candidate_7793",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_7793",
+            "candidate_7793",
+            "candidate_7793"
+          ],
+          "verdicts": {
+            "candidate_2069": "correct",
+            "candidate_8513": "correct",
+            "candidate_7793": "correct",
+            "candidate_1988": "incorrect"
+          }
+        },
+        {
+          "case_id": "airport",
+          "winner": "candidate_9440",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_9440",
+            "candidate_9440",
+            "candidate_9440"
+          ],
+          "verdicts": {
+            "candidate_9440": "correct",
+            "candidate_4540": "incorrect",
+            "candidate_3493": "incorrect",
+            "candidate_9746": "incorrect"
+          }
+        },
+        {
+          "case_id": "road-sign",
+          "winner": "candidate_9850",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_9850",
+            "candidate_9850",
+            "candidate_9850"
+          ],
+          "verdicts": {
+            "candidate_9547": "incorrect",
+            "candidate_2769": "partial",
+            "candidate_9850": "correct",
+            "candidate_4355": "partial"
+          }
+        },
+        {
+          "case_id": "lights-off",
+          "winner": "candidate_7337",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_7337",
+            "candidate_7337",
+            "candidate_3815"
+          ],
+          "verdicts": {
+            "candidate_7337": "correct",
+            "candidate_3815": "correct",
+            "candidate_5747": "correct",
+            "candidate_5203": "incorrect"
+          }
+        },
+        {
+          "case_id": "store-closing",
+          "winner": "candidate_7405",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_2658",
+            "candidate_7405",
+            "candidate_7405"
+          ],
+          "verdicts": {
+            "candidate_6093": "incorrect",
+            "candidate_2658": "correct",
+            "candidate_7405": "correct",
+            "candidate_7023": "incorrect"
+          }
+        },
+        {
+          "case_id": "medication",
+          "winner": "candidate_2881",
+          "winner_model": "gemma4:12b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_2881",
+            "candidate_2881",
+            "candidate_2881"
+          ],
+          "verdicts": {
+            "candidate_2046": "correct",
+            "candidate_2881": "correct",
+            "candidate_2948": "correct",
+            "candidate_7739": "correct"
+          }
+        },
+        {
+          "case_id": "fastest-route",
+          "winner": "candidate_4987",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_4987",
+            "candidate_4987",
+            "candidate_4987"
+          ],
+          "verdicts": {
+            "candidate_6108": "incorrect",
+            "candidate_9147": "correct",
+            "candidate_4369": "incorrect",
+            "candidate_4987": "correct"
+          }
+        },
+        {
+          "case_id": "empty-box",
+          "winner": "candidate_5582",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_5582",
+            "candidate_1288",
+            "candidate_5582"
+          ],
+          "verdicts": {
+            "candidate_2139": "correct",
+            "candidate_6127": "incorrect",
+            "candidate_5582": "correct",
+            "candidate_1288": "correct"
+          }
+        }
+      ]
+    },
+    "typesafe:typesafe-env-dev": {
+      "provider": "typesafe:typesafe-env-dev",
+      "cases": 10,
+      "rounds": 3,
+      "winner_correct": 9,
+      "winner_known": 10,
+      "winner_accuracy": 0.9,
+      "abstentions": 0,
+      "errors": 0,
+      "order_stable_cases": 5,
+      "verdict_matches": 33,
+      "verdict_total": 40,
+      "verdict_accuracy": 0.825,
+      "mean_ms": 684.9,
+      "median_ms": 678.4,
+      "p95_ms": 733.5,
+      "quality_shape": {
+        "all_candidates_correct": 0,
+        "mixed_candidate_quality": 10,
+        "no_candidate_correct": 0
+      },
+      "case_results": [
+        {
+          "case_id": "tallest",
+          "winner": "candidate_9292",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_6916",
+            "candidate_9292",
+            "candidate_9292"
+          ],
+          "verdicts": {
+            "candidate_6916": "correct",
+            "candidate_2676": "partial",
+            "candidate_9292": "correct",
+            "candidate_1126": "incorrect"
+          }
+        },
+        {
+          "case_id": "coffee-safety",
+          "winner": "candidate_9509",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_2236",
+            "candidate_9509",
+            "candidate_9509"
+          ],
+          "verdicts": {
+            "candidate_9381": "incorrect",
+            "candidate_2236": "correct",
+            "candidate_9509": "correct",
+            "candidate_1636": "incorrect"
+          }
+        },
+        {
+          "case_id": "telescope",
+          "winner": "candidate_7793",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_8513",
+            "candidate_7793",
+            "candidate_7793"
+          ],
+          "verdicts": {
+            "candidate_2069": "correct",
+            "candidate_8513": "correct",
+            "candidate_7793": "correct",
+            "candidate_1988": "incorrect"
+          }
+        },
+        {
+          "case_id": "airport",
+          "winner": "candidate_9440",
+          "winner_model": "SparkLLM/Spark-X2.5-4B:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_9440",
+            "candidate_9440",
+            "candidate_9440"
+          ],
+          "verdicts": {
+            "candidate_9440": "correct",
+            "candidate_4540": "incorrect",
+            "candidate_3493": "partial",
+            "candidate_9746": "incorrect"
+          }
+        },
+        {
+          "case_id": "road-sign",
+          "winner": "candidate_9850",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_9850",
+            "candidate_9850",
+            "candidate_9850"
+          ],
+          "verdicts": {
+            "candidate_9547": "incorrect",
+            "candidate_2769": "incorrect",
+            "candidate_9850": "correct",
+            "candidate_4355": "partial"
+          }
+        },
+        {
+          "case_id": "lights-off",
+          "winner": "candidate_3815",
+          "winner_model": "gemma4:12b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_7337",
+            "candidate_3815",
+            "candidate_3815"
+          ],
+          "verdicts": {
+            "candidate_7337": "correct",
+            "candidate_3815": "correct",
+            "candidate_5747": "correct",
+            "candidate_5203": "incorrect"
+          }
+        },
+        {
+          "case_id": "store-closing",
+          "winner": "candidate_7405",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_7405",
+            "candidate_7405",
+            "candidate_7405"
+          ],
+          "verdicts": {
+            "candidate_6093": "incorrect",
+            "candidate_2658": "correct",
+            "candidate_7405": "correct",
+            "candidate_7023": "incorrect"
+          }
+        },
+        {
+          "case_id": "medication",
+          "winner": "candidate_7739",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": false,
+          "round_winners": [
+            "candidate_7739",
+            "candidate_7739",
+            "candidate_7739"
+          ],
+          "verdicts": {
+            "candidate_2046": "partial",
+            "candidate_2881": "correct",
+            "candidate_2948": "correct",
+            "candidate_7739": "correct"
+          }
+        },
+        {
+          "case_id": "fastest-route",
+          "winner": "candidate_4987",
+          "winner_model": "ornith-1.5:9b",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_4987",
+            "candidate_4987",
+            "candidate_4987"
+          ],
+          "verdicts": {
+            "candidate_6108": "partial",
+            "candidate_9147": "correct",
+            "candidate_4369": "partial",
+            "candidate_4987": "correct"
+          }
+        },
+        {
+          "case_id": "empty-box",
+          "winner": "candidate_5582",
+          "winner_model": "granite4.2:latest",
+          "winner_correct": true,
+          "round_winners": [
+            "candidate_5582",
+            "candidate_1288",
+            "candidate_5582"
+          ],
+          "verdicts": {
+            "candidate_2139": "correct",
+            "candidate_6127": "incorrect",
+            "candidate_5582": "correct",
+            "candidate_1288": "correct"
+          }
+        }
+      ]
+    }
+  },
+  "comparisons": [
+    {
+      "left": "local-jev",
+      "right": "typesafe:typesafe-env-dev",
+      "winner_matches": 6,
+      "cases": 10,
+      "agreement": 0.6
+    }
+  ]
+}

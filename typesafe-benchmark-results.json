@@ -1,0 +1,422 @@
+{
+  "profiles": [
+    {
+      "id": "typesafe-env-dev",
+      "name": "TypeSafe env.dev",
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "model": "jev-latest"
+    }
+  ],
+  "tests": [
+    {
+      "id": "car-wash",
+      "question": "If I wanted to wash my car at a local facility; should I walk there or drive to achieve the outcome",
+      "choices": [
+        "walk",
+        "drive"
+      ],
+      "expected": "drive"
+    },
+    {
+      "id": "penguin-wings",
+      "question": "All birds have wings. A penguin is a bird. Does a penguin have wings?",
+      "choices": [
+        "yes",
+        "no"
+      ],
+      "expected": "yes"
+    },
+    {
+      "id": "transport-distance",
+      "question": "A shop is 10 kilometres away and you have a working bicycle. To reach it efficiently, should you walk or cycle?",
+      "choices": [
+        "walk",
+        "cycle"
+      ],
+      "expected": "cycle"
+    },
+    {
+      "id": "ice-warm-room",
+      "question": "An ice cube is left in a warm room. Will it melt or freeze?",
+      "choices": [
+        "melt",
+        "freeze"
+      ],
+      "expected": "melt"
+    },
+    {
+      "id": "dead-phone",
+      "question": "A phone battery is dead and the goal is to charge it. Should you plug it in or unplug it?",
+      "choices": [
+        "plug it in",
+        "unplug it"
+      ],
+      "expected": "plug it in"
+    },
+    {
+      "id": "square-rectangle",
+      "question": "Every square is a rectangle. This object is a square. Is it a rectangle?",
+      "choices": [
+        "yes",
+        "no"
+      ],
+      "expected": "yes"
+    },
+    {
+      "id": "rain-arrival",
+      "question": "You need to arrive dry during rain. Should you take an umbrella or leave it behind?",
+      "choices": [
+        "take an umbrella",
+        "leave it behind"
+      ],
+      "expected": "take an umbrella"
+    },
+    {
+      "id": "boiling-water",
+      "question": "A recipe requires boiling water, but the water is cold. Should you heat it or chill it?",
+      "choices": [
+        "heat it",
+        "chill it"
+      ],
+      "expected": "heat it"
+    },
+    {
+      "id": "equal-mass",
+      "question": "Which is heavier: one kilogram of feathers or one kilogram of steel?",
+      "choices": [
+        "feathers",
+        "steel",
+        "they weigh the same"
+      ],
+      "expected": "they weigh the same"
+    },
+    {
+      "id": "red-light",
+      "question": "A traffic light is red. Should a driver stop or accelerate?",
+      "choices": [
+        "stop",
+        "accelerate"
+      ],
+      "expected": "stop"
+    },
+    {
+      "id": "refrigeration",
+      "question": "Fresh food needs to stay cold for several hours. Should you put it in a refrigerator or leave it in direct sunlight?",
+      "choices": [
+        "refrigerator",
+        "direct sunlight"
+      ],
+      "expected": "refrigerator"
+    }
+  ],
+  "results": [
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "car-wash",
+      "expected": "drive",
+      "answer": "drive",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 626.1,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "penguin-wings",
+      "expected": "yes",
+      "answer": "yes",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 509.0,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "transport-distance",
+      "expected": "cycle",
+      "answer": "cycle",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 574.5,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "ice-warm-room",
+      "expected": "melt",
+      "answer": "melt",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 500.3,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "dead-phone",
+      "expected": "plug it in",
+      "answer": "plug it in",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 642.0,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "square-rectangle",
+      "expected": "yes",
+      "answer": "yes",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 502.8,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "rain-arrival",
+      "expected": "take an umbrella",
+      "answer": "take an umbrella",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 577.3,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "boiling-water",
+      "expected": "heat it",
+      "answer": "heat it",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 501.1,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "equal-mass",
+      "expected": "they weigh the same",
+      "answer": "they weigh the same",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 581.3,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "red-light",
+      "expected": "stop",
+      "answer": "stop",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 508.2,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "jev",
+      "model": "gemma4:12b",
+      "test": "refrigeration",
+      "expected": "refrigerator",
+      "answer": "refrigerator",
+      "confidence": "high",
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 568.1,
+      "eval_tokens": 10,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "car-wash",
+      "expected": "drive",
+      "answer": "drive",
+      "confidence": 0.97,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 701.2,
+      "input_tokens": 341,
+      "output_tokens": 31,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "penguin-wings",
+      "expected": "yes",
+      "answer": "yes",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 721.8,
+      "input_tokens": 338,
+      "output_tokens": 31,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "transport-distance",
+      "expected": "cycle",
+      "answer": "cycle",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 785.0,
+      "input_tokens": 345,
+      "output_tokens": 31,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "ice-warm-room",
+      "expected": "melt",
+      "answer": "melt",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 1792.5,
+      "input_tokens": 336,
+      "output_tokens": 33,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "dead-phone",
+      "expected": "plug it in",
+      "answer": "plug it in",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 707.3,
+      "input_tokens": 353,
+      "output_tokens": 38,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "square-rectangle",
+      "expected": "yes",
+      "answer": "yes",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 1186.3,
+      "input_tokens": 336,
+      "output_tokens": 31,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "rain-arrival",
+      "expected": "take an umbrella",
+      "answer": "take an umbrella",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 963.8,
+      "input_tokens": 345,
+      "output_tokens": 37,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "boiling-water",
+      "expected": "heat it",
+      "answer": "heat it",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 717.8,
+      "input_tokens": 344,
+      "output_tokens": 35,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "equal-mass",
+      "expected": "they weigh the same",
+      "answer": "they weigh the same",
+      "confidence": 0.99,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 669.2,
+      "input_tokens": 356,
+      "output_tokens": 45,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "red-light",
+      "expected": "stop",
+      "answer": "stop",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 1091.0,
+      "input_tokens": 334,
+      "output_tokens": 33,
+      "error": null
+    },
+    {
+      "backend": "typesafe",
+      "config_id": "typesafe-env-dev",
+      "model": "jev-latest",
+      "test": "refrigeration",
+      "expected": "refrigerator",
+      "answer": "refrigerator",
+      "confidence": 1.0,
+      "correct": true,
+      "concise": true,
+      "elapsed_ms": 703.4,
+      "input_tokens": 348,
+      "output_tokens": 38,
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEV — local logic-engine benchmarks (llama.cpp parallel-decision)</title>
+<meta name="description" content="JEV benchmarks a parallel-decision endpoint against Ollama chat generation, hosted TypeSafe, CLM, and Apple Foundation Models: bounded decisions with probability distributions, measured latency, and a real-time grid benchmark. On-device providers; air-gap capable.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230B0D0A'/%3E%3Crect x='4' y='4' width='11' height='11' fill='none' stroke='%23E8E6DD' stroke-opacity='.35'/%3E%3Crect x='17' y='4' width='11' height='11' fill='none' stroke='%23E8E6DD' stroke-opacity='.35'/%3E%3Crect x='4' y='17' width='11' height='11' fill='none' stroke='%23E8E6DD' stroke-opacity='.35'/%3E%3Crect x='17' y='17' width='11' height='11' fill='%23F5A700'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#0B0D0A;
+    --bg-raised:#101309;
+    --panel:#0E110C;
+    --line:rgba(232,230,221,.12);
+    --line-faint:rgba(232,230,221,.07);
+    --ink:#E8E6DD;
+    --ink-dim:#9BA094;
+    --ink-faint:#6A7062;
+    --amber:#F5A700;
+    --amber-soft:rgba(245,167,0,.14);
+    --green:#5CDB78;
+    --green-soft:rgba(92,219,120,.16);
+    --yellow:#E8C33E;
+    --yellow-soft:rgba(232,195,62,.18);
+    --red:#E5484D;
+    --red-soft:rgba(229,72,77,.22);
+    --mono:"SF Mono","Cascadia Code","JetBrains Mono","Fira Code",ui-monospace,"Menlo","Consolas",monospace;
+    --max:1100px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--mono);
+    font-size:15px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1100px 480px at 82% -8%, rgba(245,167,0,.06), transparent 62%),
+      linear-gradient(var(--line-faint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-faint) 1px, transparent 1px);
+    background-size:auto, 100% 52px, 52px 100%;
+  }
+  /* film grain — inline, no fetch */
+  body::after{
+    content:"";position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  }
+  ::selection{background:var(--amber);color:#0B0D0A}
+  a{color:var(--amber);text-decoration:none}
+  a:hover{text-decoration:underline;text-underline-offset:3px}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+  .small{font-size:12.5px;line-height:1.7;color:var(--ink-dim)}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,13,10,.86);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex;align-items:center;gap:22px;height:52px}
+  .brand{display:flex;align-items:baseline;gap:10px;font-weight:700;letter-spacing:.08em}
+  .brand .sq{width:9px;height:9px;background:var(--amber);display:inline-block;transform:translateY(-1px)}
+  .brand em{font-style:normal;color:var(--ink-dim);font-weight:400;font-size:12px;letter-spacing:.05em}
+  .topnav{margin-left:auto;display:flex;gap:20px;font-size:12px;letter-spacing:.06em}
+  .topnav a{color:var(--ink-dim)}
+  .topnav a:hover{color:var(--amber);text-decoration:none}
+  .topnav a b{color:var(--amber);font-weight:400;margin-right:4px}
+  .netflag{font-size:11px;letter-spacing:.08em;color:var(--green);border:1px solid rgba(92,219,120,.35);padding:3px 9px;border-radius:2px;white-space:nowrap}
+  .netflag .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .wbbtn{font-size:11px;letter-spacing:.1em;color:var(--amber);border:1px solid rgba(245,167,0,.5);padding:4px 10px;border-radius:2px;white-space:nowrap}
+  .wbbtn:hover{background:var(--amber-soft);text-decoration:none}
+  @media(max-width:860px){.topnav,.netflag{display:none}.wbbtn{margin-left:auto}}
+
+  /* ---------- hero ---------- */
+  .hero{padding:88px 0 64px;position:relative}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .95fr;gap:56px;align-items:center}
+  @media(max-width:960px){.hero-grid{grid-template-columns:1fr;gap:44px}}
+  .eyebrow{
+    font-size:12px;letter-spacing:.22em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:26px;
+  }
+  .eyebrow::before{content:"";width:34px;height:1px;background:var(--amber)}
+  h1{
+    font-size:clamp(2.4rem,5.4vw,4.1rem);line-height:1.04;letter-spacing:-.015em;
+    font-weight:700;text-transform:uppercase;margin-bottom:26px;
+  }
+  h1 .amber{color:var(--amber)}
+  h1 .strike{position:relative;white-space:nowrap}
+  h1 .strike::after{
+    content:"";position:absolute;left:-2%;right:-2%;top:52%;height:.09em;
+    background:var(--red);transform:rotate(-1.6deg);
+  }
+  .lede{color:var(--ink-dim);max-width:56ch;margin-bottom:34px}
+  .lede b{color:var(--ink);font-weight:400}
+  .statstrip{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  @media(max-width:680px){.statstrip{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--bg);padding:16px 16px 14px}
+  .stat .n{font-size:26px;font-weight:700;color:var(--amber);letter-spacing:-.02em;line-height:1.1}
+  .stat .l{font-size:11px;letter-spacing:.08em;color:var(--ink-dim);text-transform:uppercase;margin-top:6px;line-height:1.5}
+
+  /* ---------- board panel ---------- */
+  .boardcard{
+    border:1px solid var(--line);background:var(--panel);
+    box-shadow:0 24px 60px rgba(0,0,0,.45);
+    position:relative;
+  }
+  .boardcard::before{ /* hazard corner tick */
+    content:"";position:absolute;top:-1px;left:-1px;width:52px;height:4px;
+    background:repeating-linear-gradient(-45deg,var(--amber) 0 7px,transparent 7px 14px);
+  }
+  .boardhead{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 14px;border-bottom:1px solid var(--line);
+    font-size:11px;letter-spacing:.1em;color:var(--ink-dim);text-transform:uppercase;
+  }
+  .boardhead .live{color:var(--amber)}
+  .boardhead .live::before{content:"●";margin-right:6px;animation:pulse 1.4s infinite}
+  .boardwrap{padding:18px 14px 10px;display:flex;justify-content:center;overflow-x:auto}
+  .board{display:grid;grid-template-columns:repeat(18,20px);grid-auto-rows:20px;gap:2px}
+  .cell{
+    border:1px solid var(--line-faint);border-radius:1px;
+    transition:background .35s,border-color .35s,opacity .5s;
+    position:relative;
+  }
+  .cell.exit{border-color:rgba(245,167,0,.5)}
+  .cell.goo{background:rgba(229,72,77,.78);border-color:transparent}
+  .cell.trail{background:var(--green-soft);border-color:rgba(92,219,120,.55)}
+  .cell.dead{background:var(--yellow-soft);border-color:rgba(232,195,62,.6)}
+  .cell.hot{background:var(--red-soft);border-color:rgba(229,72,77,.65)}
+  .cell.fog{opacity:.13}
+  .token{
+    position:absolute;width:10px;height:10px;border-radius:50%;
+    background:var(--amber);top:50%;left:50%;transform:translate(-50%,-50%);
+    box-shadow:0 0 0 3px rgba(245,167,0,.22);
+    animation:tokenpulse 1.1s infinite;
+  }
+  @keyframes tokenpulse{0%,100%{box-shadow:0 0 0 2px rgba(245,167,0,.28)}50%{box-shadow:0 0 0 6px rgba(245,167,0,.05)}}
+  .boardread{
+    border-top:1px solid var(--line);padding:10px 14px;
+    font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .boardread .mv{color:var(--ink)}
+  .boardread .mv b{color:var(--amber);font-weight:400}
+  .boardread .meta{color:var(--ink-faint)}
+  .boardfoot{padding:0 14px 12px;font-size:10.5px;color:var(--ink-faint);letter-spacing:.04em}
+
+  /* ---------- sections ---------- */
+  section{padding:88px 0;border-top:1px solid var(--line)}
+  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:14px}
+  .sec-num{font-size:13px;color:var(--amber);letter-spacing:.18em}
+  .sec-rule{flex:1;height:1px;background:var(--line);transform:translateY(-4px)}
+  h2{font-size:clamp(1.5rem,3vw,2.15rem);text-transform:uppercase;letter-spacing:.01em;line-height:1.15;margin-bottom:22px;font-weight:700}
+  h2 .amber{color:var(--amber)}
+  .sec p.body{color:var(--ink-dim);max-width:74ch;margin-bottom:14px}
+  .sec p.body b{color:var(--ink);font-weight:400}
+  .sec p.body code, .tbl-note code{font-family:var(--mono);font-size:.9em;color:var(--green)}
+
+  /* tables */
+  .tblwrap{overflow-x:auto;margin:30px 0 10px;border:1px solid var(--line)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:640px}
+  thead th{
+    text-align:left;font-weight:400;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--amber);padding:12px 16px;border-bottom:1px solid var(--line);
+    background:rgba(245,167,0,.04);white-space:nowrap;
+  }
+  tbody td{padding:11px 16px;border-bottom:1px solid var(--line-faint);vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.hl td{background:rgba(245,167,0,.05)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  td .dim{color:var(--ink-faint)}
+  td .tag{
+    font-size:10.5px;letter-spacing:.08em;border:1px solid var(--line);
+    padding:1px 7px;border-radius:2px;color:var(--ink-dim);white-space:nowrap;
+  }
+  td .tag.hot{border-color:rgba(245,167,0,.5);color:var(--amber)}
+  td .tag.go{border-color:rgba(92,219,120,.45);color:var(--green)}
+  .tbl-note{font-size:12px;color:var(--ink-faint);max-width:80ch;line-height:1.7;margin-top:12px}
+
+  /* code block */
+  .codeblock{
+    margin:30px 0;border:1px solid var(--line);background:var(--panel);
+    font-size:13px;line-height:1.85;overflow-x:auto;
+  }
+  .codeblock .cb-head{
+    padding:8px 16px;border-bottom:1px solid var(--line);
+    font-size:11px;letter-spacing:.12em;color:var(--ink-dim);text-transform:uppercase;
+    display:flex;justify-content:space-between;
+  }
+  .codeblock pre{padding:18px 20px;color:var(--ink-dim)}
+  .codeblock .k{color:var(--amber)}
+  .codeblock .v{color:var(--green)}
+  .codeblock .c{color:var(--ink-faint)}
+  .codeblock .r{color:var(--red)}
+
+  /* primitives + chips */
+  .prims{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:30px 0}
+  @media(max-width:720px){.prims{grid-template-columns:1fr}}
+  .prim{background:var(--bg);padding:18px 18px 16px}
+  .prim .t{color:var(--amber);font-size:14px;letter-spacing:.1em;margin-bottom:6px}
+  .prim .d{font-size:12.5px;color:var(--ink-dim);line-height:1.65}
+
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 6px}
+  .chip{
+    font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+    border:1px solid rgba(245,167,0,.4);color:var(--amber);
+    padding:7px 14px;border-radius:2px;background:var(--amber-soft);
+  }
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:28px 0}
+  .kv div{background:var(--bg);padding:14px 16px}
+  .kv .k{font-size:10.5px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase;margin-bottom:5px}
+  .kv .v2{font-size:15px;color:var(--ink)}
+
+  /* ---------- air-gap section ---------- */
+  .airgap{position:relative;border-top:none;padding-top:0}
+  .tape{
+    height:8px;
+    background:repeating-linear-gradient(-45deg,var(--amber) 0 14px,#0B0D0A 14px 28px);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  }
+  .airgap-inner{border-top:1px solid var(--line);padding:88px 0 92px;background:
+    radial-gradient(900px 420px at 18% 0%, rgba(245,167,0,.05), transparent 60%);}
+  .airgap .lede-big{
+    font-size:clamp(1.3rem,2.6vw,1.9rem);line-height:1.35;color:var(--ink);
+    max-width:30ch;margin-bottom:26px;text-transform:uppercase;letter-spacing:.005em;font-weight:700;
+  }
+  .airgap .lede-big .amber{color:var(--amber)}
+  .offgrid{
+    display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:start;
+  }
+  @media(max-width:920px){.offgrid{grid-template-columns:1fr}}
+  .provlist{border:1px solid var(--line)}
+  .provlist .row{
+    display:flex;gap:14px;align-items:baseline;padding:13px 16px;
+    border-bottom:1px solid var(--line-faint);font-size:13px;
+  }
+  .provlist .row:last-child{border-bottom:none}
+  .provlist .ic{width:9px;height:9px;flex:none;transform:translateY(1px)}
+  .provlist .go{background:var(--green)}
+  .provlist .no{background:var(--red)}
+  .provlist .name{color:var(--ink);white-space:nowrap}
+  .provlist .why{color:var(--ink-faint);font-size:12px;line-height:1.6}
+  .closing{
+    margin-top:54px;text-align:left;font-size:clamp(1.05rem,2.2vw,1.45rem);
+    color:var(--amber);letter-spacing:.06em;text-transform:uppercase;line-height:1.6;
+    border-left:2px solid var(--amber);padding-left:22px;
+  }
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:44px 0 60px;font-size:12px;color:var(--ink-faint)}
+  footer .cols{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap}
+  footer .ports{color:var(--ink-dim);line-height:2}
+  footer .ports b{color:var(--ink);font-weight:400}
+
+  /* ---------- reveal ---------- */
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s ease}
+  .rv.on{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){
+    .rv{opacity:1;transform:none;transition:none}
+    .token,.boardhead .live::before,.netflag .dot{animation:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================= TOP BAR ======================= -->
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="sq"></span>JEV <em>/ parallel-decision</em></div>
+    <nav class="topnav">
+      <a href="#benchmark"><b>01</b>BENCHMARK</a>
+      <a href="#watermark"><b>02</b>WATERMARK</a>
+      <a href="#speed"><b>03</b>SPEED</a>
+      <a href="#run"><b>04</b>RUN</a>
+      <a href="#airgap"><b>05</b>AIR-GAP</a>
+      <a href="#app"><b>06</b>APP</a>
+    </nav>
+    <a class="wbbtn" href="/workbench">WORKBENCH&nbsp;↗</a>
+    <span class="netflag"><span class="dot"></span>RESEARCH BUILD · LOCAL-FIRST</span>
+  </div>
+</header>
+
+<!-- ======================= HERO ======================= -->
+<div class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">A LOCAL LOGIC ENGINE · BUILT ON LLAMA.CPP</div>
+      <h1>Decide,<br>don't <span class="strike">generate</span>.</h1>
+      <p class="lede">
+        JEV drives an LLM through a <b>parallel-decision endpoint</b>: one evidence context in,
+        a finite decision schema out — every field scored in parallel, full probability
+        distributions returned, JSON assembled in code. <b>No prose to parse, no prompt drift,
+        no JSON repair.</b> This workspace measures that approach against Ollama chat
+        generation, hosted TypeSafe, CLM, and Apple Foundation Models.
+      </p>
+      <div class="statstrip">
+        <div class="stat"><div class="n">0.62s</div><div class="l">Mean decision · local gemma4:12b</div></div>
+        <div class="stat"><div class="n">−79%</div><div class="l">Decision latency vs Ollama chat</div></div>
+        <div class="stat"><div class="n">11/11</div><div class="l">Logic baseline · 2026-09-22 run</div></div>
+        <div class="stat"><div class="n">0</div><div class="l">Network calls · on-device decision</div></div>
+      </div>
+    </div>
+
+    <div class="boardcard rv">
+      <div class="boardhead">
+        <span>Radioactive Run · preview board</span>
+        <span class="live">decision replay</span>
+      </div>
+      <div class="boardwrap"><div class="board" id="board" aria-label="Illustrative replay of a model navigating a hazardous grid"></div></div>
+      <div class="boardread">
+        <span class="mv" id="readout">mv 00 · <b>STANDBY</b></span>
+        <span class="meta" id="meta">budget — · fog ±4 cols</span>
+      </div>
+      <div class="boardfoot">illustrative replay — real runs are measured, per-decision, in the <a href="/workbench">workbench</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= 01 BENCHMARK ======================= -->
+<section id="benchmark">
+  <div class="wrap sec">
+    <div class="sec-head"><span class="sec-num">01 / BENCHMARK</span><span class="sec-rule"></span></div>
+    <h2>Benchmark suites,<br><span class="amber">measured results</span>.</h2>
+    <p class="body">
+      The harness in this repo doesn't ask models to chat — it asks them to commit to bounded
+      answers and scores them exactly. <b>Eleven logic baselines.</b> A <b>100-question quiz</b>
+      that separates definite answers from judgment calls, and counts <i>over-caution</i>
+      ("it can't be determined") as its own failure mode. <b>Ambiguity</b> and common-sense
+      <b>reasoning</b> suites. And a <b>judge</b> that ranks raw agent responses through five
+      shuffled orderings, because a single ranking pass is position-biased.
+    </p>
+
+    <div class="tblwrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Backend</th><th>Where</th><th class="num">Correct</th>
+            <th class="num">Mean</th><th class="num">Median</th><th class="num">Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hl">
+            <td>JEV · gemma4:12b</td><td><span class="tag hot">on-device</span></td>
+            <td class="num">11/11</td><td class="num">0.62 s</td><td class="num">0.56 s</td><td class="num">0.50–1.36 s</td>
+          </tr>
+          <tr>
+            <td>TypeSafe · jev-latest</td><td><span class="tag">hosted</span></td>
+            <td class="num">11/11</td><td class="num">0.91 s</td><td class="num">0.72 s</td><td class="num">0.67–1.79 s</td>
+          </tr>
+          <tr>
+            <td>Ollama · gemma4:12b <span class="dim">(chat)</span></td><td><span class="tag go">local</span></td>
+            <td class="num">11/11</td><td class="num">2.99 s</td><td class="num">3.45 s</td><td class="num">1.92–4.23 s</td>
+          </tr>
+          <tr>
+            <td>Ollama · granite4.2 <span class="dim">(chat)</span></td><td><span class="tag go">local</span></td>
+            <td class="num">10/11</td><td class="num">7.13 s</td><td class="num">11.95 s</td><td class="num">0.87–12.64 s</td>
+          </tr>
+          <tr>
+            <td>Ollama · minicpm5:2b <span class="dim">(chat)</span></td><td><span class="tag go">local</span></td>
+            <td class="num">11/11</td><td class="num">3.15 s</td><td class="num">5.38 s</td><td class="num">0.43–5.43 s</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-note">
+      Same bounded questions, exact-match scoring. Ollama timings were taken concurrently across
+      models and include loading and contention; the JEV engine answered against an already-loaded
+      model. This is a <i>decision-stage</i> comparison, not an end-to-end workflow claim. The
+      useful signal: JEV returns reliable finite decisions with no explanations, reasoning traces,
+      markdown fences, or post-hoc JSON repair. Source: <a href="benchmark-report.md">benchmark-report.md</a>
+      · run 2026-09-22.
+    </p>
+  </div>
+</section>
+
+<!-- ======================= 02 WATERMARK ======================= -->
+<section id="watermark">
+  <div class="wrap sec">
+    <div class="sec-head"><span class="sec-num">02 / WATERMARK</span><span class="sec-rule"></span></div>
+    <h2>TypeSafe is the watermark —<br><span class="amber">the reference for every local provider</span>.</h2>
+    <p class="body">
+      Hosted TypeSafe <code>jev-latest</code> sets the reference mark for logical testing: the same
+      bounded questions, the same request contract, one stable gateway. Every local provider —
+      Ollama-backed JEV hybrids, the contrastive CLM, Apple's on-device Foundation Models — answers
+      the identical suites, and the watermark's answers set the bar. No provider silently falls
+      back to another; failures are explicit.
+    </p>
+
+    <div class="tblwrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Provider</th><th>Kind</th><th>What comes back</th><th>Measured</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hl">
+            <td>JEV local engine<br><span class="dim" style="font-size:12px">llama.cpp parallel-decision · any Ollama GGUF blob</span></td>
+            <td><span class="tag hot">on-device</span></td>
+            <td>Value + full probability distribution</td>
+            <td>11/11 baselines · 0.62 s mean<br><span class="dim">12 decision sequences · 32-field batches</span></td>
+          </tr>
+          <tr class="hl">
+            <td>TypeSafe · jev-latest</td>
+            <td><span class="tag">hosted watermark</span></td>
+            <td>Value + distribution + confidence</td>
+            <td>11/11 baselines · 0.91 s mean</td>
+          </tr>
+          <tr>
+            <td>CLM · v0.1-8B<br><span class="dim" style="font-size:12px">contrastive — embeds state &amp; options, softmax over them</span></td>
+            <td><span class="tag hot">on-device</span></td>
+            <td>Option probabilities · generates no text at all</td>
+            <td>8/11 baselines · 85/100 quiz<br><span class="dim">after request adaptation</span></td>
+          </tr>
+          <tr>
+            <td>Apple Foundation Models<br><span class="dim" style="font-size:12px">guided generation · macOS 26</span></td>
+            <td><span class="tag hot">on-device</span></td>
+            <td>Schema-valid value · no probabilities exposed</td>
+            <td>30/100 quiz (strict) · ~1.2 s median<br><span class="dim">structured-decision POC, not a probability benchmark</span></td>
+          </tr>
+          <tr>
+            <td>Ollama chat models</td>
+            <td><span class="tag go">local baseline</span></td>
+            <td>Free text — the thing being replaced</td>
+            <td>10–11/11 · 3–9 s mean</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-note">
+      The gateway (port 8096) fronts all of them behind one <code>POST /v1/decision</code> contract;
+      callers never change code when the provider changes. CLM figures: <a href="README.md">README.md</a> ·
+      Apple figures: <a href="output/apple-fm-scaling-2026-09-24.json">output/apple-fm-scaling-2026-09-24.json</a>
+      (concurrency 1, strict exact-match, run 2026-09-24).
+    </p>
+  </div>
+</section>
+
+<!-- ======================= 03 SPEED ======================= -->
+<section id="speed">
+  <div class="wrap sec">
+    <div class="sec-head"><span class="sec-num">03 / SPEED</span><span class="sec-rule"></span></div>
+    <h2>Prefill once. Score everything.<br><span class="amber">Assemble the JSON in code.</span></h2>
+    <p class="body">
+      Arbitrary JSON generation is removed from the answer path — that's where the speed and the
+      reliability come from. The first live decision against gemma4:12b, cold, measured
+      <b>1.07 s total</b>: the context is prefilled once and shared, scoring all fields against it
+      is the cheap part, and the output object is built deterministically. Warm decisions run at
+      roughly half a second.
+    </p>
+
+    <div class="codeblock">
+      <div class="cb-head"><span>Request anatomy — first live decision</span><span>gemma4:12b · cold</span></div>
+      <pre><span class="k">POST /v1/decision</span>            <span class="c">← one request, many fields</span>
+schema:
+  route   <span class="k">choice</span>[ local · cloud · queue ]
+  risk    <span class="k">score</span>[ 1..5 ]
+  block   <span class="k">noul</span>
+contexts: [ …one evidence packet… ]
+
+<span class="v">prefill   937 ms</span>   <span class="c">(once, shared by every field)</span>
+<span class="v">scoring   132 ms</span>   <span class="c">(all fields, in parallel)</span>
+<span class="r">json        0 ms</span>   <span class="c">(assembled in code — never generated)</span></pre>
+    </div>
+
+    <div class="prims">
+      <div class="prim"><div class="t">CHOICE</div><div class="d">Pick one label from a finite set. Classification, routing, triage, extraction into bounded labels.</div></div>
+      <div class="prim"><div class="t">SCORE</div><div class="d">Bounded 2–10 ordered levels, with the exact tree distribution converted into a probability-weighted score.</div></div>
+      <div class="prim"><div class="t">NOUL</div><div class="d">Yes / no with its probability retained. Policy checks and gates.</div></div>
+    </div>
+    <p class="body">
+      Three primitives cover the bounded-decision space. Related decisions over one evidence
+      packet travel together — up to <b>32 fields per batch</b>, every answer carrying its
+      distribution, so downstream code can gate on confidence instead of parsing prose.
+    </p>
+  </div>
+</section>
+
+<!-- ======================= 04 RADIOACTIVE RUN ======================= -->
+<section id="run">
+  <div class="wrap sec">
+    <div class="sec-head"><span class="sec-num">04 / RUN</span><span class="sec-rule"></span></div>
+    <h2>Real-time decisions:<br>the <span class="amber">Radioactive Run</span>.</h2>
+    <p class="body">
+      A hazardous grid. A model with fog of war and nothing but the history it accumulates,
+      <b>one decision request per step</b>. The board is generated from a seed — same seed, same
+      board, so models are compared on equal ground — and a protected route always exists. The
+      code is only the referee: it enforces legality and records metrics, and it never chooses
+      between two legal moves. When only one move is legal, it's applied automatically and
+      labelled <i>forced</i> — that's physics, not strategy.
+    </p>
+
+    <div class="kv">
+      <div><div class="k">Field</div><div class="v2">20 rows × 40/60/80 cols, seeded</div></div>
+      <div><div class="k">Per step</div><div class="v2">1 JEV Choice request</div></div>
+      <div><div class="k">Context</div><div class="v2">capped at 7,000 chars</div></div>
+      <div><div class="k">Fog of war</div><div class="v2">known map, ±15-col window</div></div>
+      <div><div class="k">Memory aids</div><div class="v2">map · facts · pockets</div></div>
+      <div><div class="k">Scored on</div><div class="v2">efficiency vs shortest path</div></div>
+    </div>
+    <p class="body">
+      The comparison table records moves over the breadth-first shortest path, revisits, dead
+      ends and pocket cells, flagged moves chosen anyway (seen vs unseen), invalid responses,
+      retries, and <b>average decision time and confidence per run</b>. Colour tells the story
+      on the board and in the prompt alike:
+      <span style="color:var(--green)">green</span> is safe to reuse,
+      <span style="color:var(--yellow)">yellow</span> is a known dead end,
+      <span style="color:var(--red)">red</span> means been-here-and-done-that.
+    </p>
+  </div>
+</section>
+
+<!-- ======================= 05 AIR-GAP ======================= -->
+<section id="airgap" class="airgap">
+  <div class="tape" aria-hidden="true"></div>
+  <div class="airgap-inner">
+    <div class="wrap sec">
+      <div class="sec-head"><span class="sec-num">05 / AIR-GAP OPERATION</span><span class="sec-rule"></span></div>
+      <p class="lede-big">The same decision engine, run <span class="amber">without the internet</span>.</p>
+      <div class="offgrid">
+        <div>
+          <p class="body">
+            The engine loads GGUF blobs directly from local disk. CLM runs as two local
+            processes. Apple Foundation Models runs on-device. <b>Only the TypeSafe watermark
+            touches the network — and it's optional.</b> A single Mac and a menu-bar service
+            expose one gateway on the LAN, so trusted devices on the floor share the same
+            decision engine. If the network disappears, the decisions don't.
+          </p>
+          <p class="body">
+            Bounded, low-latency decisions with distributions are what machinery control needs;
+            free-text generation is a poor fit for it. The applications below are the intended
+            targets for this engine — candidate use cases, not yet demonstrated results.
+          </p>
+          <div class="chips" aria-label="candidate applications">
+            <span class="chip">warehouse racking</span>
+            <span class="chip">stack sequencing</span>
+            <span class="chip">robotic movement</span>
+            <span class="chip">routing &amp; triage</span>
+            <span class="chip">policy checks</span>
+            <span class="chip">bounded extraction</span>
+          </div>
+        </div>
+        <div class="provlist rv">
+          <div class="row"><span class="ic go"></span><span class="name">JEV · llama.cpp</span><span class="why">loads GGUF directly from the Ollama store — no API, no cloud</span></div>
+          <div class="row"><span class="ic go"></span><span class="name">CLM v0.1-8B</span><span class="why">frozen encoder + local heads, two processes on loopback</span></div>
+          <div class="row"><span class="ic go"></span><span class="name">Apple FM</span><span class="why">on-device guided generation, loopback adapter only</span></div>
+          <div class="row"><span class="ic go"></span><span class="name">LAN gateway</span><span class="why">one stable endpoint for every trusted device on the floor</span></div>
+          <div class="row"><span class="ic no"></span><span class="name">TypeSafe</span><span class="why">the only uplink — used as the watermark, never required</span></div>
+        </div>
+      </div>
+      <p class="closing">Every decision provider binds to loopback; the LAN gateway is the only network listener. The TypeSafe watermark is the only uplink — and it is optional.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 06 THE APP ======================= -->
+<section id="app">
+  <div class="wrap sec">
+    <div class="sec-head"><span class="sec-num">06 / THE APP</span><span class="sec-rule"></span></div>
+    <h2>The workbench is the app —<br><span class="amber">the same suites, in the browser</span>.</h2>
+    <div class="offgrid">
+      <div>
+        <p class="body">
+          The browser workbench talks to the same gateway, through the same selected provider
+          the agents use. Pick a case from the logic baselines, the ambiguity or reasoning
+          sets, or the Parallel &amp; agentic suite — edit its question or evidence, run it, and
+          read the returned fields, probabilities, reference comparison, latency, and raw
+          response. The 100-question quiz, the Radioactive Run boards, and the parallel report
+          (saved runs, side by side, per provider) live in the same page. Provider selection
+          happens in the macOS menu-bar service.
+        </p>
+        <div class="provlist">
+          <div class="row"><span class="ic go"></span><span class="name"><a href="/workbench">/workbench ↗</a></span><span class="why">the app, on the Mac or any trusted LAN device</span></div>
+          <div class="row"><span class="ic go"></span><span class="name">&lt;Mac-LAN-IP&gt;:8096</span><span class="why">this page on the LAN · the app lives at /workbench — no client auth; keep it off untrusted networks</span></div>
+          <div class="row"><span class="ic go"></span><span class="name">GET /health</span><span class="why">service and provider status · decisions go to POST /v1/decision</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="codeblock">
+          <div class="cb-head"><span>Reproduce the numbers</span><span>from the repo root</span></div>
+<pre><span class="c"># test suites</span>
+node --test tests/radioactive_run.test.mjs
+python3 -m unittest discover -s tests -p 'test_*.py'
+
+<span class="c"># benchmark suites</span>
+python3 scripts/logic_benchmark.py
+python3 scripts/ambiguity_benchmark.py
+python3 scripts/reasoning_benchmark.py
+python3 scripts/fair_judge_benchmark.py <span class="c">&amp;&amp; python3 scripts/aggregate_fair_judge.py</span>
+python3 scripts/typesafe_benchmark.py
+python3 scripts/cross_provider_judge_benchmark.py --suite reasoning --rounds 3
+
+<span class="c"># service</span>
+curl -s http://127.0.0.1:8096/health
+./scripts/run_server.sh  <span class="c"># engine only, port 8097</span></pre>
+        </div>
+        <p class="tbl-note">
+          Sources on this page: <a href="benchmark-report.md">benchmark-report.md</a> ·
+          <a href="README.md">README.md</a> ·
+          <a href="output/apple-fm-scaling-2026-09-24.json">output/apple-fm-scaling-2026-09-24.json</a> ·
+          <a href="scripts/logic_100_questions.json">scripts/logic_100_questions.json</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= FOOTER ======================= -->
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="brand" style="margin-bottom:10px"><span class="sq"></span>JEV <em>/ parallel-decision</em></div>
+        <div>Built on the <a href="https://github.com/ggml-org/llama.cpp" rel="noopener">llama.cpp</a> parallel-decision branch · thecodacus fork.<br>
+        Native macOS menu-bar controller · browser workbench · benchmark harness.<br>
+        Open the app: <a href="/workbench">127.0.0.1:8096/workbench</a></div>
+      </div>
+      <div class="ports">
+        <b>:8096</b> stable gateway · <b>:8097</b> local engine · <b>:8098</b> apple adapter<br>
+        <b>:8099</b> clm encoder · <b>:8700</b> clm head
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- scroll reveals ---------- */
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduced && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target); } });
+    }, {threshold:.15});
+    document.querySelectorAll(".rv").forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll(".rv").forEach(function(el){ el.classList.add("on"); });
+  }
+
+  /* ---------- radioactive run replay (illustrative) ---------- */
+  var COLS=18, ROWS=7;
+  var GOO = {"0,3":1,"1,10":1,"2,5":1,"2,10":1,"3,5":1,"3,10":1,"3,14":1,"4,5":1,"4,10":1,"4,14":1,"5,14":1,"6,8":1};
+  // authored walk: [row, col, dir, class-override]
+  var PATH = [
+    [3,1,"RIGHT"],[3,2,"RIGHT"],[3,3,"RIGHT"],[3,4,"RIGHT"],
+    [4,4,"DOWN"],[5,4,"DOWN"],[4,4,"UP"],[3,4,"UP"],[4,4,"DOWN"],[5,4,"DOWN"], // hesitation loop → (4,4) goes red
+    [5,5,"RIGHT"],[5,6,"RIGHT"],
+    [6,6,"DOWN","dead"],[6,7,"RIGHT","dead"],[6,6,"LEFT","dead"],[5,6,"UP"], // pocket → yellow
+    [5,7,"RIGHT"],[5,8,"RIGHT"],[5,9,"RIGHT"],[5,10,"RIGHT"],[5,11,"RIGHT"],[5,12,"RIGHT"],[5,13,"RIGHT"],
+    [4,13,"UP"],[3,13,"UP"],[2,13,"UP"],[1,13,"UP"],
+    [1,14,"RIGHT"],[1,15,"RIGHT"],[1,16,"RIGHT"],[1,17,"RIGHT"]
+  ];
+  var SHORTEST = 17;
+  var board = document.getElementById("board");
+  var readout = document.getElementById("readout");
+  var meta = document.getElementById("meta");
+  if (!board) return;
+
+  var cells = [];
+  for (var r=0; r<ROWS; r++){
+    for (var c=0; c<COLS; c++){
+      var d = document.createElement("div");
+      d.className = "cell";
+      if (GOO[r+","+c]) d.classList.add("goo");
+      if (c===COLS-1) d.classList.add("exit");
+      board.appendChild(d);
+      cells.push(d);
+    }
+  }
+  function at(row,col){ return cells[row*COLS+col]; }
+
+  var token = document.createElement("div");
+  token.className = "token";
+  at(3,0).appendChild(token);
+
+  var STEP_MS = 640;
+  function stepTime(i){ // deterministic pseudo-latency, ~0.4–0.9 s
+    var x = Math.sin(i*12.9898)*43758.5453; x = x - Math.floor(x);
+    return (0.42 + x*0.46).toFixed(2);
+  }
+  function conf(i){
+    var x = Math.sin(i*78.233)*43758.5453; x = x - Math.floor(x);
+    return (0.78 + x*0.18).toFixed(2);
+  }
+
+  var visits = {};       // "r,c" -> count
+  var flags = {};        // "r,c" -> class applied when flagged
+  var i = 0, fogCol = 4;
+
+  function applyFog(curCol){
+    for (var r=0; r<ROWS; r++){
+      for (var c=0; c<COLS; c++){
+        var cell = at(r,c);
+        if (c > curCol + 4) cell.classList.add("fog");
+        else cell.classList.remove("fog");
+      }
+    }
+  }
+
+  function tick(){
+    if (i >= PATH.length){
+      readout.innerHTML = "mv " + PATH.length + " · <b>EXIT REACHED</b> · eff " +
+        (SHORTEST/PATH.length).toFixed(2);
+      meta.textContent = "31 moves · shortest " + SHORTEST + " · 28 decisions · 0 invalid";
+      setTimeout(reset, 3200);
+      return;
+    }
+    var s = PATH[i];
+    var cell = at(s[0], s[1]);
+    var key = s[0]+","+s[1];
+    visits[key] = (visits[key]||0)+1;
+
+    if (i > 0){
+      var prev = PATH[i-1];
+      var pk = prev[0]+","+prev[1];
+      var pcell = at(prev[0], prev[1]);
+      pcell.classList.remove("trail");
+        if (flags[pk]) pcell.classList.add(flags[pk]);
+        else if (visits[pk] >= 3) pcell.classList.add("hot");
+        else pcell.classList.add("trail");
+    }
+    if (s[3]) flags[key] = (s[3]==="dead") ? "dead" : "trail";
+    if (visits[key] >= 3) flags[key] = "hot";
+
+    cell.appendChild(token);
+    cell.classList.remove("fog");
+    applyFog(s[1]);
+
+    readout.innerHTML = "mv " + String(i+1).padStart(2,"0") + " · <b>" + s[2] + "</b> · " +
+      stepTime(i) + " s · conf " + conf(i);
+    var revisits = Object.values(visits).filter(function(v){return v>1;}).length;
+    meta.textContent = "budget " + Math.max(4*SHORTEST, SHORTEST+40) + " · furthest c" + s[1] + " · revisits " + revisits;
+    i++;
+    setTimeout(tick, STEP_MS);
+  }
+
+  function reset(){
+    visits = {}; flags = {}; i = 0;
+    for (var r=0; r<ROWS; r++) for (var c=0; c<COLS; c++){
+      var cell = at(r,c);
+      cell.className = "cell";
+      if (GOO[r+","+c]) cell.classList.add("goo");
+      if (c===COLS-1) cell.classList.add("exit");
+    }
+    at(3,0).appendChild(token);
+    applyFog(0);
+    readout.innerHTML = "mv 00 · <b>STANDBY</b>";
+    meta.textContent = "budget — · fog ±4 cols";
+    setTimeout(tick, 700);
+  }
+
+  if (reduced){
+    // static final frame
+    for (var k=0; k<PATH.length; k++){
+      var st = PATH[k];
+      var cl = at(st[0],st[1]);
+      cl.classList.remove("goo");
+      cl.classList.add(st[3]==="dead" ? "dead" : "trail");
+    }
+    at(4,4).className = "cell hot";
+    at(1,17).appendChild(token);
+    readout.innerHTML = "mv 31 · <b>EXIT REACHED</b> · eff 0.55";
+    meta.textContent = "31 moves · shortest 17 · 28 decisions";
+  } else {
+    applyFog(0);
+    setTimeout(tick, 900);
+  }
+})();
+</script>
+</body>
+</html>
