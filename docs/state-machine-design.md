@@ -104,7 +104,33 @@ one token can run on the TypeSafe watermark while another runs on local
 gemma. That same override is the hook for the predetermined-path evaluation:
 T1 maps the course, later tokens follow it.
 
-## 5. Proposed next: policy modes in the grid run
+## 5. Shipped: guided runs (scout → follow)
+
+The grid run now has a **Follow mapped route** toggle. When the field has a
+completed run, a new run inherits that run's observations (its known map),
+receives the upcoming route segment in its context ("Mapped route from a
+previous run: …"), and sees the route's next move marked in its choice
+criteria. The referee still computes legality and applies every move; the
+model still makes every non-forced choice. Per-run metrics add **route kept**
+(share of model decisions that matched the guide's next move). The first
+completed run on a field is the scout; later runs — for example a different
+model — follow it.
+
+First paired result (20×40 field, seed 3428655726, 2026-09-28):
+
+| run | status | moves (shortest 43) | decisions | avg ms | conf | route kept | elapsed |
+| --- | --- | --- | --- | ---: | ---: | ---: | ---: |
+| gemma guided (TypeSafe T2 route) | completed | 43 · eff 100% | 43 | 4,920 | 1.000 | 95% | 212 s |
+| gemma unguided (explores alone) | completed | 43 · eff 100% | 43 | 4,808 | 0.995 | — | 207 s |
+
+Honest reading: on this easy field gemma explores optimally on its own, so the
+guide bought nothing except saturated confidence (1.000 — the deterministic
+behaviour the air-gap story wants) at a ~2% context cost. The paired harness
+is the point: harder fields (60/80 columns), weaker models, and scout/follow
+across different providers are where the guide should pay, and the comparison
+table now measures exactly that per run.
+
+## 6. Proposed next: policy modes in the grid run
 
 Add a per-run **policy** selector beside the existing memory-aid selector, so
 the same seeded field compares policies in the existing table:
@@ -127,7 +153,7 @@ per transition, distribution gates, deterministic fallbacks — warehouse
 racking, stack sequencing, robotic movement. The state machine is the
 product; the model is a pluggable transition adviser.
 
-## 6. What this does not claim
+## 7. What this does not claim
 
 Confidence from tree scoring is a provider signal, not calibrated truth.
 The heuristic fallback is only as good as its coded policy. Policy

@@ -294,6 +294,8 @@
     .grid-hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
     .grid-hero-select { width: 130px; min-height: 36px; padding: 7px 11px; font-size: 11px; }
     .grid-hero-seed { width: 170px; min-height: 36px; margin: 0; padding: 7px 11px; font-size: 11px; }
+    .grid-guide-toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; color: var(--muted); font: 10px var(--mono); letter-spacing: .04em; cursor: pointer; }
+    .grid-guide-toggle input { width: 14px; min-height: 0; margin: 0; padding: 0; accent-color: var(--acid); cursor: pointer; }
     .grid-run-table { overflow-x: auto; padding: 0 14px 14px; }
     .grid-run-table table { width: 100%; border-collapse: collapse; color: var(--muted); font: 9px/1.5 var(--mono); }
     .grid-run-table th { padding: 6px 8px; border-bottom: 1px solid var(--line-bright); color: #C5C3B8; font-weight: 650; text-align: left; white-space: nowrap; }
@@ -580,7 +582,7 @@
         <div>
           <div class="section-label">Agent logic lab · spatial navigation</div>
           <h2 id="gridPageTitle">Radioactive Run</h2>
-          <p>Generate &amp; run builds a seeded field locally (same seed and width, same field every time) and then sends the token on its way. The JEV model makes every navigation decision whenever more than one legal move exists, including when to go back; the code only enforces legality, applies a forced move when exactly one legal move exists, and keeps score of the metrics. The model sees a fog-of-war map of the cells it has observed plus its recent move history, and an optional memory aid summarises what it has already observed (dead-end and explored-pocket flags derived only from seen cells) at a level recorded per run. Parallel races start several independent tokens on the same field at once; their decision requests run concurrently, and each token is recorded as its own run. A run ends at the exit, at the move budget (4× the shortest path, at least +40), when you press Stop, or after three failed attempts at one decision.</p>
+          <p>Generate &amp; run builds a seeded field locally (same seed and width, same field every time) and then sends the token on its way. The JEV model makes every navigation decision whenever more than one legal move exists, including when to go back; the code only enforces legality, applies a forced move when exactly one legal move exists, and keeps score of the metrics. The model sees a fog-of-war map of the cells it has observed plus its recent move history, and an optional memory aid summarises what it has already observed (dead-end and explored-pocket flags derived only from seen cells) at a level recorded per run. Parallel races start several independent tokens on the same field at once; their decision requests run concurrently, and each token is recorded as its own run. "Follow mapped route" guides a new run with the recorded path and observations of the field's latest completed run — the first completed run scouts the course, later runs (for example a different model) navigate against that predetermined route, and route adherence is recorded per run. A run ends at the exit, at the move budget (4× the shortest path, at least +40), when you press Stop, or after three failed attempts at one decision.</p>
         </div>
         <div class="grid-hero-actions">
           <select id="gridColumns" class="grid-hero-select" aria-label="Field width in columns">
@@ -599,6 +601,9 @@
             <option value="3">3 tokens · race</option>
             <option value="4">4 tokens · race</option>
           </select>
+          <label class="grid-guide-toggle" title="If this field has a completed run, follow its mapped route instead of exploring from scratch">
+            <input type="checkbox" id="gridGuide"> Follow mapped route
+          </label>
           <input id="gridSeed" class="search grid-hero-seed" type="text" placeholder="random seed" autocomplete="off" spellcheck="false" aria-label="Field seed (blank for a random seed)">
           <button id="newGridGame" class="button" type="button">＋ &nbsp; Generate &amp; run</button>
           <button id="stopGridRun" class="quiet-button" type="button" hidden>Stop token</button>
@@ -2077,6 +2082,22 @@
         const facts2 = rrNeighbourFacts(board, run, move);
         lines.push(`- ${rrMoveFactText(run, board, move)} · neighbours: ${facts2.knownOpen} known open / ${facts2.knownGoo} known goo / ${facts2.unseen} unseen`);
       }
+      if (run.guide) {
+        const chain = [];
+        let row = run.pos.row;
+        let col = run.pos.col;
+        while (chain.length < 14) {
+          const dir = run.guide.nextDirByCell[gridKey(row, col)];
+          if (!dir) break;
+          chain.push(dir);
+          const delta = GRID_DIRECTIONS.find((item) => item.id === dir);
+          row += delta.dy;
+          col += delta.dx;
+        }
+        lines.push(chain.length
+          ? `Mapped route from a previous run, from your position: ${chain.join(" -> ")}. The route is known open as far as it goes; follow it and deviate only if you must.`
+          : "You are off the mapped route. Rejoin it if a legal move leads back to it; otherwise use your own judgement.");
+      }
       if (run.memoryAid === "facts" || run.memoryAid === "memory") {
         lines.push(`Steps since you last reached a new furthest column: ${run.moves - (run.furthestStep || 0)}.`);
         const recent = run.steps.slice(-12);
@@ -2118,6 +2139,8 @@
         avgConfidence: avg(confidenceSteps, (step) => step.conf),
         flagsIgnored: run.flagsIgnored || 0,
         flagsUnseen: run.flagsUnseen || 0,
+        guided: !!run.guide,
+        routeKept: run.guide ? ((run.guide.kept + run.guide.off) ? run.guide.kept / (run.guide.kept + run.guide.off) : null) : null,
         deadEndsFound: run.flags ? Object.keys(run.flags.deadEnds || {}).length : 0,
         pocketCellsFound: run.flags ? Object.keys(run.flags.pockets || {}).length : 0,
       };
@@ -2487,7 +2510,7 @@
         const table = document.createElement("table");
         const thead = document.createElement("thead");
         const headRow = document.createElement("tr");
-        for (const text of ["Model", "Aid", "Status", "Moves / shortest", "Efficiency", "Decisions", "Forced", "Revisits", "Invalid / retries", "Avg ms", "Avg conf", "Flags ignored", "Dead ends / pocket cells", "Duration", ""]) {
+        for (const text of ["Model", "Aid", "Status", "Moves / shortest", "Efficiency", "Decisions", "Forced", "Revisits", "Invalid / retries", "Avg ms", "Avg conf", "Flags ignored", "Dead ends / pocket cells", "Route kept", "Duration", ""]) {
           const th = document.createElement("th");
           th.textContent = text;
           headRow.append(th);
@@ -2505,7 +2528,7 @@
           const decisions = legacy ? run.requestCount || 0 : metrics.modelDecisions ?? run.coreRun?.modelDecisions ?? 0;
           const duration = run.endedAt && run.startedAt ? formatDuration(new Date(run.endedAt) - new Date(run.startedAt)) : "in progress";
           const cells = [
-            (displayName(run.backendId) || "unknown model") + (run.race ? ` · T${run.race.token}` : ""),
+            (displayName(run.backendId) || "unknown model") + (run.race ? ` · T${run.race.token}` : "") + (run.guide ? " · guided" : ""),
             run.memoryAid || run.coreRun?.memoryAid || run.metrics?.memoryAid || "—",
             String(run.status || "unknown"),
             legacy && run.score == null ? "—" : legacy
@@ -2522,6 +2545,7 @@
             fmt(metrics.avgConfidence, "", 3),
             legacy ? "—" : `${metrics.flagsIgnored ?? run.coreRun?.flagsIgnored ?? 0}${metrics.flagsUnseen || run.coreRun?.flagsUnseen ? ` (+${metrics.flagsUnseen ?? run.coreRun?.flagsUnseen} unseen)` : ""}`,
             legacy ? "—" : `${Object.keys(run.coreRun?.flags?.deadEnds || {}).length} / ${Object.keys(run.coreRun?.flags?.pockets || {}).length}`,
+            !legacy && metrics.routeKept != null ? Math.round(metrics.routeKept * 100) + "%" : "—",
             duration,
           ];
           cells.forEach((text, cellIndex) => {
@@ -2669,12 +2693,47 @@
         game.runs.push(run);
         runs.push(run);
       }
+      // Guide: the field's latest completed run maps the course; later runs follow it.
+      const guideWanted = Boolean($("gridGuide")?.checked);
+      const guideRun = guideWanted
+        ? [...game.runs].reverse().find((item) => item.status === "completed" && item.coreRun?.steps?.length && !runs.includes(item))
+        : null;
+      let guideNextByCell = null;
+      let guideCellCount = 0;
+      if (guideRun) {
+        guideNextByCell = {};
+        const guideSteps = guideRun.coreRun.steps;
+        const spawnKey = gridKey(runs[0].coreRun.pos.row, runs[0].coreRun.pos.col);
+        if (guideSteps.length) guideNextByCell[spawnKey] = guideSteps[0].dir;
+        for (let i = 0; i + 1 < guideSteps.length; i++) {
+          guideNextByCell[gridKey(guideSteps[i].row, guideSteps[i].col)] = guideSteps[i + 1].dir;
+        }
+        guideCellCount = guideSteps.length;
+      }
+      for (const run of runs) {
+        run.guide = guideRun ? {
+          runId: guideRun.id,
+          source: displayName(guideRun.backendId) + (guideRun.race ? ` T${guideRun.race.token}` : ""),
+          cells: guideCellCount,
+          nextDirByCell: guideNextByCell,
+          kept: 0,
+          off: 0,
+        } : null;
+        if (guideRun) {
+          run.coreRun.guide = run.guide;
+          Object.assign(run.coreRun.observed, guideRun.coreRun.observed || {});
+        }
+      }
       game.viewRunId = runs[0].id;
       renderGridGames();
       $("stopGridRun").hidden = false;
-      setGridNotice(tokenCount > 1
-        ? `Race started on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount} independent tokens on the same seeded field, decisions in parallel. ${displayName(runs[0].backendId)} chooses every non-forced move for each token.`
-        : `Token run started on field ${state.gridGames.indexOf(game) + 1}. ${displayName(runs[0].backendId)} chooses every non-forced move; the code applies a move only when exactly one legal move exists.`, "running");
+      setGridNotice(guideRun
+        ? `Guided run on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount > 1 ? tokenCount + " tokens " : ""}following the mapped route from ${displayName(guideRun.backendId)}${guideRun.race ? ` T${guideRun.race.token}` : ""} (${guideCellCount} cells, observations inherited). ${displayName(runs[0].backendId)} still makes every non-forced choice; the route is marked in its context.`
+        : guideWanted
+          ? `No completed run on this field yet — this run scouts the course; if it reaches the exit, its mapped route can guide later runs.`
+          : tokenCount > 1
+            ? `Race started on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount} independent tokens on the same seeded field, decisions in parallel. ${displayName(runs[0].backendId)} chooses every non-forced move for each token.`
+            : `Token run started on field ${state.gridGames.indexOf(game) + 1}. ${displayName(runs[0].backendId)} chooses every non-forced move; the code applies a move only when exactly one legal move exists.`, "running");
 
       const sleep = (ms) => new Promise((resolve, reject) => {
         const timer = setTimeout(resolve, ms);
@@ -2687,13 +2746,16 @@
         run.requestCount += 1;
         await readGridProvider(run.backendId, controller.signal);
         const started = performance.now();
+        const criteria = rrMoveCriteria(coreRun, board, legal);
+        const guidedId = coreRun.guide?.nextDirByCell?.[gridKey(coreRun.pos.row, coreRun.pos.col)];
+        if (guidedId && criteria[guidedId]) criteria[guidedId] += " · the mapped route continues with this move";
         const response = await sendDecisionRequest({
           instructions: rrMoveInstructions(coreRun.memoryAid),
           schema: {
             move: {
               type: "choice",
               choices: legal.map((item) => item.id),
-              criteria: rrMoveCriteria(coreRun, board, legal),
+              criteria,
               instructions: RR_MOVE_INSTRUCTIONS[coreRun.memoryAid] || RR_MOVE_INSTRUCTIONS.memory
             }
           },
@@ -2742,6 +2804,8 @@
           run.error = lastError?.message || "JEV could not decide this move.";
           return;
         }
+        const guidedId = coreRun.guide?.nextDirByCell?.[gridKey(coreRun.pos.row, coreRun.pos.col)];
+        if (guidedId) coreRun.guide[outcome.move === guidedId ? "kept" : "off"] += 1;
         const flag = rrRecordDecision(coreRun, board, legal, { chosenId: outcome.move, forced: false, probabilities: outcome.probabilities });
         rrApplyMove(coreRun, board, { id: outcome.move }, { forced: false, confidence: outcome.confidence, ms: outcome.ms, flag });
       };
@@ -2806,8 +2870,9 @@
         const parts = runs.map((run) => {
           const m = run.metrics || {};
           const tag = `T${run.race?.token || 1}`;
-          if (run.status === "completed") return `${tag} exit in ${m.moves} moves · eff ${Math.round((m.efficiency || 0) * 100)}% · ${m.modelDecisions} decisions`;
-          return `${tag} ${run.status}${run.error ? ` (${run.error})` : ""}`;
+          const route = m.routeKept != null ? ` · route kept ${Math.round(m.routeKept * 100)}%` : "";
+          if (run.status === "completed") return `${tag} exit in ${m.moves} moves · eff ${Math.round((m.efficiency || 0) * 100)}% · ${m.modelDecisions} decisions${route}`;
+          return `${tag} ${run.status}${route}${run.error ? ` (${run.error})` : ""}`;
         });
         setGridNotice(`${displayName(runs[0].backendId)}${runs.length > 1 ? ` race (${runs.length} tokens)` : ""}: ${parts.join(" · ")} · ${duration}.`, runs.some((run) => run.status === "completed") ? "" : "error");
       }
