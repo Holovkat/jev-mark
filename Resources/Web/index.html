@@ -355,6 +355,7 @@
     .grid-square.wall::after { inset: 12%; border-radius: 40% 60% 56% 44%; background: radial-gradient(circle at 35% 35%, rgba(255,180,180,.85), rgba(229,72,77,.3) 38%, transparent 68%); mix-blend-mode: screen; }
     .grid-square.visited { border-color: rgba(92,219,120,.55); background: rgba(92,219,120,.18); box-shadow: inset 0 0 8px rgba(92,219,120,.25); }
     .grid-square.visited::after { background: rgba(92,219,120,.14); }
+    .grid-square.guide-path::after { inset: 20%; border-radius: 2px; background: rgba(232,230,221,.55); }
     .grid-square.spawn { border-color: rgba(157,184,204,.75); box-shadow: 0 0 9px rgba(157,184,204,.3), inset 0 0 8px rgba(157,184,204,.22); }
     .grid-square.exit { border-color: rgba(245,167,0,.55); background: rgba(245,167,0,.1); }
     .grid-square.token { z-index: 1; transform: scale(.92); border: 1px solid #FFD268; background: radial-gradient(circle, #FFE9B0 0 16%, #FFC23D 22% 39%, #F5A700 55%, #3A2A05 76%); box-shadow: 0 0 7px #FFC23D, 0 0 18px rgba(245,167,0,.8), 0 0 30px rgba(245,167,0,.3); animation: tokenArrival .25s ease-out; }
@@ -387,6 +388,7 @@
     .grid-key-swatch.dead-end { border-color: #E8C33E; background: rgba(232,195,62,.45); color: #2A2404; display: grid; place-items: center; font-size: 8px; font-weight: 700; }
     .grid-key-swatch.pocket { border: 1px dashed rgba(229,72,77,.7); background: rgba(229,72,77,.18); }
     .grid-key-swatch.decision { border-color: rgba(232,230,221,.6); background: rgba(10,13,9,.7); }
+    .grid-key-swatch.guide { border-color: rgba(232,230,221,.6); background: rgba(232,230,221,.55); }
     .grid-run-list { display: grid; gap: 6px; padding: 0 14px 14px; }
     .grid-run-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 5px; background: rgba(10,13,9,.72); }
     .grid-run-summary { display: grid; gap: 3px; min-width: 0; }
@@ -2478,6 +2480,7 @@
         }
       }
       const current = selectedRun?.coreRun?.pos || legacyPath.at(-1) || { row: RR_START_ROW, col: 0 };
+      const guideCells = guideCellSet(game, selectedRun);
       const boardViewport = document.createElement("div");
       boardViewport.className = "grid-board-viewport";
       const board = document.createElement("div");
@@ -2496,6 +2499,7 @@
           if (!blocked && current.row === row && current.col === col) classes.push("token");
           const markers = gridCellClasses(game, selectedRun, row, col);
           classes.push(...markers.extra);
+          if (guideCells?.has(gridKey(row, col))) classes.push("guide-path");
           cell.className = classes.join(" ");
           if (blocked) cell.style.setProperty("--goo-delay", `${((row * 13 + col * 7) % 23) * 31}ms`);
           const cellType = blocked ? "radioactive blocker" : cellVisits ? `visited open cell (${cellVisits} visit${cellVisits === 1 ? "" : "s"})` : "open cell";
@@ -2509,7 +2513,7 @@
 
       const key = document.createElement("div");
       key.className = "grid-key";
-      for (const [label, swatch] of [["open", ""], ["radioactive goo", "goo"], ["token / current square", "token"], [`green: visited 1–${RR_RED_VISITS}×, ok`, "visited"], [`red: visited ${RR_RED_VISITS + 1}+×, been here, done that`, "visited-red"], ["yellow: known dead end", "dead-end"], ["explored pocket", "pocket"], ["last decision: chosen / other options", "decision"]]) {
+      for (const [label, swatch] of [["open", ""], ["radioactive goo", "goo"], ["token / current square", "token"], [`green: visited 1–${RR_RED_VISITS}×, ok`, "visited"], [`red: visited ${RR_RED_VISITS + 1}+×, been here, done that`, "visited-red"], ["yellow: known dead end", "dead-end"], ["explored pocket", "pocket"], ["gray core: mapped guide route", "guide"], ["last decision: chosen / other options", "decision"]]) {
         const item = document.createElement("span");
         item.className = "grid-key-item";
         const sample = document.createElement("span");
@@ -2600,6 +2604,12 @@
       return card;
     }
 
+    function guideCellSet(game, selectedRun) {
+      const guideRun = selectedRun?.guide ? game.runs.find((item) => item.id === selectedRun.guide.runId) : null;
+      return guideRun?.coreRun?.steps?.length
+        ? new Set(guideRun.coreRun.steps.map((step) => gridKey(step.row, step.col)))
+        : null;
+    }
     function renderGridGames() {
       const root = $("gridGames");
       root.replaceChildren();
@@ -2659,6 +2669,7 @@
         }
       }
       const current = selectedRun.coreRun?.pos || legacyPath.at(-1) || { row: RR_START_ROW, col: 0 };
+      const guideCells = guideCellSet(game, selectedRun);
       card.querySelectorAll(".grid-square").forEach((cell, index) => {
         const row = Math.floor(index / game.columns);
         const col = index % game.columns;
@@ -2668,6 +2679,7 @@
         cell.classList.toggle("visited", !blocked && cellVisits > 0 && cellVisits <= RR_RED_VISITS && !occupied);
         cell.classList.toggle("visited-red", !blocked && cellVisits > RR_RED_VISITS && !occupied);
         cell.classList.toggle("token", occupied);
+        cell.classList.toggle("guide-path", !!guideCells && guideCells.has(gridKey(row, col)));
         const markers = gridCellClasses(game, selectedRun, row, col);
         for (const cls of ["flag-dead-end", "flag-pocket", "decision-option", "decision-chosen", "decision-rejected-flag", "decision-ignored"]) {
           cell.classList.toggle(cls, markers.extra.includes(cls));
