@@ -2068,6 +2068,30 @@
 
     function rrBuildMoveContext(run, board) {
       const legal = rrLegalMoves(board, run.pos);
+      if (run.guide) {
+        const chain = [];
+        let growRow = run.pos.row;
+        let growCol = run.pos.col;
+        while (chain.length < 14) {
+          const dir = run.guide.nextDirByCell[gridKey(growRow, growCol)];
+          if (!dir) break;
+          chain.push(dir);
+          const delta = GRID_DIRECTIONS.find((item) => item.id === dir);
+          growRow += delta.dy;
+          growCol += delta.dx;
+        }
+        if (chain.length) {
+          const slimLines = [
+            `Goal: reach any open cell in column ${board.columns} (the rightmost column) in as few moves as possible.`,
+            `A previous model mapped a safe route for this field. Position: row ${run.pos.row + 1}, column ${run.pos.col + 1}. Step number: ${run.moves + 1}. Moves remaining in budget: ${run.budget - run.moves}.`,
+            `Mapped route from your position: ${chain.join(" -> ")}. It is known open as far as it goes; follow it and deviate only if you must.`,
+            "Legal moves:",
+            ...legal.map((move) => `- ${rrMoveFactText(run, board, move)}`),
+            "Answer with exactly one listed move.",
+          ];
+          return slimLines.join("\n");
+        }
+      }
       const map = rrRenderKnownMap(run, board);
       const historyLines = run.steps.slice(-20).map((step, index, list) => {
         const number = run.steps.length - list.length + index + 1;
@@ -2750,7 +2774,9 @@
         const guidedId = coreRun.guide?.nextDirByCell?.[gridKey(coreRun.pos.row, coreRun.pos.col)];
         if (guidedId && criteria[guidedId]) criteria[guidedId] += " · the mapped route continues with this move";
         const response = await sendDecisionRequest({
-          instructions: rrMoveInstructions(coreRun.memoryAid),
+          instructions: coreRun.guide
+            ? "A previous model mapped a safe route for this field. Answer only the move prompt in the shared context: pick the move the mapped route continues with, unless it is unavailable. Answer with exactly one listed move."
+            : rrMoveInstructions(coreRun.memoryAid),
           schema: {
             move: {
               type: "choice",

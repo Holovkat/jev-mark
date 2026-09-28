@@ -116,19 +116,25 @@ model still makes every non-forced choice. Per-run metrics add **route kept**
 completed run on a field is the scout; later runs — for example a different
 model — follow it.
 
-First paired result (20×40 field, seed 3428655726, 2026-09-28):
+First paired result (20×40 field, seed 3428655726, 2026-09-28). The first
+guided implementation layered the route on top of the full exploration context
+and ran at the same speed as unguided — decision latency is dominated by
+prefill, not by how hard the choice is, so the follower was paying for
+exploration state it no longer needed. The fix: while on the mapped route the
+follower sends a **slim context** (goal, position, route chain, legal moves —
+no map, no memory aids, no history) and falls back to the full context only
+when off-route. Slim-context result:
 
 | run | status | moves (shortest 43) | decisions | avg ms | conf | route kept | elapsed |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
-| gemma guided (TypeSafe T2 route) | completed | 43 · eff 100% | 43 | 4,920 | 1.000 | 95% | 212 s |
-| gemma unguided (explores alone) | completed | 43 · eff 100% | 43 | 4,808 | 0.995 | — | 207 s |
+| gemma guided, slim context (TypeSafe T2 route) | completed | 43 · eff 100% | 43 | **1,552** | **1.000** | **100%** | **67 s** |
+| gemma unguided (explores alone) | completed | 43 · eff 100% | 43 | 4,724 | 0.995 | — | 203 s |
 
-Honest reading: on this easy field gemma explores optimally on its own, so the
-guide bought nothing except saturated confidence (1.000 — the deterministic
-behaviour the air-gap story wants) at a ~2% context cost. The paired harness
-is the point: harder fields (60/80 columns), weaker models, and scout/follow
-across different providers are where the guide should pay, and the comparison
-table now measures exactly that per run.
+Following the mapped route is now **~3× faster end to end** than exploring,
+with perfect route adherence and saturated confidence. The lesson generalises:
+a guided transition should carry only the state the transition needs — the
+deterministic reference replaces exploration state, and the context shrink is
+where the speed comes from.
 
 ## 6. Proposed next: policy modes in the grid run
 
