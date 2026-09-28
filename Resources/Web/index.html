@@ -22,6 +22,7 @@
       --acid-dim: #C0880A;
       --red: #E5484D;
       --amber: #E8C33E;
+      --green: #5CDB78;
       --blue: #9DB8CC;
       --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Fira Code", ui-monospace, "Menlo", "Consolas", monospace;
       --display: var(--mono);
@@ -224,8 +225,8 @@
     .answer-value { margin: 5px 0 6px; color: var(--acid); font-size: clamp(22px, 2.2vw, 32px); font-weight: 750; letter-spacing: -.02em; overflow-wrap: anywhere; }
     .answer-meta { display: flex; flex-wrap: wrap; gap: 6px; }
     .pill { padding: 4px 6px; border: 1px solid var(--line-bright); border-radius: 3px; color: #AEB3A4; font: 9px var(--mono); }
-    .pill.match { color: var(--acid); border-color: rgba(245,167,0,.4); }
-    .pill.mismatch { color: var(--amber); border-color: rgba(232,195,62,.42); }
+    .pill.match { color: var(--green); border-color: rgba(92,219,120,.5); background: rgba(92,219,120,.1); }
+    .pill.mismatch { color: var(--red); border-color: rgba(229,72,77,.5); background: rgba(229,72,77,.1); }
     .result-guidance { margin: 11px 0 14px; color: var(--muted); font-size: 10px; line-height: 1.55; }
     .result-guidance.error-text { color: var(--red); }
     .workflow-outcome { margin: 12px 0 14px; padding: 11px 12px; border: 1px solid var(--line-bright); border-radius: 7px; background: rgba(11,13,10,.58); }
@@ -277,9 +278,9 @@
     .report-model-stats { display: block; margin-top: 6px; color: var(--muted); font: 9px/1.45 var(--mono); }
     .report-answer { display: block; color: var(--text); line-height: 1.5; overflow-wrap: anywhere; }
     .report-verdict { display: inline-block; margin-top: 6px; padding: 3px 5px; border: 1px solid var(--line-bright); border-radius: 3px; color: var(--muted); font: 8px var(--mono); text-transform: uppercase; }
-    .report-verdict.match { color: var(--acid); border-color: rgba(245,167,0,.4); }
-    .report-verdict.differs { color: var(--amber); border-color: rgba(232,195,62,.42); }
-    .report-verdict.partial { color: var(--blue); border-color: rgba(157,184,204,.4); }
+    .report-verdict.match { color: var(--green); border-color: rgba(92,219,120,.5); background: rgba(92,219,120,.09); }
+    .report-verdict.differs { color: var(--red); border-color: rgba(229,72,77,.5); background: rgba(229,72,77,.09); }
+    .report-verdict.partial { color: var(--amber); border-color: rgba(232,195,62,.5); background: rgba(232,195,62,.09); }
     .report-model-scores { display: block; margin-top: 4px; color: var(--text); font: 9px/1.45 var(--mono); white-space: pre-line; }
     .grid-screen { min-height: calc(100vh - 76px); padding: 22px 18px 40px; }
     .grid-shell { width: min(100%, 1720px); margin: 0 auto; }
