@@ -358,6 +358,8 @@
     .grid-square.guide-path::after { inset: 20%; border-radius: 2px; background: rgba(232,230,221,.55); }
     .grid-square.spawn { border-color: rgba(157,184,204,.75); box-shadow: 0 0 9px rgba(157,184,204,.3), inset 0 0 8px rgba(157,184,204,.22); }
     .grid-square.exit { border-color: rgba(245,167,0,.55); background: rgba(245,167,0,.1); }
+    .grid-square.start-option { border-color: rgba(92,219,120,.85); background: rgba(92,219,120,.2); box-shadow: 0 0 9px rgba(92,219,120,.5), inset 0 0 7px rgba(92,219,120,.35); cursor: pointer; }
+    .grid-square.start-option:hover { background: rgba(92,219,120,.42); box-shadow: 0 0 14px rgba(92,219,120,.85), inset 0 0 9px rgba(92,219,120,.55); }
     .grid-square.token { z-index: 1; transform: scale(.92); border: 1px solid #FFD268; background: radial-gradient(circle, #FFE9B0 0 16%, #FFC23D 22% 39%, #F5A700 55%, #3A2A05 76%); box-shadow: 0 0 7px #FFC23D, 0 0 18px rgba(245,167,0,.8), 0 0 30px rgba(245,167,0,.3); animation: tokenArrival .25s ease-out; }
     .grid-square.token::after { inset: 30%; border-radius: 50%; background: #FFF3D0; box-shadow: 0 0 5px #fff; }
     .grid-square.flag-pocket { border: 1px dashed rgba(229,72,77,.7); background: rgba(229,72,77,.18); box-shadow: inset 0 0 6px rgba(229,72,77,.25); }
@@ -389,6 +391,7 @@
     .grid-key-swatch.pocket { border: 1px dashed rgba(229,72,77,.7); background: rgba(229,72,77,.18); }
     .grid-key-swatch.decision { border-color: rgba(232,230,221,.6); background: rgba(10,13,9,.7); }
     .grid-key-swatch.guide { border-color: rgba(232,230,221,.6); background: rgba(232,230,221,.55); }
+    .grid-key-swatch.start { border-color: rgba(92,219,120,.85); background: rgba(92,219,120,.35); box-shadow: 0 0 8px rgba(92,219,120,.5); }
     .grid-run-list { display: grid; gap: 6px; padding: 0 14px 14px; }
     .grid-run-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 5px; background: rgba(10,13,9,.72); }
     .grid-run-summary { display: grid; gap: 3px; min-width: 0; }
@@ -584,7 +587,7 @@
         <div>
           <div class="section-label">Agent logic lab · spatial navigation</div>
           <h2 id="gridPageTitle">Radioactive Run</h2>
-          <p>Generate &amp; run builds a seeded field locally (same seed and width, same field every time) and then sends the token on its way. The JEV model makes every navigation decision whenever more than one legal move exists, including when to go back; the code only enforces legality, applies a forced move when exactly one legal move exists, and keeps score of the metrics. The model sees a fog-of-war map of the cells it has observed plus its recent move history, and an optional memory aid summarises what it has already observed (dead-end and explored-pocket flags derived only from seen cells) at a level recorded per run. Parallel races start several independent tokens on the same field at once; their decision requests run concurrently, and each token is recorded as its own run. "Follow mapped route" guides a new run with the recorded path and observations of the field's latest completed run — the first completed run scouts the course, later runs (for example a different model) navigate against that predetermined route, and route adherence is recorded per run. A run ends at the exit, at the move budget (4× the shortest path, at least +40), when you press Stop, or after three failed attempts at one decision.</p>
+          <p>Generate &amp; run builds a seeded field locally (same seed and width, same field every time) and then sends the token on its way. The JEV model makes every navigation decision whenever more than one legal move exists, including when to go back; the code only enforces legality, applies a forced move when exactly one legal move exists, and keeps score of the metrics. The model sees a fog-of-war map of the cells it has observed plus its recent move history, and an optional memory aid summarises what it has already observed (dead-end and explored-pocket flags derived only from seen cells) at a level recorded per run. Parallel races start several independent tokens on the same field at once; their decision requests run concurrently, and each token is recorded as its own run. "Follow mapped route" guides a new run with the recorded path and observations of the field's latest completed run — the first completed run scouts the course, later runs (for example a different model) navigate against that predetermined route, and route adherence is recorded per run. Runs begin from a start pod you pick: press a run button and the first column lights up green — click one pod (or press the button again to cancel) and the run commences from there, with shortest path, move budget, and efficiency computed for that pod. A run ends at the exit, at the move budget (4× the shortest path, at least +40), when you press Stop, or after three failed attempts at one decision.</p>
         </div>
         <div class="grid-hero-actions">
           <select id="gridColumns" class="grid-hero-select" aria-label="Field width in columns">
@@ -659,6 +662,7 @@
       try { localStorage.setItem(gridGamesKey, JSON.stringify(state.gridGames)); } catch {}
     }
     const activeGridRuns = new Map();
+    let pendingStartPick = null;
     const panelWidthBounds = { library: [190, 420], results: [300, 760] };
     function clampPanelWidth(panel, value, min = panelWidthBounds[panel][0], max = panelWidthBounds[panel][1]) {
       return Math.round(Math.max(min, Math.min(max, Number(value) || min)));
@@ -1718,8 +1722,8 @@
       return null;
     }
 
-    function rrShortestPath(wallRows, rows = RR_ROWS, columns = wallRows[0]?.length) {
-      const start = { row: RR_START_ROW, col: 0 };
+    function rrShortestPath(wallRows, rows = RR_ROWS, columns = wallRows[0]?.length, startRow = RR_START_ROW) {
+      const start = { row: startRow, col: 0 };
       const queue = [start];
       const distances = new Map([[gridKey(start.row, start.col), 0]]);
       for (let index = 0; index < queue.length; index++) {
@@ -1818,8 +1822,10 @@
 
     const RR_MEMORY_AIDS = ["map", "facts", "memory"];
     const RR_RED_VISITS = 3;
-    function rrCreateRunState(board, { viewRadius = 1, memoryAid = "memory" } = {}) {
-      const start = { row: RR_START_ROW, col: 0 };
+    function rrCreateRunState(board, { viewRadius = 1, memoryAid = "memory", startRow = RR_START_ROW } = {}) {
+      const start = { row: startRow, col: 0 };
+      const shortestRaw = rrShortestPath(board.wallRows, board.rows, board.columns, startRow);
+      const shortest = shortestRaw >= 0 ? shortestRaw : board.shortestPath;
       const run = {
         pos: { ...start },
         visits: {},
@@ -1831,7 +1837,8 @@
         revisits: 0,
         furthestColumn: 0,
         furthestStep: 0,
-        budget: rrMoveBudget(board.shortestPath),
+        shortestPath: shortest,
+        budget: rrMoveBudget(shortest),
         viewRadius,
         memoryAid: RR_MEMORY_AIDS.includes(memoryAid) ? memoryAid : "memory",
         flags: { deadEnds: {}, pockets: {} },
@@ -2154,8 +2161,8 @@
       return {
         status: run.status,
         moves: run.moves,
-        shortestPath: board.shortestPath,
-        efficiency: completed && run.moves ? board.shortestPath / run.moves : null,
+        shortestPath: run.shortestPath ?? board.shortestPath,
+        efficiency: completed && run.moves ? (run.shortestPath ?? board.shortestPath) / run.moves : null,
         modelDecisions: run.modelDecisions,
         forcedMoves: run.forcedMoves,
         revisits: run.revisits,
@@ -2453,7 +2460,7 @@
         const runButton = document.createElement("button");
         runButton.type = "button";
         runButton.className = "button";
-        runButton.textContent = runs.length ? "Run this field again" : "Start token";
+        runButton.textContent = pendingStartPick?.gameId === game.id ? "Cancel start pick" : runs.length ? "Run this field again" : "Start token";
         runButton.disabled = anyBusy || !state.provider?.selected_backend;
         runButton.title = "The JEV model chooses every non-forced move from its fog-of-war map and recent history; code only enforces legality and applies a move when exactly one legal move exists.";
         runButton.addEventListener("click", () => runGridGame(game.id));
@@ -2494,7 +2501,7 @@
           const classes = ["grid-square"];
           if (blocked) classes.push("wall");
           else if (cellVisits) classes.push(cellVisits > RR_RED_VISITS ? "visited-red" : "visited");
-          if (row === RR_START_ROW && col === 0) classes.push("spawn");
+          if (col === 0 && row === (selectedRun?.startRow ?? RR_START_ROW)) classes.push("spawn");
           if (col === game.columns - 1) classes.push("exit");
           if (!blocked && current.row === row && current.col === col) classes.push("token");
           const markers = gridCellClasses(game, selectedRun, row, col);
@@ -2508,12 +2515,20 @@
           board.append(cell);
         }
       }
+      if (pendingStartPick?.gameId === game.id) {
+        for (let row = 0; row < game.rows; row++) {
+          if (game.wallRows[row][0] === "#") continue;
+          const pod = board.children[row * game.columns];
+          pod.classList.add("start-option");
+          pod.addEventListener("click", () => runGridGame(game.id, row));
+        }
+      }
       boardViewport.append(board);
       card.append(boardViewport);
 
       const key = document.createElement("div");
       key.className = "grid-key";
-      for (const [label, swatch] of [["open", ""], ["radioactive goo", "goo"], ["token / current square", "token"], [`green: visited 1–${RR_RED_VISITS}×, ok`, "visited"], [`red: visited ${RR_RED_VISITS + 1}+×, been here, done that`, "visited-red"], ["yellow: known dead end", "dead-end"], ["explored pocket", "pocket"], ["gray core: mapped guide route", "guide"], ["last decision: chosen / other options", "decision"]]) {
+      for (const [label, swatch] of [["open", ""], ["radioactive goo", "goo"], ["token / current square", "token"], [`green: visited 1–${RR_RED_VISITS}×, ok`, "visited"], [`red: visited ${RR_RED_VISITS + 1}+×, been here, done that`, "visited-red"], ["yellow: known dead end", "dead-end"], ["explored pocket", "pocket"], ["gray core: mapped guide route", "guide"], ["green glow: pick a start pod", "start"], ["last decision: chosen / other options", "decision"]]) {
         const item = document.createElement("span");
         item.className = "grid-key-item";
         const sample = document.createElement("span");
@@ -2694,13 +2709,31 @@
       if (controller) controller.abort();
     }
 
-    async function runGridGame(gameId) {
+    async function runGridGame(gameId, startRow) {
       if (activeGridRuns.size) {
         setGridNotice("Finish or stop the active token run before starting another.", "error");
         return;
       }
       const game = state.gridGames.find((item) => item.id === gameId);
       if (!game) return;
+      if (startRow === undefined) {
+        if (pendingStartPick?.gameId === gameId) {
+          pendingStartPick = null;
+          renderGridGames();
+          setGridNotice("Start pick cancelled.");
+          return;
+        }
+        pendingStartPick = { gameId };
+        renderGridGames();
+        setGridNotice("Pick a start pod: click any glowing cell in the first column — the run commences from there. Press the run button again to cancel.");
+        return;
+      }
+      startRow = Math.trunc(Number(startRow));
+      if (!Number.isInteger(startRow) || startRow < 0 || startRow >= game.rows || game.wallRows[startRow][0] === "#") {
+        setGridNotice("That start cell is not open. Pick a glowing pod in the first column.", "error");
+        return;
+      }
+      pendingStartPick = null;
       const board = boardOfGame(game);
       const controller = new AbortController();
       activeGridRuns.set(game.id, controller);
@@ -2710,7 +2743,7 @@
       const raceId = tokenCount > 1 ? makeGridId("race") : null;
       const runs = [];
       for (let index = 0; index < tokenCount; index++) {
-        const coreRun = rrCreateRunState(board, { memoryAid });
+        const coreRun = rrCreateRunState(board, { memoryAid, startRow });
         const run = {
           id: makeGridId("run"),
           backendId: state.provider?.selected_backend || null,
@@ -2722,6 +2755,7 @@
           error: null,
           requestCount: 0,
           memoryAid,
+          startRow,
           race: raceId ? { id: raceId, token: index + 1, size: tokenCount } : null,
           coreRun,
           status: "running",
@@ -2732,7 +2766,7 @@
       // Guide: the field's latest completed run maps the course; later runs follow it.
       const guideWanted = Boolean($("gridGuide")?.checked);
       const guideRun = guideWanted
-        ? [...game.runs].reverse().find((item) => item.status === "completed" && item.coreRun?.steps?.length && !runs.includes(item))
+        ? [...game.runs].reverse().find((item) => item.status === "completed" && item.coreRun?.steps?.length && (item.startRow ?? RR_START_ROW) === startRow && !runs.includes(item))
         : null;
       let guideNextByCell = null;
       let guideCellCount = 0;
@@ -2763,13 +2797,14 @@
       game.viewRunId = runs[0].id;
       renderGridGames();
       $("stopGridRun").hidden = false;
+      const startNote = startRow !== RR_START_ROW ? ` · start row ${startRow + 1}` : "";
       setGridNotice(guideRun
-        ? `Guided run on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount > 1 ? tokenCount + " tokens " : ""}following the mapped route from ${displayName(guideRun.backendId)}${guideRun.race ? ` T${guideRun.race.token}` : ""} (${guideCellCount} cells, observations inherited). ${displayName(runs[0].backendId)} still makes every non-forced choice; the route is marked in its context.`
+        ? `Guided run on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount > 1 ? tokenCount + " tokens " : ""}following the mapped route from ${displayName(guideRun.backendId)}${guideRun.race ? ` T${guideRun.race.token}` : ""} (${guideCellCount} cells, observations inherited).${startNote} ${displayName(runs[0].backendId)} still makes every non-forced choice; the route is marked in its context.`
         : guideWanted
-          ? `No completed run on this field yet — this run scouts the course; if it reaches the exit, its mapped route can guide later runs.`
+          ? `No completed run from this start pod yet — this run scouts the course; if it reaches the exit, its mapped route can guide later runs.`
           : tokenCount > 1
-            ? `Race started on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount} independent tokens on the same seeded field, decisions in parallel. ${displayName(runs[0].backendId)} chooses every non-forced move for each token.`
-            : `Token run started on field ${state.gridGames.indexOf(game) + 1}. ${displayName(runs[0].backendId)} chooses every non-forced move; the code applies a move only when exactly one legal move exists.`, "running");
+            ? `Race started on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount} independent tokens on the same seeded field, decisions in parallel.${startNote} ${displayName(runs[0].backendId)} chooses every non-forced move for each token.`
+            : `Token run started on field ${state.gridGames.indexOf(game) + 1}${startNote}. ${displayName(runs[0].backendId)} chooses every non-forced move; the code applies a move only when exactly one legal move exists.`, "running");
 
       const sleep = (ms) => new Promise((resolve, reject) => {
         const timer = setTimeout(resolve, ms);
