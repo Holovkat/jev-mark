@@ -2619,7 +2619,43 @@
       return card;
     }
 
+    // Splice a BFS walk from (fromRow, fromCol) to the nearest already-routed cell
+    // into guide.nextDirByCell, so a follower that is off-route gets a deterministic
+    // path back onto the mapped corridor. Returns the number of spliced cells.
+    function guideSpliceJoin(guide, board, fromRow, fromCol) {
+      const fromKey = gridKey(fromRow, fromCol);
+      if (guide.nextDirByCell[fromKey] !== undefined) return 0;
+      const parent = new Map([[fromKey, null]]);
+      let frontier = [{ row: fromRow, col: fromCol }];
+      let joinKey = null;
+      while (!joinKey && frontier.length) {
+        const nextFrontier = [];
+        for (const current of frontier) {
+          for (const direction of GRID_DIRECTIONS) {
+            const reachRow = current.row + direction.dy;
+            const reachCol = current.col + direction.dx;
+            const reachKey = gridKey(reachRow, reachCol);
+            if (reachRow < 0 || reachRow >= board.rows || reachCol < 0 || reachCol >= board.columns || parent.has(reachKey) || board.wallRows[reachRow][reachCol] === "#") continue;
+            parent.set(reachKey, { key: gridKey(current.row, current.col), dir: direction.id });
+            if (guide.nextDirByCell[reachKey] !== undefined) { joinKey = reachKey; break; }
+            nextFrontier.push({ row: reachRow, col: reachCol });
+          }
+          if (joinKey) break;
+        }
+        frontier = nextFrontier;
+      }
+      let joined = 0;
+      let walk = joinKey;
+      while (walk && walk !== fromKey) {
+        const step = parent.get(walk);
+        guide.nextDirByCell[step.key] = step.dir;
+        walk = step.key;
+        joined += 1;
+      }
+      return joined;
+    }
     function guideCellSet(game, selectedRun) {
+      if (selectedRun?.guide?.nextDirByCell) return new Set(Object.keys(selectedRun.guide.nextDirByCell));
       const guideRun = selectedRun?.guide ? game.runs.find((item) => item.id === selectedRun.guide.runId) : null;
       return guideRun?.coreRun?.steps?.length
         ? new Set(guideRun.coreRun.steps.map((step) => gridKey(step.row, step.col)))
@@ -2778,39 +2814,9 @@
           guideNextByCell[gridKey(guideSteps[i].row, guideSteps[i].col)] = guideSteps[i + 1].dir;
         }
         guideCellCount = guideSteps.length;
-        // The picked pod may sit off the recorded corridor: BFS over the mapped field
-        // (the scout mapped the course) finds the nearest corridor cell, and the
-        // approach walk is spliced in so the model follows one continuous route.
-        const startCell = { row: startRow, col: 0 };
-        const startKey = gridKey(startCell.row, startCell.col);
-        if (guideNextByCell[startKey] === undefined) {
-          const parent = new Map([[startKey, null]]);
-          let frontier = [startCell];
-          let joinKey = null;
-          while (!joinKey && frontier.length) {
-            const nextFrontier = [];
-            for (const current of frontier) {
-              for (const direction of GRID_DIRECTIONS) {
-                const reachRow = current.row + direction.dy;
-                const reachCol = current.col + direction.dx;
-                const reachKey = gridKey(reachRow, reachCol);
-                if (reachRow < 0 || reachRow >= board.rows || reachCol < 0 || reachCol >= board.columns || parent.has(reachKey) || board.wallRows[reachRow][reachCol] === "#") continue;
-                parent.set(reachKey, { key: gridKey(current.row, current.col), dir: direction.id });
-                if (guideNextByCell[reachKey] !== undefined) { joinKey = reachKey; break; }
-                nextFrontier.push({ row: reachRow, col: reachCol });
-              }
-              if (joinKey) break;
-            }
-            frontier = nextFrontier;
-          }
-          let walk = joinKey;
-          while (walk && walk !== startKey) {
-            const step = parent.get(walk);
-            guideNextByCell[step.key] = step.dir;
-            walk = step.key;
-            guideJoinCount += 1;
-          }
-        }
+        // The picked pod may sit off the recorded corridor: splice the approach walk
+        // so the model follows one continuous route from its pod.
+        guideJoinCount = guideSpliceJoin({ nextDirByCell: guideNextByCell }, board, startRow, 0);
       }
       for (const run of runs) {
         run.guide = guideRun ? {
@@ -2880,6 +2886,7 @@
       const tokenLabel = (run) => run.race ? `T${run.race.token}` : "token";
       const stepToken = async (run) => {
         const coreRun = run.coreRun;
+        if (coreRun.guide) guideSpliceJoin(coreRun.guide, board, coreRun.pos.row, coreRun.pos.col);
         const legal = rrLegalMoves(board, coreRun.pos);
         if (legal.length === 1) {
           const flag = rrRecordDecision(coreRun, board, legal, { chosenId: legal[0].id, forced: true });
