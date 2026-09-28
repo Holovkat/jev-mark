@@ -234,6 +234,12 @@ cmake --build build --config Release -j 10
 `LLAMA_OPENSSL=OFF` is intentional for this local HTTP-only server: the
 machine's OpenSSL headers and linked library do not expose the same symbol set.
 
+After renaming this folder, the binaries under `build/bin` keep the old
+absolute rpath and fail with `dyld: Library not loaded`. Repair them in place
+(re-`id` the dylibs to `@rpath`, `-change` old-path references, swap the rpath
+for `@executable_path`, then re-sign), or simply rerun the cmake build from
+the new location.
+
 ## First live result
 
 The first request against `gemma4:12b` returned a valid decision and field

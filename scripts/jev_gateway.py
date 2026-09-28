@@ -1377,9 +1377,22 @@ class GatewayHandler(BaseHTTPRequestHandler):
             self.send_json(500, {"error": "JEV gateway could not process the request."})
 
 
+class GatewayServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address) -> None:
+        error = sys.exc_info()[1]
+        # A client dropping the connection before the response is written
+        # (browser polls aborted by reload/close) is routine, not a fault.
+        if isinstance(error, (BrokenPipeError, ConnectionResetError)):
+            log(f"client {client_address[0]} disconnected before response")
+            return
+        super().handle_error(request, client_address)
+
+
 def main() -> None:
     try:
-        server = ThreadingHTTPServer((GATEWAY_HOST, GATEWAY_PORT), GatewayHandler)
+        server = GatewayServer((GATEWAY_HOST, GATEWAY_PORT), GatewayHandler)
     except OSError as error:
         log(f"failed to bind {GATEWAY_HOST}:{GATEWAY_PORT} ({error})")
         raise
