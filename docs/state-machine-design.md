@@ -136,6 +136,18 @@ a guided transition should carry only the state the transition needs — the
 deterministic reference replaces exploration state, and the context shrink is
 where the speed comes from.
 
+**Cross-pod join (shipped):** the guide no longer requires the same start
+pod. Runs also begin from a **picked start pod** — pressing a run button makes
+the first column glow green, the user clicks one pod, and the run commences
+there with shortest path, budget, and efficiency recomputed for that pod. When
+"Follow mapped route" is on, the referee BFS-joins the picked pod to the
+recorded corridor (the scout mapped the course), splicing the approach walk
+into the route so the model follows one continuous chain: pod → corridor →
+exit. First live check: ornith-1.5:9b following a gemma-mapped corridor from a
+different pod — 100% route adherence including the computed approach. The
+guide source is the field's latest completed run; pinning a specific scout
+(e.g. always the TypeSafe watermark) is future work.
+
 ## 6. Proposed next: policy modes in the grid run
 
 Add a per-run **policy** selector beside the existing memory-aid selector, so

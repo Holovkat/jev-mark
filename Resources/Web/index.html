@@ -2766,25 +2766,58 @@
       // Guide: the field's latest completed run maps the course; later runs follow it.
       const guideWanted = Boolean($("gridGuide")?.checked);
       const guideRun = guideWanted
-        ? [...game.runs].reverse().find((item) => item.status === "completed" && item.coreRun?.steps?.length && (item.startRow ?? RR_START_ROW) === startRow && !runs.includes(item))
+        ? [...game.runs].reverse().find((item) => item.status === "completed" && item.coreRun?.steps?.length && !runs.includes(item))
         : null;
       let guideNextByCell = null;
       let guideCellCount = 0;
+      let guideJoinCount = 0;
       if (guideRun) {
         guideNextByCell = {};
         const guideSteps = guideRun.coreRun.steps;
-        const spawnKey = gridKey(runs[0].coreRun.pos.row, runs[0].coreRun.pos.col);
-        if (guideSteps.length) guideNextByCell[spawnKey] = guideSteps[0].dir;
         for (let i = 0; i + 1 < guideSteps.length; i++) {
           guideNextByCell[gridKey(guideSteps[i].row, guideSteps[i].col)] = guideSteps[i + 1].dir;
         }
         guideCellCount = guideSteps.length;
+        // The picked pod may sit off the recorded corridor: BFS over the mapped field
+        // (the scout mapped the course) finds the nearest corridor cell, and the
+        // approach walk is spliced in so the model follows one continuous route.
+        const startCell = { row: startRow, col: 0 };
+        const startKey = gridKey(startCell.row, startCell.col);
+        if (guideNextByCell[startKey] === undefined) {
+          const parent = new Map([[startKey, null]]);
+          let frontier = [startCell];
+          let joinKey = null;
+          while (!joinKey && frontier.length) {
+            const nextFrontier = [];
+            for (const current of frontier) {
+              for (const direction of GRID_DIRECTIONS) {
+                const reachRow = current.row + direction.dy;
+                const reachCol = current.col + direction.dx;
+                const reachKey = gridKey(reachRow, reachCol);
+                if (reachRow < 0 || reachRow >= board.rows || reachCol < 0 || reachCol >= board.columns || parent.has(reachKey) || board.wallRows[reachRow][reachCol] === "#") continue;
+                parent.set(reachKey, { key: gridKey(current.row, current.col), dir: direction.id });
+                if (guideNextByCell[reachKey] !== undefined) { joinKey = reachKey; break; }
+                nextFrontier.push({ row: reachRow, col: reachCol });
+              }
+              if (joinKey) break;
+            }
+            frontier = nextFrontier;
+          }
+          let walk = joinKey;
+          while (walk && walk !== startKey) {
+            const step = parent.get(walk);
+            guideNextByCell[step.key] = step.dir;
+            walk = step.key;
+            guideJoinCount += 1;
+          }
+        }
       }
       for (const run of runs) {
         run.guide = guideRun ? {
           runId: guideRun.id,
           source: displayName(guideRun.backendId) + (guideRun.race ? ` T${guideRun.race.token}` : ""),
           cells: guideCellCount,
+          approach: guideJoinCount,
           nextDirByCell: guideNextByCell,
           kept: 0,
           off: 0,
@@ -2799,7 +2832,7 @@
       $("stopGridRun").hidden = false;
       const startNote = startRow !== RR_START_ROW ? ` · start row ${startRow + 1}` : "";
       setGridNotice(guideRun
-        ? `Guided run on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount > 1 ? tokenCount + " tokens " : ""}following the mapped route from ${displayName(guideRun.backendId)}${guideRun.race ? ` T${guideRun.race.token}` : ""} (${guideCellCount} cells, observations inherited).${startNote} ${displayName(runs[0].backendId)} still makes every non-forced choice; the route is marked in its context.`
+        ? `Guided run on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount > 1 ? tokenCount + " tokens " : ""}following the mapped corridor from ${displayName(guideRun.backendId)}${guideRun.race ? ` T${guideRun.race.token}` : ""} (${guideCellCount}-cell corridor${guideJoinCount ? ` + ${guideJoinCount}-cell approach from your pod` : ""}, observations inherited).${startNote} ${displayName(runs[0].backendId)} still makes every non-forced choice; the route is marked in its context.`
         : guideWanted
           ? `No completed run from this start pod yet — this run scouts the course; if it reaches the exit, its mapped route can guide later runs.`
           : tokenCount > 1
