@@ -77,7 +77,34 @@ The lever is not a better prompt. It is moving determinism into the harness:
    facts → pockets) is the experiment harness for how much derived state a
    model of a given size can exploit — already recorded per run.
 
-## 4. Proposed next step: policy modes in the grid run
+## 4. Shipped: parallel token races in the grid run
+
+The grid run now has a parallel-token selector (1–4). A race starts that many
+independent state machines on the same seeded field; each round fires every
+running token's decision request **concurrently** (`Promise.all`), so
+wall-clock per round is one decision latency regardless of token count. Each
+token is recorded as its own run (`race.token`) in the existing comparison
+table; one token failing its retry ladder drops out of the race without
+killing the others; Stop aborts the whole race.
+
+First live result (TypeSafe `jev-latest` watermark, 2 tokens, 20×40 field,
+seed `3428655726`, 2026-09-28): both tokens completed 49 moves (shortest 43,
+88% efficiency), 48 decisions each, avg 293 ms/decision, avg confidence 0.97,
+0 invalid / 0 retries — **14.8 s wall clock for both streams**, roughly half
+the sequential time. The local engine was built with `--decision-seqs 12`, so
+the same race applies to local models unchanged (select the local provider in
+the menu-bar app).
+
+Honest finding: same seed + same model + deterministic scoring means the
+tokens took **identical paths** — a same-model race measures concurrency and
+throughput, not path diversity. Path diversity (and the scout/waypoint
+evaluation below) needs per-token provider selection, which requires a small
+gateway extension: a backend-override parameter on the decision request so
+one token can run on the TypeSafe watermark while another runs on local
+gemma. That same override is the hook for the predetermined-path evaluation:
+T1 maps the course, later tokens follow it.
+
+## 5. Proposed next: policy modes in the grid run
 
 Add a per-run **policy** selector beside the existing memory-aid selector, so
 the same seeded field compares policies in the existing table:
@@ -100,7 +127,7 @@ per transition, distribution gates, deterministic fallbacks — warehouse
 racking, stack sequencing, robotic movement. The state machine is the
 product; the model is a pluggable transition adviser.
 
-## 5. What this does not claim
+## 6. What this does not claim
 
 Confidence from tree scoring is a provider signal, not calibrated truth.
 The heuristic fallback is only as good as its coded policy. Policy

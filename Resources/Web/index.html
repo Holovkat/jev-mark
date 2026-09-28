@@ -580,7 +580,7 @@
         <div>
           <div class="section-label">Agent logic lab · spatial navigation</div>
           <h2 id="gridPageTitle">Radioactive Run</h2>
-          <p>Generate &amp; run builds a seeded field locally (same seed and width, same field every time) and then sends the token on its way. The JEV model makes every navigation decision whenever more than one legal move exists, including when to go back; the code only enforces legality, applies a forced move when exactly one legal move exists, and keeps score of the metrics. The model sees a fog-of-war map of the cells it has observed plus its recent move history, and an optional memory aid summarises what it has already observed (dead-end and explored-pocket flags derived only from seen cells) at a level recorded per run. A run ends at the exit, at the move budget (4× the shortest path, at least +40), when you press Stop, or after three failed attempts at one decision.</p>
+          <p>Generate &amp; run builds a seeded field locally (same seed and width, same field every time) and then sends the token on its way. The JEV model makes every navigation decision whenever more than one legal move exists, including when to go back; the code only enforces legality, applies a forced move when exactly one legal move exists, and keeps score of the metrics. The model sees a fog-of-war map of the cells it has observed plus its recent move history, and an optional memory aid summarises what it has already observed (dead-end and explored-pocket flags derived only from seen cells) at a level recorded per run. Parallel races start several independent tokens on the same field at once; their decision requests run concurrently, and each token is recorded as its own run. A run ends at the exit, at the move budget (4× the shortest path, at least +40), when you press Stop, or after three failed attempts at one decision.</p>
         </div>
         <div class="grid-hero-actions">
           <select id="gridColumns" class="grid-hero-select" aria-label="Field width in columns">
@@ -592,6 +592,12 @@
             <option value="memory" selected>Memory aid: map + facts + pockets</option>
             <option value="facts">Memory aid: map + move facts</option>
             <option value="map">Memory aid: map only</option>
+          </select>
+          <select id="gridTokens" class="grid-hero-select" aria-label="Parallel tokens">
+            <option value="1" selected>1 token</option>
+            <option value="2">2 tokens · race</option>
+            <option value="3">3 tokens · race</option>
+            <option value="4">4 tokens · race</option>
           </select>
           <input id="gridSeed" class="search grid-hero-seed" type="text" placeholder="random seed" autocomplete="off" spellcheck="false" aria-label="Field seed (blank for a random seed)">
           <button id="newGridGame" class="button" type="button">＋ &nbsp; Generate &amp; run</button>
@@ -2499,7 +2505,7 @@
           const decisions = legacy ? run.requestCount || 0 : metrics.modelDecisions ?? run.coreRun?.modelDecisions ?? 0;
           const duration = run.endedAt && run.startedAt ? formatDuration(new Date(run.endedAt) - new Date(run.startedAt)) : "in progress";
           const cells = [
-            displayName(run.backendId) || "unknown model",
+            (displayName(run.backendId) || "unknown model") + (run.race ? ` · T${run.race.token}` : ""),
             run.memoryAid || run.coreRun?.memoryAid || run.metrics?.memoryAid || "—",
             String(run.status || "unknown"),
             legacy && run.score == null ? "—" : legacy
@@ -2583,8 +2589,15 @@
       const run = game.runs.at(-1);
       if (!card || !run) return;
       const status = card.querySelector(".grid-game-status");
-      status.textContent = gridRunStatusText(run, game);
-      status.className = "grid-game-status" + (run.status === "completed" ? " good" : run.error || run.status === "failed" || run.status === "budget" ? " error" : "");
+      const raceRuns = run.race ? game.runs.filter((item) => item.race?.id === run.race.id) : null;
+      if (raceRuns && run.status === "running") {
+        const live = raceRuns.filter((item) => item.status === "running");
+        status.textContent = live.map((item) => item.progressMessage).filter(Boolean).join("  ·  ") || gridRunStatusText(run, game);
+        status.className = "grid-game-status" + (raceRuns.some((item) => item.status === "failed" || item.status === "budget" || item.error) ? " error" : "");
+      } else {
+        status.textContent = gridRunStatusText(run, game);
+        status.className = "grid-game-status" + (run.status === "completed" ? " good" : run.error || run.status === "failed" || run.status === "budget" ? " error" : "");
+      }
       const selectedRun = game.runs.find((item) => item.id === game.viewRunId) || run;
       const legacyPath = selectedRun.path || [];
       const visits = selectedRun.coreRun?.visits || null;
@@ -2633,26 +2646,35 @@
       activeGridRuns.set(game.id, controller);
       const memoryAidOption = String($("gridMemoryAid")?.value || "");
       const memoryAid = RR_MEMORY_AIDS.includes(memoryAidOption) ? memoryAidOption : "memory";
-      const coreRun = rrCreateRunState(board, { memoryAid });
-      const run = {
-        id: makeGridId("run"),
-        backendId: state.provider?.selected_backend || null,
-        seed: game.seed,
-        startedAt: new Date().toISOString(),
-        endedAt: null,
-        retries: 0,
-        invalidResponses: 0,
-        error: null,
-        requestCount: 0,
-        memoryAid,
-        coreRun,
-        status: "running",
-      };
-      game.runs.push(run);
-      game.viewRunId = run.id;
+      const tokenCount = Math.max(1, Math.min(4, Number($("gridTokens")?.value) || 1));
+      const raceId = tokenCount > 1 ? makeGridId("race") : null;
+      const runs = [];
+      for (let index = 0; index < tokenCount; index++) {
+        const coreRun = rrCreateRunState(board, { memoryAid });
+        const run = {
+          id: makeGridId("run"),
+          backendId: state.provider?.selected_backend || null,
+          seed: game.seed,
+          startedAt: new Date().toISOString(),
+          endedAt: null,
+          retries: 0,
+          invalidResponses: 0,
+          error: null,
+          requestCount: 0,
+          memoryAid,
+          race: raceId ? { id: raceId, token: index + 1, size: tokenCount } : null,
+          coreRun,
+          status: "running",
+        };
+        game.runs.push(run);
+        runs.push(run);
+      }
+      game.viewRunId = runs[0].id;
       renderGridGames();
       $("stopGridRun").hidden = false;
-      setGridNotice(`Token run started on field ${state.gridGames.indexOf(game) + 1}. ${displayName(run.backendId)} chooses every non-forced move; the code applies a move only when exactly one legal move exists.`, "running");
+      setGridNotice(tokenCount > 1
+        ? `Race started on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount} independent tokens on the same seeded field, decisions in parallel. ${displayName(runs[0].backendId)} chooses every non-forced move for each token.`
+        : `Token run started on field ${state.gridGames.indexOf(game) + 1}. ${displayName(runs[0].backendId)} chooses every non-forced move; the code applies a move only when exactly one legal move exists.`, "running");
 
       const sleep = (ms) => new Promise((resolve, reject) => {
         const timer = setTimeout(resolve, ms);
@@ -2661,7 +2683,7 @@
           reject(new DOMException("Token run stopped.", "AbortError"));
         }, { once: true });
       });
-      const moveRequest = async (legal) => {
+      const moveRequest = async (run, coreRun, legal) => {
         run.requestCount += 1;
         await readGridProvider(run.backendId, controller.signal);
         const started = performance.now();
@@ -2687,93 +2709,107 @@
         }
         return { ...parsed, ms };
       };
+      const tokenLabel = (run) => run.race ? `T${run.race.token}` : "token";
+      const stepToken = async (run) => {
+        const coreRun = run.coreRun;
+        const legal = rrLegalMoves(board, coreRun.pos);
+        if (legal.length === 1) {
+          const flag = rrRecordDecision(coreRun, board, legal, { chosenId: legal[0].id, forced: true });
+          rrApplyMove(coreRun, board, legal[0], { forced: true, flag });
+          return;
+        }
+        let outcome = null;
+        let lastError = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            run.progressMessage = `${tokenLabel(run).toUpperCase()} STEP ${coreRun.moves + 1} · JEV choosing among ${legal.length} moves${attempt ? ` (attempt ${attempt + 1} of 3)` : ""}`;
+            outcome = await moveRequest(run, coreRun, legal);
+            break;
+          } catch (error) {
+            if (controller.signal.aborted || error.name === "AbortError") throw error;
+            if (error.providerFatal) throw error;
+            lastError = error;
+            if (error.invalid) run.invalidResponses += 1;
+            if (attempt < 2) {
+              run.retries += 1;
+              await sleep(error.invalid ? (attempt === 0 ? 1000 : 2000) : (attempt === 0 ? 3000 : 6000));
+            }
+          }
+        }
+        if (!outcome) {
+          run.status = "failed";
+          coreRun.status = "failed";
+          run.error = lastError?.message || "JEV could not decide this move.";
+          return;
+        }
+        const flag = rrRecordDecision(coreRun, board, legal, { chosenId: outcome.move, forced: false, probabilities: outcome.probabilities });
+        rrApplyMove(coreRun, board, { id: outcome.move }, { forced: false, confidence: outcome.confidence, ms: outcome.ms, flag });
+      };
 
       try {
-        if (!game.wallRows[coreRun.pos.row] || game.wallRows[coreRun.pos.row][coreRun.pos.col] === "#") {
+        const spawnRow = runs[0].coreRun.pos.row;
+        if (!game.wallRows[spawnRow] || game.wallRows[spawnRow][runs[0].coreRun.pos.col] === "#") {
           throw new Error("The spawn cell is blocked; this saved field is invalid.");
         }
-        while (coreRun.status === "running") {
+        while (runs.some((run) => run.coreRun.status === "running")) {
           if (controller.signal.aborted) throw new DOMException("Token run stopped.", "AbortError");
-          const legal = rrLegalMoves(board, coreRun.pos);
-          if (legal.length === 1) {
-            const flag = rrRecordDecision(coreRun, board, legal, { chosenId: legal[0].id, forced: true });
-            rrApplyMove(coreRun, board, legal[0], { forced: true, flag });
-          } else {
-            let outcome = null;
-            let lastError = null;
-            for (let attempt = 0; attempt < 3; attempt++) {
-              try {
-                if (attempt > 0) {
-                  run.progressMessage = `STEP ${coreRun.moves + 1} · retrying JEV decision (attempt ${attempt + 1} of 3)`;
-                  updateGridGameView(game);
-                } else {
-                  run.progressMessage = `STEP ${coreRun.moves + 1} · JEV choosing among ${legal.length} moves`;
-                  updateGridGameView(game);
-                }
-                outcome = await moveRequest(legal);
-                break;
-              } catch (error) {
-                if (controller.signal.aborted || error.name === "AbortError") throw error;
-                if (error.providerFatal) throw error;
-                lastError = error;
-                if (error.invalid) run.invalidResponses += 1;
-                if (attempt < 2) {
-                  run.retries += 1;
-                  await sleep(error.invalid ? (attempt === 0 ? 1000 : 2000) : (attempt === 0 ? 3000 : 6000));
-                }
-              }
+          const active = runs.filter((run) => run.coreRun.status === "running");
+          await Promise.all(active.map(stepToken));
+          for (const run of runs) {
+            if (run.status !== "running" || run.coreRun.status !== "running") continue;
+            const nextLegal = rrLegalMoves(board, run.coreRun.pos);
+            const lastStep = run.coreRun.steps.at(-1);
+            const label = tokenLabel(run).toUpperCase();
+            if (lastStep?.forced) {
+              run.progressMessage = `${label} STEP ${run.coreRun.moves} · forced move ${lastStep.dir} · next: ${nextLegal.length} legal move${nextLegal.length === 1 ? "" : "s"}`;
+            } else if (lastStep) {
+              const decision = run.coreRun.lastDecision;
+              const chosen = decision?.candidates.find((item) => item.id === decision.chosen);
+              const pct = chosen && chosen.probability != null ? ` (${Math.round(chosen.probability * 100)}%)` : "";
+              const rejected = decision?.candidates.filter((item) => item.id !== decision.chosen) || [];
+              const ignored = decision?.candidates.find((item) => item.id === decision.chosen && item.flag && item.shown);
+              run.progressMessage = `${label} STEP ${run.coreRun.moves} · JEV chose ${lastStep.dir}${pct}`
+                + (rejected.length ? ` · rejected: ${rejected.map((item) => item.id).join(", ")}` : "")
+                + (ignored ? ` · IGNORED A ${RR_FLAG_NAMES[ignored.flag].toUpperCase()} FLAG` : "")
+                + ` · next: ${nextLegal.length} legal move${nextLegal.length === 1 ? "" : "s"}`;
             }
-            if (!outcome) throw lastError || new Error("JEV could not decide this move.");
-            const flag = rrRecordDecision(coreRun, board, legal, { chosenId: outcome.move, forced: false, probabilities: outcome.probabilities });
-            rrApplyMove(coreRun, board, { id: outcome.move }, { forced: false, confidence: outcome.confidence, ms: outcome.ms, flag });
-          }
-          const nextLegal = rrLegalMoves(board, coreRun.pos);
-          const lastStep = coreRun.steps.at(-1);
-          if (lastStep.forced) {
-            run.progressMessage = `STEP ${coreRun.moves} · forced move ${lastStep.dir} · next: ${nextLegal.length} legal move${nextLegal.length === 1 ? "" : "s"}`;
-          } else {
-            const decision = coreRun.lastDecision;
-            const chosen = decision.candidates.find((item) => item.id === decision.chosen);
-            const pct = chosen && chosen.probability != null ? ` (${Math.round(chosen.probability * 100)}%)` : "";
-            const parts = [`STEP ${coreRun.moves} · JEV chose ${lastStep.dir}${pct}`];
-            const rejected = decision.candidates.filter((item) => item.id !== decision.chosen);
-            if (rejected.length) {
-              parts.push(`rejected: ${rejected.map((item) => `${item.id}${item.flag ? ` (${RR_FLAG_NAMES[item.flag]})` : ""}`).join(", ")}`);
-            }
-            const ignored = decision.candidates.find((item) => item.id === decision.chosen && item.flag && item.shown);
-            if (ignored) parts.push(`IGNORED A ${RR_FLAG_NAMES[ignored.flag].toUpperCase()} FLAG`);
-            parts.push(`next: ${nextLegal.length} legal move${nextLegal.length === 1 ? "" : "s"}`);
-            run.progressMessage = parts.join(" · ");
+            if (run.coreRun.moves % 5 === 0) run.metrics = rrSummarizeRun(run.coreRun, board);
           }
           updateGridGameView(game);
-          if (coreRun.moves % 5 === 0) {
-            run.metrics = rrSummarizeRun(coreRun, board);
-            saveGridGames();
+          if (runs.some((run) => run.coreRun.moves % 5 === 0)) saveGridGames();
+        }
+        for (const run of runs) run.status = run.coreRun.status;
+      } catch (error) {
+        for (const run of runs) {
+          if (run.status !== "running") continue;
+          if (controller.signal.aborted || error.name === "AbortError") {
+            run.status = "stopped";
+            run.error = "Stopped before the exit; the last confirmed move stays on the board.";
+          } else {
+            run.status = "failed";
+            run.error = error.message || "JEV could not complete this move.";
           }
         }
-        run.status = coreRun.status;
-      } catch (error) {
-        if (controller.signal.aborted || error.name === "AbortError") {
-          run.status = "stopped";
-          run.error = "Stopped before the exit; the last confirmed move stays on the board.";
-        } else {
-          run.status = "failed";
-          run.error = error.message || "JEV could not complete this move.";
-        }
       } finally {
-        run.endedAt = new Date().toISOString();
-        run.metrics = rrSummarizeRun(coreRun, board);
-        run.metrics.status = run.status;
-        delete run.progressMessage;
+        const endedAt = new Date().toISOString();
+        for (const run of runs) {
+          run.endedAt = endedAt;
+          run.metrics = rrSummarizeRun(run.coreRun, board);
+          run.metrics.status = run.status;
+          delete run.progressMessage;
+        }
         activeGridRuns.delete(game.id);
         $("stopGridRun").hidden = true;
         saveGridGames();
         renderGridGames();
-        const duration = formatDuration(new Date(run.endedAt) - new Date(run.startedAt));
-        const summary = run.status === "completed"
-          ? `Exit reached · ${run.metrics.moves} moves (shortest ${run.metrics.shortestPath}) · efficiency ${Math.round(run.metrics.efficiency * 100)}% · ${run.metrics.modelDecisions} decisions · ${duration}.`
-          : `${gridRunStatusText(run, game)} · ${duration}.`;
-        setGridNotice(`${displayName(run.backendId)}: ${summary}`, run.status === "completed" ? "" : "error");
+        const duration = formatDuration(new Date(endedAt) - new Date(runs[0].startedAt));
+        const parts = runs.map((run) => {
+          const m = run.metrics || {};
+          const tag = `T${run.race?.token || 1}`;
+          if (run.status === "completed") return `${tag} exit in ${m.moves} moves · eff ${Math.round((m.efficiency || 0) * 100)}% · ${m.modelDecisions} decisions`;
+          return `${tag} ${run.status}${run.error ? ` (${run.error})` : ""}`;
+        });
+        setGridNotice(`${displayName(runs[0].backendId)}${runs.length > 1 ? ` race (${runs.length} tokens)` : ""}: ${parts.join(" · ")} · ${duration}.`, runs.some((run) => run.status === "completed") ? "" : "error");
       }
     }
 
