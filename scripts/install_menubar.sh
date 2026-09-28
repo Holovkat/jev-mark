@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-app_dir="${JEV_APP_DIR:-$HOME/Applications/JEV Menu Bar.app}"
+app_dir="${JEV_APP_DIR:-/Applications/JEV Menu Bar.app}"
 build_dir="$root_dir/.build/release"
 
 swift build -c release --package-path "$root_dir"
