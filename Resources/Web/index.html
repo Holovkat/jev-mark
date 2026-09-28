@@ -227,6 +227,7 @@
     .pill { padding: 4px 6px; border: 1px solid var(--line-bright); border-radius: 3px; color: #AEB3A4; font: 9px var(--mono); }
     .pill.match { color: var(--green); border-color: rgba(92,219,120,.5); background: rgba(92,219,120,.1); }
     .pill.mismatch { color: var(--red); border-color: rgba(229,72,77,.5); background: rgba(229,72,77,.1); }
+    .pill.partial { color: var(--amber); border-color: rgba(232,195,62,.5); background: rgba(232,195,62,.1); }
     .result-guidance { margin: 11px 0 14px; color: var(--muted); font-size: 10px; line-height: 1.55; }
     .result-guidance.error-text { color: var(--red); }
     .workflow-outcome { margin: 12px 0 14px; padding: 11px 12px; border: 1px solid var(--line-bright); border-radius: 7px; background: rgba(11,13,10,.58); }
@@ -1490,9 +1491,10 @@
       $("answerBlock").className = "answer-block" + (canCompare ? "" : " no-reference");
       if (scoredOutcomes.length) {
         const acceptable = scoredOutcomes.filter((outcome) => ACCEPTABLE_OUTCOMES.has(outcome)).length;
-        $("answerMeta").append(makePill(`acceptable ${acceptable}/${scoredOutcomes.length}`, acceptable === scoredOutcomes.length ? "match" : "mismatch"));
+        const outcomeKind = acceptable === scoredOutcomes.length ? "match" : acceptable > 0 ? "partial" : "mismatch";
+        $("answerMeta").append(makePill(`acceptable ${acceptable}/${scoredOutcomes.length}`, outcomeKind));
       } else if (canCompare) $("answerMeta").append(makePill(matched ? "reference match" : "differs from reference", matched ? "match" : "mismatch"));
-      else if (returnedReferences > 0) $("answerMeta").append(makePill(`${returnedReferences}/${Object.keys(referenceAnswers || {}).length} reference values returned`, "mismatch"));
+      else if (returnedReferences > 0) $("answerMeta").append(makePill(`${returnedReferences}/${Object.keys(referenceAnswers || {}).length} reference values returned`, "partial"));
 
       const providerValue = state.provider?.selected_backend || "";
       const providerHasDistribution = primaryField.probabilities && Object.keys(primaryField.probabilities).length;
