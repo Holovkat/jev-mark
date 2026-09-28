@@ -2814,9 +2814,15 @@
           guideNextByCell[gridKey(guideSteps[i].row, guideSteps[i].col)] = guideSteps[i + 1].dir;
         }
         guideCellCount = guideSteps.length;
-        // The picked pod may sit off the recorded corridor: splice the approach walk
-        // so the model follows one continuous route from its pod.
-        guideJoinCount = guideSpliceJoin({ nextDirByCell: guideNextByCell }, board, startRow, 0);
+        // The picked pod may sit off the corridor's row. Entry is always the scout's
+        // own start pod: the left lane (first five columns) is guaranteed open, so
+        // the approach is a safe vertical walk to that row, then the recorded
+        // corridor follows exactly as the scout walked it.
+        const scoutStartKey = gridKey(guideRun.startRow ?? RR_START_ROW, 0);
+        const approach = { nextDirByCell: {} };
+        approach.nextDirByCell[scoutStartKey] = guideSteps[0].dir;
+        guideJoinCount = guideSpliceJoin(approach, board, startRow, 0);
+        Object.assign(guideNextByCell, approach.nextDirByCell);
       }
       for (const run of runs) {
         run.guide = guideRun ? {
@@ -2831,6 +2837,17 @@
         if (guideRun) {
           run.coreRun.guide = run.guide;
           Object.assign(run.coreRun.observed, guideRun.coreRun.observed || {});
+          // The left-lane approach has no model decision in it — the referee applies
+          // it deterministically (marked forced) and the model takes over at the
+          // corridor entry, where the navigation actually happens.
+          for (let step = 0; step < guideJoinCount; step++) {
+            const legal = rrLegalMoves(board, run.coreRun.pos);
+            const dir = run.guide.nextDirByCell[gridKey(run.coreRun.pos.row, run.coreRun.pos.col)];
+            const move = legal.find((item) => item.id === dir);
+            if (!move) break;
+            const flag = rrRecordDecision(run.coreRun, board, legal, { chosenId: move.id, forced: true });
+            rrApplyMove(run.coreRun, board, move, { forced: true, flag });
+          }
         }
       }
       game.viewRunId = runs[0].id;
@@ -2838,7 +2855,7 @@
       $("stopGridRun").hidden = false;
       const startNote = startRow !== RR_START_ROW ? ` · start row ${startRow + 1}` : "";
       setGridNotice(guideRun
-        ? `Guided run on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount > 1 ? tokenCount + " tokens " : ""}following the mapped corridor from ${displayName(guideRun.backendId)}${guideRun.race ? ` T${guideRun.race.token}` : ""} (${guideCellCount}-cell corridor${guideJoinCount ? ` + ${guideJoinCount}-cell approach from your pod` : ""}, observations inherited).${startNote} ${displayName(runs[0].backendId)} still makes every non-forced choice; the route is marked in its context.`
+        ? `Guided run on field ${state.gridGames.indexOf(game) + 1}: ${tokenCount > 1 ? tokenCount + " tokens " : ""}following the mapped corridor from ${displayName(guideRun.backendId)}${guideRun.race ? ` T${guideRun.race.token}` : ""} (${guideCellCount}-cell corridor, observations inherited${guideJoinCount ? `; the referee walks the ${guideJoinCount}-cell left-lane approach to the entry row` : ""}).${startNote} ${displayName(runs[0].backendId)} still makes every non-forced choice; the route is marked in its context.`
         : guideWanted
           ? `No completed run from this start pod yet — this run scouts the course; if it reaches the exit, its mapped route can guide later runs.`
           : tokenCount > 1
