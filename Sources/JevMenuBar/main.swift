@@ -778,7 +778,7 @@ struct JevMenuBarApp: App {
         MenuBarExtra {
             ContentView(controller: controller)
         } label: {
-            Image(systemName: "waveform.path.ecg")
+            Image(systemName: "square.grid.2x2")
                 .symbolRenderingMode(.hierarchical)
         }
         .menuBarExtraStyle(.window)

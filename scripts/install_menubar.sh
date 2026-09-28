@@ -25,6 +25,7 @@ fi
 mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources/web"
 cp "$build_dir/JevMenuBar" "$app_dir/Contents/MacOS/JevMenuBar"
 cp "$root_dir/Resources/Info.plist" "$app_dir/Contents/Info.plist"
+cp "$root_dir/Resources/AppIcon.icns" "$app_dir/Contents/Resources/AppIcon.icns"
 cp "$root_dir/scripts/jev_gateway.py" "$app_dir/Contents/Resources/jev_gateway.py"
 cp "$root_dir/Resources/Web/index.html" "$app_dir/Contents/Resources/web/index.html"
 if [[ -f "$root_dir/landing.html" ]]; then

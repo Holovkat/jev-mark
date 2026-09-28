@@ -6,6 +6,8 @@
 	<string>JEV Menu Bar</string>
 	<key>CFBundleExecutable</key>
 	<string>JevMenuBar</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.codex.jev.menubar</string>
 	<key>CFBundleInfoDictionaryVersion</key>
