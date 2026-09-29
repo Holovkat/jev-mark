@@ -75,8 +75,11 @@ The result panel compares each answer with its display-only reference; the
 reference answers are not included in the provider request.
 
 The **Parallel & agentic patterns** suite also includes the **100-question logic
-quiz**. Local and TypeSafe providers receive four concurrent Choice requests
-(32/32/32/4 fields), matching the decision engine's 32-field batch limit. When
+quiz**. The local engine receives four concurrent Choice requests
+(32/32/32/4 fields), matching its 32-field limit. TypeSafe receives one gateway
+request containing all questions. The hosted provider validates whether that
+request fits its capacity; the gateway returns actionable errors when it does
+not. When
 Apple Foundation Models is selected, the Workbench instead sends one
 independent question per request, using that question's own evidence context,
 with at most four requests in flight. Successful answers are retained if an
@@ -346,7 +349,10 @@ back to another provider.
 
 For related decisions about one evidence packet, put the packet in one
 `contexts` entry and give each decision its own schema field. TypeSafe receives
-these fields as parallel Choice, Score, or Noul questions in one API request.
+these fields as parallel Choice, Score, or Noul questions. The gateway keeps
+them together in one upstream API request per context. Projects do not need a
+copy of the Workbench's local-engine 32-field batching rule. Each `contexts`
+entry is separate evidence and requires separate evaluation.
 Instructions and criteria may be strings, objects, arrays, or null. Choice
 criteria map option labels to descriptions; Score criteria are 2-10 ordered
 levels; Noul criteria optionally describe `true` and `false`. TypeSafe receives
@@ -354,6 +360,35 @@ the structured guidance. The local text-oriented engine receives the same
 guidance serialized into each field's rubric. Local Score uses bounded integer
 levels internally and converts the exact tree distribution into the
 probability-weighted score and legend.
+
+The gateway owns request scheduling across callers. Its existing eight-worker
+bound is now shared by all TypeSafe requests, rather than allowing each client
+its own eight workers. `GET /capabilities` describes the selected route's
+batching and capacity support without exposing credentials or provider routing.
+For TypeSafe, `token_accounting: "unavailable"` and
+`preflight_verified: false` mean the gateway cannot measure the selected
+model's exact token budget. `capacity_status: "unknown"` reports that lack of
+local capacity evidence; `capacity_validation: "provider"` means the upstream
+provider checks the request. The gateway has not verified it in advance.
+Automatic question partitioning is disabled. The gateway
+does not guess token counts from bytes, invent question limits, or silently
+truncate or summarize evidence. Keep shared evidence relevant and compact; if
+the provider rejects its size, reduce or regroup it using the returned guidance.
+The model-specific limits are documented by [TypeSafe](https://docs.typesafe.ai/models).
+
+A successful response includes `complete: true` and the existing `results` and
+`usage`. A failed batch returns a non-success HTTP status and `complete: false`.
+Successful answers remain in `results`, including answers from the same context
+as a missing or malformed sibling answer. `failed_work` identifies unfinished
+fields and their errors. `retry_requests` contains each unfinished request as
+`{context_index, request: {schema, contexts, instructions?}}`, preserving the
+original evidence and instructions. Retry those requests rather than repeating
+successful work. HTTP 429 and `Retry-After` are preserved. When the provider
+supplies a valid `Retry-After`, the gateway shares that timed cooldown across
+callers. A missing or invalid header does not create an invented wait. The
+gateway does not retry automatically or switch providers. Capacity errors return guidance to reduce or regroup the
+request. The Workbench retains returned answers, labels the run incomplete,
+marks missing questions, and suppresses any whole-workflow success outcome.
 
 Choice and Score responses retain their full distributions. TypeSafe also
 returns its own `confidence` value; Noul retains its yes-probability as

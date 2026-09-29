@@ -154,14 +154,21 @@ class TestJEVGateway(unittest.TestCase):
                 return response.status, json.loads(body), content_type
             return response.status, body, content_type
 
-    def test_root_serves_the_workbench_without_replacing_health_endpoint(self) -> None:
-        page = self.directory / "index.html"
-        page.write_text("<!doctype html><title>JEV Workbench</title>", encoding="utf-8")
-        with patch.object(gateway, "workbench_path", return_value=page):
+    def test_landing_and_workbench_keep_distinct_routes_and_health(self) -> None:
+        landing = self.directory / "landing.html"
+        workbench = self.directory / "index.html"
+        landing.write_text("<!doctype html><title>JEV Landing</title>", encoding="utf-8")
+        workbench.write_text("<!doctype html><title>JEV Workbench</title>", encoding="utf-8")
+        with patch.object(gateway, "landing_path", return_value=landing), \
+             patch.object(gateway, "workbench_path", return_value=workbench):
             status, body, content_type = self._get("/")
+            self.assertEqual(status, 200)
+            self.assertIn("text/html", content_type)
+            self.assertEqual(body, landing.read_bytes())
+            status, body, content_type = self._get("/workbench")
         self.assertEqual(status, 200)
         self.assertIn("text/html", content_type)
-        self.assertIn(b"JEV Workbench", body)
+        self.assertEqual(body, workbench.read_bytes())
 
         status, body, content_type = self._get("/health")
         self.assertEqual(status, 200)

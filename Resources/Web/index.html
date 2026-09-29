@@ -887,7 +887,8 @@
           const requests = Number(run.requestCount) > 1 ? " · " + run.requestCount + " requests" : "";
           const concurrency = Number(run.maxConcurrency) > 0 ? " · max " + run.maxConcurrency + " in flight" : "";
           const failures = Number(run.failedCount) > 0 ? " · " + run.failedCount + " failed" : "";
-          stats.textContent = formatDuration(run.elapsedMs) + accuracy + requests + concurrency + failures;
+          const completion = run.complete === false ? " · incomplete" : "";
+          stats.textContent = formatDuration(run.elapsedMs) + accuracy + requests + concurrency + failures + completion;
           th.append(model, runId, stats);
           if (scoreLines) {
             const scores = document.createElement("span");
@@ -1026,13 +1027,14 @@
         requestCount: Number(data.request_count) || 1,
         maxConcurrency: Number(data.max_concurrency) || null,
         failedCount: Array.isArray(data.field_errors) ? data.field_errors.length : 0,
+        complete: data.complete !== false,
         batchLatenciesMs: data.batch_latencies_ms || [],
         fields: answers
       });
       try {
         localStorage.setItem(parallelReportKey, JSON.stringify(state.reportRuns));
       } catch {
-        $("runNote").textContent = "Run completed, but browser storage is full; this column is only available until the page is closed.";
+        $("runNote").textContent = "Browser storage is full; this result column is only available until the page is closed.";
         $("runNote").style.color = "var(--amber)";
       }
       renderParallelReport();
@@ -1443,6 +1445,40 @@
       return null;
     }
 
+    function decisionResponseForDisplay(data, request) {
+      if (!Array.isArray(data.results) || !data.results.length) return data;
+      // The panel displays the first evidence context. A successful later
+      // context must never stand in for a failed first context.
+      const indexed = data.results.some((item) => item.context_index !== undefined);
+      const resultIndex = indexed ? data.results.findIndex((item) => item.context_index === 0) : 0;
+      const result = resultIndex >= 0 ? data.results[resultIndex] : { context_index: 0, decision: {}, fields: {} };
+      const fields = { ...(result.fields || {}) };
+      const decision = result.decision || {};
+      const errors = new Map((Array.isArray(data.field_errors) ? data.field_errors : []).map((item) => [item.field, item]));
+      for (const work of data.failed_work || []) {
+        if (work.context_index !== undefined && work.context_index !== 0) continue;
+        const message = typeof work.error === "string" ? work.error : work.error?.message || "The gateway could not complete this question.";
+        const retry = work.retry_after ? ` Gateway Retry-After: ${work.retry_after}.` : "";
+        for (const name of work.fields || []) {
+          if (!Object.prototype.hasOwnProperty.call(request.schema, name) || fieldValue(name, request.schema, fields, decision) !== undefined) continue;
+          errors.set(name, { field: name, error: message + retry });
+          fields[name] = { ...fields[name], error: message + retry };
+        }
+      }
+      for (const name of Object.keys(request.schema)) {
+        if (fieldValue(name, request.schema, fields, decision) !== undefined) continue;
+        const message = fields[name]?.error || "The provider returned no value for this question.";
+        errors.set(name, { field: name, error: message });
+        fields[name] = { ...fields[name], error: message };
+      }
+      return {
+        ...data,
+        complete: data.complete !== false && errors.size === 0,
+        results: [{ ...result, fields }, ...data.results.filter((_, index) => index !== resultIndex)],
+        field_errors: [...errors.values()]
+      };
+    }
+
     function renderResult(data, request, elapsed) {
       const result = data.results?.[0];
       if (!result || typeof result !== "object") throw new Error("JEV returned no decision result.");
@@ -1527,7 +1563,12 @@
         $("resultGuidance").textContent += ` ${fieldErrors.length} question${fieldErrors.length === 1 ? "" : "s"} failed individually; successful answers were retained and failures are marked below.`;
       }
 
-      const outcome = fieldErrors.length
+      if (data.complete === false) {
+        $("resultGuidance").classList.add("error-text");
+        $("resultGuidance").textContent += " This run is incomplete. Review the failed questions and gateway guidance in the response; retry_requests contains only unfinished work.";
+      }
+
+      const outcome = fieldErrors.length || data.complete === false
         ? null
         : workflowOutcome(state.selected?.workflow, request.schema, fields, decision, Number(data.request_count) || 1);
       $("workflowOutcome").hidden = !outcome;
@@ -1597,14 +1638,14 @@
       $("resultState").className = "result-state visible";
     }
 
-    async function sendDecisionRequest(payload, signal) {
+    async function sendDecisionRequest(payload, signal, { allowIncomplete = false } = {}) {
       const started = performance.now();
       const response = await fetch("/v1/decision", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload), signal
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) {
+      if (!response.ok && !(allowIncomplete && body.complete === false && body.results?.length)) {
         const rawError = body.error;
         const detail = typeof rawError === "string"
           ? rawError
@@ -3034,8 +3075,11 @@
         : [];
       const batches = [];
       if (!fanOutRun) {
-        for (let offset = 0; offset < schemaEntries.length; offset += 32) {
-          const fieldBatch = schemaEntries.slice(offset, offset + 32);
+        // TypeSafe batching belongs to the gateway. The 32-field limit is
+        // imposed by the local decision engine, not the hosted API.
+        const batchSize = providerForRun?.selected_backend?.startsWith("remote:") ? schemaEntries.length : 32;
+        for (let offset = 0; offset < schemaEntries.length; offset += batchSize) {
+          const fieldBatch = schemaEntries.slice(offset, offset + batchSize);
           batches.push({
             ...request,
             schema: Object.fromEntries(fieldBatch),
@@ -3131,7 +3175,7 @@
             field_errors: fieldErrors
           };
         } else {
-          const responses = await Promise.all(batches.map((batch) => sendDecisionRequest(batch, controller.signal)));
+          const responses = await Promise.all(batches.map((batch) => sendDecisionRequest(batch, controller.signal, { allowIncomplete: true })));
           merged = responses[0].body;
           if (responses.length > 1) {
             const result = { ...responses[0].body.results[0], decision: {}, fields: {} };
@@ -3148,14 +3192,15 @@
             };
           }
         }
+        merged = decisionResponseForDisplay(merged, request);
         const elapsed = performance.now() - started;
         renderResult(merged, request, elapsed);
         saveParallelRun(merged, request, elapsed, caseForRun, editedForRun, providerForRun);
         const failedCount = merged.field_errors?.length || 0;
-        $("runNote").textContent = failedCount
-          ? `Completed with ${failedCount} failed question${failedCount === 1 ? "" : "s"}; successful answers were retained.`
+        $("runNote").textContent = merged.complete === false
+          ? `Incomplete${failedCount ? ` · ${failedCount} failed question${failedCount === 1 ? "" : "s"}` : ""}; successful answers were retained. See the response for unfinished work and retry guidance.`
           : "Completed via the current menu-bar selection.";
-        if (failedCount) $("runNote").style.color = "var(--amber)";
+        if (merged.complete === false) $("runNote").style.color = "var(--amber)";
       } catch (error) {
         controller.abort();
         const message = error.name === "AbortError" ? "The request timed out after three minutes." : error.message || "Could not reach the JEV gateway.";
@@ -3168,7 +3213,7 @@
         $("workflowOutcome").hidden = true;
         $("responsePreview").textContent = JSON.stringify(error.responseBody || { error: message }, null, 2);
         $("resultState").className = "result-state visible error";
-        $("runNote").textContent = "Request failed; check the gateway status or log.";
+        $("runNote").textContent = "Request failed; follow the gateway guidance shown above.";
         $("runNote").style.color = "var(--red)";
       } finally {
         clearTimeout(timeout);
