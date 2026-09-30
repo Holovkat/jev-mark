@@ -509,10 +509,30 @@ toggle. Build/install it with:
 ./scripts/install_menubar.sh
 ```
 
-It installs to `~/Applications/JEV Menu Bar.app` and manages the gateway, Apple
+It installs to `/Applications/JEV Menu Bar.app` by default (`JEV_APP_DIR` can
+override the target) and manages the gateway, Apple
 adapter, and selected local Ollama-backed server. The provider picker discovers
 models already installed in Ollama and secure TypeSafe API profiles, plus the
 on-device Apple option; changing a local model while it is running reloads the
 selected model. macOS starts the app at user login through a LaunchAgent; the
 gateway and Apple adapter start with the app, while a local model starts only
 when selected and started from the menu.
+
+## Service analytics
+
+The gateway-served portal and Workbench include metadata-only service analytics
+at `http://127.0.0.1:8096/analytics`. For future changes, use
+[docs/service-analytics.md](docs/service-analytics.md) as the implementation
+map and contract. It identifies the service wrapper, recorder, portal, installer
+and regression-test owners, and records the privacy, access and request
+compatibility requirements. Keep analytics instrumentation in
+`scripts/jev_service.py`; preserve the existing decision behavior in
+`scripts/jev_gateway.py`. Update the deterministic analytics tests when
+changing the captured metadata, API, storage or UI.
+
+## Agent capability selection
+
+The shared [capability selector](docs/capability-selection.md) recommends native
+skills and tools across Codex, Claude Code, Pi and ZCode through the same Jev
+proxy. It preserves mandatory guidance and normal discovery. Install it with
+`python3 scripts/install_capability_selector.py`.

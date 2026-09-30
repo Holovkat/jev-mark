@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "tracker": {"provider": "gitlab", "project": "bulhanb/triplogger", "scope": {"kind": "issue_children", "id": 528}},
+  "documents": ["docs/feature-plan.md"],
+  "policies": ["AGENTS.md"],
+  "discussion": [{"id": "D1", "state": "agreed", "quote": "The owner-approved final decision in full.", "source": "discussion-evidence.md"}],
+  "requirements": [{"id": "R1", "text": "The canonical documented requirement.", "source": "docs/feature-plan.md", "decision_ids": ["D1"], "task_ids": [530, 535], "scenario_ids": ["S1"]}],
+  "tasks": [
+    {"id": 530, "kind": "implementation", "requirement_ids": ["R1"], "scenario_ids": ["S1"]},
+    {"id": 535, "kind": "verification", "requirement_ids": ["R1"], "scenario_ids": ["S1"], "after": [530], "before_dev_uat": true}
+  ],
+  "scenarios": [{"id": "S1", "text": "Implemented behavior and its relevant failure path.", "requirement_ids": ["R1"], "implementation_task_ids": [530]}]
+}

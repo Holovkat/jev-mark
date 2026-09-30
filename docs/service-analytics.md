@@ -33,6 +33,42 @@ The installer preserves the launcher's existing bundled filename:
 Portal navigation is added while serving HTML. The original large portal and
 Workbench HTML files are not rewritten. Static `file://` copies are not decorated.
 
+## Implementation map for agents
+
+Treat this guide as the change contract. Keep the analytics wrapper around the
+existing decision gateway so request/response behavior and provider adapters
+remain compatible.
+
+| Concern | Source of truth | Implementation guidance |
+| --- | --- | --- |
+| Request observation, provider-attempt instrumentation, HTTP routes and context propagation | `scripts/jev_service.py` | The observed service entry point dynamically loads the gateway core, scopes instrumentation to that module, and carries request context into worker pools. Add routes or lifecycle changes here. |
+| Allow-listed metadata, SQLite schema/writes, summaries, filters, retention and health | `scripts/jev_analytics.py` | `Observation` and `AnalyticsStore` own the telemetry contract. Update recording, queries, CSV export and existing-database handling together when fields or schema change. |
+| Decision request/response contract and provider adapters | `scripts/jev_gateway.py` | This remains the core. The installer bundles it as `jev_gateway_core.py`; avoid analytics-specific changes to provider behavior. |
+| Analytics page and Workbench attribution headers | `Resources/Web/analytics.html`, `Resources/Web/analytics-portal.js` | The service serves these same-origin assets. Keep caller labels explicit and never persist credentials in browser storage or URLs. |
+| App launch and installed bundle | `Sources/JevMenuBar/main.swift`, `scripts/install_menubar.sh` | Swift continues to launch the bundled resource named `jev_gateway.py`. The installer maps the observed wrapper to that name and copies the core, recorder and web assets. Add every new runtime module or asset to this mapping. |
+| Regression coverage | `tests/test_jev_analytics.py`, `tests/test_jev_gateway.py`, `tests/analytics_ui.test.mjs`, `.github/workflows/service-analytics.yml` | Use deterministic provider doubles. Keep gateway compatibility, recorder/privacy, HTTP/concurrency/access, and browser-helper coverage in the corresponding suites. |
+
+When changing the implementation:
+
+- Keep the `/v1/decision` JSON contract unchanged. The request ID is returned
+  in `X-JEV-Request-ID`; do not add telemetry fields to decision responses.
+- Count provider attempts at gateway outbound POST dispatches. Preserve the
+  request observation across remote and temporary worker pools.
+- Keep recording best-effort and bounded. Storage, queue or metadata errors must
+  not delay or change a provider call or decision response.
+- Persist only the metadata defined below. Never store prompt/evidence text,
+  schema names or values, answer bodies, provider URLs, credentials, client IPs,
+  or raw error messages.
+- Protect every `/api/analytics` route, including health and export. Preserve
+  loopback-only access by default and fail closed when token protection is set.
+- For persisted-field changes, update schema initialization/upgrade behavior,
+  recording, summary/filter/export output, retention behavior, privacy tests
+  and this guide together.
+- If the installed runtime gains a file dependency, update
+  `scripts/install_menubar.sh` and verify the bundle contains it. Keep
+  `Sources/JevMenuBar/main.swift` pointed at the stable `jev_gateway.py`
+  resource name.
+
 ## Metric definitions
 
 **Incoming requests** count `POST /v1/decision` calls through this observed gateway,
