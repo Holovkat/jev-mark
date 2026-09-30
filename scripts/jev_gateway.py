@@ -4,6 +4,10 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import threading
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import math
 import os
 import re
@@ -42,6 +46,11 @@ MAX_CONTEXTS = 64
 REQUEST_TIMEOUT = 180
 MAX_CHOICES = 255
 MAX_SCORE_LEVELS = 10
+# Preserve the gateway's existing eight-worker bound, now shared across callers.
+REMOTE_WORKERS = 8
+_REMOTE_POOL = ThreadPoolExecutor(max_workers=REMOTE_WORKERS, thread_name_prefix="jev-remote")
+_BACKPRESSURE_LOCK = threading.Lock()
+_BACKPRESSURE: dict[str, tuple[float, str]] = {}
 
 COMMON_CRITERIA = {
     "correct": "The response is accurate and satisfies the question and supplied criteria.",
@@ -63,10 +72,12 @@ COMMON_CRITERIA = {
 
 
 class GatewayError(Exception):
-    def __init__(self, status: int, message: str):
+    def __init__(self, status: int, message: str, *, details: dict | None = None, headers: dict | None = None):
         super().__init__(message)
         self.status = status
         self.message = message
+        self.details = details or {}
+        self.headers = headers or {}
 
 
 def log(message: str) -> None:
@@ -1034,6 +1045,74 @@ def _clm_criteria(criteria: dict[str, object]) -> dict[str, object]:
     return criteria
 
 
+def remote_capabilities() -> dict:
+    """Describe what the gateway can prove without guessing provider tokenization."""
+    return {
+        "shared_question_batching": True,
+        "automatic_question_partitioning": False,
+        "token_accounting": "unavailable",
+        "capacity_status": "unknown",
+        "capacity_validation": "provider",
+        "preflight_verified": False,
+        "global_upstream_workers": REMOTE_WORKERS,
+        "worker_limit_source": "Existing gateway worker bound, shared across callers",
+        "guidance": (
+            "Submit compact shared evidence and independent questions together. "
+            "The provider validates context capacity; no authoritative local tokenizer "
+            "or count endpoint is published. On capacity rejection, reduce or regroup "
+            "evidence explicitly; the gateway never trims evidence or retries automatically."
+        ),
+    }
+
+
+def _account_key(config: dict) -> str:
+    # Limits apply to the provider account, including profiles selecting other models.
+    origin = urlparse(config["endpoint"]).netloc
+    return hashlib.sha256(f"{origin}\0{config['api_key']}".encode()).hexdigest()
+
+
+def _retry_delay(value: str) -> float | None:
+    try:
+        seconds = int(value)
+        delay = float(seconds) if seconds >= 0 else None
+        return delay if delay is not None and math.isfinite(delay) else None
+    except (ValueError, TypeError, OverflowError):
+        try:
+            date = parsedate_to_datetime(value)
+            if date.tzinfo is None:
+                date = date.replace(tzinfo=timezone.utc)
+            return max(0.0, (date - datetime.now(timezone.utc)).total_seconds())
+        except (ValueError, TypeError, OverflowError):
+            return None
+
+
+def _check_backpressure(config: dict) -> None:
+    key = _account_key(config)
+    with _BACKPRESSURE_LOCK:
+        blocked = _BACKPRESSURE.get(key)
+        if blocked is None:
+            return
+        remaining = blocked[0] - time.monotonic()
+        if remaining <= 0:
+            _BACKPRESSURE.pop(key, None)
+            return
+    retry_after = str(math.ceil(remaining))
+    raise GatewayError(429, "Selected provider is rate limited; retry only unfinished work after Retry-After.",
+                       headers={"Retry-After": retry_after})
+
+
+def _record_backpressure(config: dict, retry_after: str | None) -> None:
+    delay = _retry_delay(retry_after) if retry_after is not None else None
+    if delay is None:
+        return
+    key = _account_key(config)
+    deadline = time.monotonic() + delay
+    with _BACKPRESSURE_LOCK:
+        previous = _BACKPRESSURE.get(key)
+        if previous is None or deadline > previous[0]:
+            _BACKPRESSURE[key] = (deadline, retry_after)
+
+
 def call_typesafe(config: dict, payload: dict) -> dict:
     who = config.get("label") or "TypeSafe provider"
     schema, contexts, caller_instructions = _typed_request_parts(payload)
@@ -1076,7 +1155,14 @@ def call_typesafe(config: dict, payload: dict) -> dict:
         else:
             raise GatewayError(422, f"{who} routing does not support schema field '{name}' of type '{field_type or 'unknown'}'. Use choice, score, or noul.")
 
-    def evaluate_context(context: str) -> dict:
+    rate_limited = threading.Event()
+
+    def evaluate_context(index_context: tuple[int, str]) -> dict:
+        context_index, context = index_context
+        if not clm:
+            _check_backpressure(config)
+            if rate_limited.is_set():
+                raise GatewayError(429, "This request encountered provider rate limiting; retry only unfinished work.")
         body = json.dumps({"state": context, "model": config["model"], "questions": questions}).encode("utf-8")
         request = Request(
             config["endpoint"],
@@ -1090,7 +1176,24 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
                 raw = response.read()
         except HTTPError as error:
-            raise GatewayError(502, f"Selected {who} returned HTTP {error.code}.") from None
+            status = error.code
+            retry_after = error.headers.get("Retry-After") if error.headers else None
+            error.close()
+            if clm:
+                raise GatewayError(502, f"Selected {who} returned HTTP {status}.") from None
+            if retry_after is not None and any(char in retry_after for char in "\r\n"):
+                retry_after = None
+            if status == 429 and not clm:
+                rate_limited.set()
+                _record_backpressure(config, retry_after)
+            headers = {"Retry-After": retry_after} if retry_after is not None else {}
+            guidance = (
+                " Reduce or regroup shared evidence/questions explicitly; evidence was not trimmed."
+                if status in {400, 413, 422} else " Retry only unfinished work; automatic retries are disabled."
+            )
+            if status == 429 and _retry_delay(retry_after) is None:
+                guidance += " Provider cooldown is unknown; pause and obtain retry timing before retrying."
+            raise GatewayError(status, f"Selected {who} returned HTTP {status}.{guidance}", headers=headers) from None
         except (URLError, TimeoutError, OSError):
             raise GatewayError(502, f"Selected {who} could not be reached.") from None
         try:
@@ -1105,7 +1208,8 @@ def call_typesafe(config: dict, payload: dict) -> dict:
 
         decision: dict[str, object] = {}
         output_fields: dict[str, dict] = {}
-        for question_id, (name, definition) in names_by_question.items():
+
+        def parse_field(question_id: str, name: str, definition: dict) -> tuple[object, dict]:
             answer = answers.get(question_id)
             if not isinstance(answer, dict):
                 raise GatewayError(502, f"Selected {who} omitted field '{name}'.")
@@ -1149,13 +1253,25 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                     "noul": score,
                     "probability": max(score, 1.0 - score),
                 }
-            decision[name] = value
-            output_fields[name] = field_result
+            return value, field_result
+
+        failed_fields = []
+        for question_id, (name, definition) in names_by_question.items():
+            try:
+                value, field_result = parse_field(question_id, name, definition)
+                decision[name] = value
+                output_fields[name] = field_result
+            except GatewayError as error:
+                if clm:
+                    raise
+                failed_fields.append({"context_index": context_index, "fields": [name],
+                                      "status": error.status, "error": error.message})
 
         usage = response.get("usage") if isinstance(response.get("usage"), dict) else {}
         return {
             "decision": decision,
             "fields": output_fields,
+            **({"context_index": context_index, "failed_work": failed_fields} if not clm else {}),
             "usage": {
                 key: usage[key]
                 for key in ("input_tokens", "output_tokens")
@@ -1163,18 +1279,58 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             },
         }
 
-    workers = min(8, len(contexts))
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        results = list(pool.map(evaluate_context, contexts))
+    if clm:
+        with ThreadPoolExecutor(max_workers=min(REMOTE_WORKERS, len(contexts))) as pool:
+            results = list(pool.map(evaluate_context, enumerate(contexts)))
+        failed_work = []
+    else:
+        futures = [_REMOTE_POOL.submit(evaluate_context, item) for item in enumerate(contexts)]
+        results = []
+        failed_work = []
+        retry_headers = {}
+        for context_index, future in enumerate(futures):
+            try:
+                result = future.result()
+                failed_work.extend(result.pop("failed_work"))
+                results.append(result)
+            except GatewayError as error:
+                failure = {"context_index": context_index, "fields": list(schema),
+                           "status": error.status, "error": error.message}
+                if "Retry-After" in error.headers:
+                    failure["retry_after"] = error.headers["Retry-After"]
+                    # The longest valid cooldown applies to the combined response.
+                    old = _retry_delay(retry_headers.get("Retry-After"))
+                    new = _retry_delay(error.headers["Retry-After"])
+                    if old is None or (new is not None and new > old):
+                        retry_headers = error.headers
+                failed_work.append(failure)
+                results.append({"context_index": context_index, "decision": {}, "fields": {}, "usage": {}})
     total_usage = {
         key: sum(result["usage"].get(key, 0) for result in results)
         for key in ("input_tokens", "output_tokens")
         if any(key in result["usage"] for result in results)
     }
-    return {
-        "results": results,
-        "usage": total_usage,
-    }
+    response = {"results": results, "usage": total_usage}
+    if clm:
+        return response
+    response.update({"complete": not failed_work, "capacity": remote_capabilities()})
+    if failed_work:
+        retry_requests = []
+        for context_index, context in enumerate(contexts):
+            names = {name for failure in failed_work if failure["context_index"] == context_index
+                     for name in failure["fields"]}
+            if not names:
+                continue
+            retry_payload = {"schema": {name: definition for name, definition in schema.items() if name in names},
+                             "contexts": [context]}
+            if "instructions" in payload:
+                retry_payload["instructions"] = payload["instructions"]
+            retry_requests.append({"context_index": context_index, "request": retry_payload})
+        response.update({"failed_work": failed_work, "retry_requests": retry_requests})
+        status = 429 if any(item["status"] == 429 for item in failed_work) else failed_work[0]["status"]
+        raise GatewayError(status, "Decision request is incomplete. Preserve successful fields and retry only retry_requests.",
+                           details=response, headers=retry_headers)
+    return response
 
 
 class GatewayHandler(BaseHTTPRequestHandler):
@@ -1184,12 +1340,14 @@ class GatewayHandler(BaseHTTPRequestHandler):
     def log_message(self, _format: str, *_args) -> None:
         return
 
-    def send_json(self, status: int, value: dict) -> None:
+    def send_json(self, status: int, value: dict, headers: dict | None = None) -> None:
         data = json.dumps(value, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
+        for key, value in (headers or {}).items():
+            self.send_header(key, value)
         self.end_headers()
         self.wfile.write(data)
 
@@ -1252,6 +1410,14 @@ class GatewayHandler(BaseHTTPRequestHandler):
             except Exception as error:
                 log(f"example catalog failed ({type(error).__name__})")
                 self.send_json(500, {"error": "JEV Workbench examples could not be loaded."})
+            return
+        if path == "/capabilities":
+            if selected_backend().startswith("remote:"):
+                self.send_json(200, remote_capabilities())
+            else:
+                self.send_json(200, {"shared_question_batching": True,
+                                     "automatic_question_partitioning": False,
+                                     "capacity_status": "adapter_managed"})
             return
         if path == "/providers":
             self.send_json(200, {
@@ -1369,7 +1535,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
             response = call_typesafe(config, payload)
             self.send_json(200, response)
         except GatewayError as error:
-            self.send_json(error.status, {"error": error.message})
+            self.send_json(error.status, {"error": error.message, **error.details}, error.headers)
         except (json.JSONDecodeError, UnicodeDecodeError):
             self.send_json(400, {"error": "Request body must be valid UTF-8 JSON."})
         except Exception as error:
