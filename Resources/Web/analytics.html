@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Service Analytics · JEV Mark</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1019;--panel:#121b29;--line:#263348;--ink:#edf2fa;--muted:#9aaac0;--accent:#80b8ff;--good:#7fddb5;--warn:#edc074;--bad:#ff9aab}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}button,input,select{font:inherit}button,a,input,select,summary{touch-action:manipulation}button{cursor:pointer}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.shell{max-width:1440px;margin:auto;padding:28px 36px 64px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:16px;font-weight:750;letter-spacing:.03em}.brand span{color:var(--muted);font-weight:400;margin-left:12px}.nav{display:flex;gap:22px;font-size:13px}.intro{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;margin:34px 0 24px}h1{font-size:clamp(27px,3vw,38px);letter-spacing:-.045em;margin:0 0 5px;line-height:1.15}h2{font-size:16px;letter-spacing:-.01em;margin:0 0 5px}p{margin:0;color:var(--muted)}.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:var(--accent);font-size:10px;font-weight:750;margin-bottom:9px}.status{border:1px solid var(--line);border-radius:30px;padding:7px 12px;color:var(--muted);white-space:nowrap;font-size:12px}.status.ok{color:var(--good);border-color:#3f806760}.status.bad{color:var(--warn);border-color:#ac854560}.filters{padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel);display:flex;align-items:flex-end;flex-wrap:wrap;gap:13px}.control{display:flex;flex-direction:column;gap:5px;min-width:118px;flex:1}.control label{color:var(--muted);font-size:11px;font-weight:650}input,select{background:#0c1421;border:1px solid #34435b;border-radius:7px;color:var(--ink);padding:9px 10px;width:100%;height:39px}input::placeholder{color:#71839b}button,.button{border:1px solid #3e5270;border-radius:7px;background:#1a2b43;color:var(--ink);padding:9px 15px;white-space:nowrap}.primary{background:#95c4ff;color:#101c2e;border-color:#95c4ff;font-weight:700}.subfilters{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:13px 0 22px;color:var(--muted);font-size:12px}.subfilters label{display:flex;align-items:center;gap:7px}.subfilters input{width:auto;height:auto;accent-color:var(--accent)}.subfilters span{margin-left:auto}.notice{padding:13px 16px;border:1px solid #79603c;background:#2a231a;border-radius:9px;color:#efcf9b;margin:0 0 20px}.notice p{color:inherit}.notice.info{border-color:var(--line);background:var(--panel);color:var(--muted)}[hidden]{display:none!important}.metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:18px}.metric{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:17px}.metric .label{color:var(--muted);font-size:11px}.metric .value{font-size:27px;font-weight:700;letter-spacing:-.04em;margin-top:9px;font-variant-numeric:tabular-nums}.metric .hint{font-size:10px;color:var(--muted);margin-top:3px}.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:18px;margin-bottom:18px}.panel{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px;min-width:0}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}.small{font-size:11px;color:var(--muted)}.chart{width:100%;display:block;height:224px}.chart text{fill:var(--muted);font:11px system-ui}.chart .axis{stroke:var(--line);stroke-width:1}.chart .bar{fill:var(--accent)}.chart-empty{height:224px;display:grid;place-content:center;text-align:center;gap:7px}.breakrow{display:grid;grid-template-columns:minmax(80px,1fr) 1fr 52px;align-items:center;gap:12px;margin:15px 0;font-size:12px}.breaklabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.track{height:6px;background:#26344a;border-radius:3px;overflow:hidden}.track div{height:100%;background:var(--accent);border-radius:3px}.num{text-align:right;font-variant-numeric:tabular-nums}.outcomes{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.badge{font-size:10px;border-radius:30px;padding:4px 8px;background:#253146;color:#c9d4e5;white-space:nowrap}.badge.complete{background:#193a32;color:var(--good)}.badge.partial,.badge.interrupted,.badge.unknown{background:#3b3222;color:var(--warn)}.badge.failed,.badge.rejected,.badge.disconnected{background:#3e2530;color:var(--bad)}.table-wrap{overflow:auto;max-width:100%}table{border-collapse:collapse;width:100%;font-size:12px;text-align:left}th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;padding:11px 12px;border-bottom:1px solid var(--line);white-space:nowrap}td{padding:13px 12px;border-bottom:1px solid #25314590;vertical-align:middle}tbody tr:hover{background:#192536}td small{display:block;font-size:10px;color:var(--muted);margin-top:3px}.row-button{padding:4px 9px;background:transparent;color:var(--accent);border:0}.history-footer{display:flex;align-items:center;justify-content:space-between;margin-top:18px;gap:14px;color:var(--muted);font-size:12px}.pager{display:flex;gap:8px}.facts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:18px 0}.facts div{overflow-wrap:anywhere}.facts dt{font-size:11px;color:var(--muted);margin-bottom:4px}.facts dd{margin:0;font-size:13px}.footnote{font-size:11px;color:var(--muted);margin-top:16px;max-width:1000px}.footer{margin-top:22px;display:flex;justify-content:space-between;gap:20px;font-size:11px;color:var(--muted)}dialog{border:1px solid var(--line);border-radius:15px;color:var(--ink);background:var(--panel);width:min(720px,calc(100% - 28px));padding:26px;max-height:85vh}dialog::backdrop{background:#000a}dialog pre{font:12px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#0a121e;padding:16px;border-radius:8px}.close{float:right}.tokenline{display:flex;gap:10px;margin-top:12px;max-width:620px}.custom{flex:1;min-width:170px}summary{cursor:pointer;color:var(--accent)}.break-select{width:auto;min-width:145px;padding:5px;height:32px;font-size:12px}@media(max-width:1100px){.metrics{grid-template-columns:repeat(3,1fr)}.shell{padding:24px}.control{min-width:125px}.wide-only{display:none}}@media(max-width:650px){.shell{padding:18px 14px 38px}.topbar{gap:12px}.brand span{display:none}.nav{gap:14px}.intro{align-items:flex-start;margin:26px 0 20px}.intro p{font-size:12px;max-width:240px}.status{font-size:10px;padding:5px 8px}.filters{padding:13px;gap:10px}.control{min-width:calc(50% - 10px)}.filters button{flex:1}.metrics{grid-template-columns:repeat(2,1fr);gap:9px}.metric{padding:14px}.metric .value{font-size:26px}.grid{grid-template-columns:1fr}.panel{padding:16px}.medium-only{display:none}th,td{padding:11px 7px}.history-footer{align-items:flex-start}.subfilters span{margin-left:0;width:100%}.footer{flex-direction:column;gap:7px}.facts{gap:14px}h1{font-size:29px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar"><div class="brand">JEV MARK <span>/ Service analytics</span></div><nav class="nav" aria-label="Portal"><a href="/">Portal</a><a href="/workbench">Workbench ↗</a></nav></header>
+<section class="intro"><div><div class="eyebrow">Gateway activity</div><h1>Service analytics</h1><p>Usage, decision workload and performance across your service.</p></div><div id="status" class="status" role="status">Connecting</div></section>
+<form id="filters" class="filters">
+<div class="control"><label for="period">Date range</label><select id="period"><option value="today">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="custom">Custom</option></select></div>
+<div class="control custom" id="from-control" hidden><label for="from">From (local time)</label><input type="datetime-local" id="from"></div>
+<div class="control custom" id="to-control" hidden><label for="to">Until (local time)</label><input type="datetime-local" id="to"></div>
+<div class="control"><label for="caller">Caller</label><input id="caller" list="callers" placeholder="All callers" maxlength="96"><datalist id="callers"></datalist></div>
+<div class="control"><label for="backend">Provider / backend</label><input id="backend" list="backends" placeholder="All backends" maxlength="96"><datalist id="backends"></datalist></div>
+<div class="control"><label for="kind">Request type</label><select id="kind"><option value="">All types</option><option>choice</option><option>score</option><option>noul</option><option>mixed</option><option>other</option><option>unknown</option></select></div>
+<div class="control"><label for="outcome">Outcome</label><select id="outcome"><option value="">All outcomes</option><option>complete</option><option>partial</option><option>rejected</option><option>failed</option><option>disconnected</option><option>interrupted</option><option>unknown</option><option value="in_progress">In progress</option></select></div>
+<button class="primary" type="submit">Apply filters</button><button type="button" id="reset">Reset</button>
+</form>
+<div class="subfilters"><label><input type="checkbox" id="live" checked> Auto-refresh every 15 seconds</label><button id="refresh" type="button">Refresh</button><span id="updated">No data loaded yet</span></div>
+<div class="notice" id="message" role="alert" hidden></div>
+<div class="notice info" id="access" hidden><strong>Analytics access is restricted.</strong><p>Open this page on localhost on the service Mac, or enter the configured analytics token. When token protection is enabled, localhost also requires it. Tokens stay only in this page's memory.</p><form id="unlock" class="tokenline"><input id="token" type="password" autocomplete="off" aria-label="Analytics access token" placeholder="Analytics access token"><button type="submit">Unlock</button></form></div>
+<div id="dashboard" hidden>
+<section class="metrics" aria-label="Overview">
+<div class="metric"><div class="label">Incoming requests</div><div class="value" id="requests">–</div><div class="hint">Decision endpoint only</div></div>
+<div class="metric"><div class="label">Provider attempts</div><div class="value" id="attempts">–</div><div class="hint">Gateway POST attempts</div></div>
+<div class="metric"><div class="label">Fields requested</div><div class="value" id="requested">–</div><div class="hint">Fields × contexts</div></div>
+<div class="metric"><div class="label">Fields completed</div><div class="value" id="completed">–</div><div class="hint" id="completion-hint">Known returned fields</div></div>
+<div class="metric"><div class="label">Median latency</div><div class="value" id="median">–</div><div class="hint">Finished gateway requests</div></div>
+<div class="metric"><div class="label">p95 latency</div><div class="value" id="p95">–</div><div class="hint">95th percentile</div></div>
+</section>
+<section class="grid">
+<div class="panel"><div class="panel-head"><div><h2>Calls over time</h2><p class="small" id="chart-note">Incoming decision requests</p></div><span class="small" id="chart-total"></span></div><div id="chart"></div><div class="outcomes" id="outcomes"></div></div>
+<div class="panel"><div class="panel-head"><div><h2>Usage breakdown</h2><p class="small">Top 20 values in this selection</p></div><select id="breakby" class="break-select" aria-label="Breakdown dimension"><option value="caller">By caller</option><option value="purpose">By purpose</option><option value="backend">By backend</option><option value="model">By model</option><option value="kind">By request type</option></select></div><div id="breakdown"></div><div class="footnote" id="types"></div></div>
+</section>
+<section class="panel"><div class="panel-head"><div><h2>Call history</h2><p class="small">Metadata only. Select a call to inspect timings and provider attempts.</p></div><button id="export" type="button">Export CSV ↓</button></div>
+<details style="margin-bottom:14px"><summary>More filters</summary><div class="filters" style="margin-top:12px"><div class="control"><label for="purpose">Purpose</label><input id="purpose" placeholder="Exact purpose" maxlength="96"></div><div class="control"><label for="model">Model</label><input id="model" placeholder="Exact model" maxlength="96"></div><div class="control"><label for="operation_id">Operation ID</label><input id="operation_id" placeholder="Exact operation ID" maxlength="96"></div><div class="control"><label for="request_id">Request ID</label><input id="request_id" placeholder="Exact request ID" maxlength="96"></div><button id="more-apply" type="button">Apply filters</button></div></details>
+<div class="table-wrap"><table><thead><tr><th>Time</th><th>Caller / purpose</th><th class="medium-only">Type</th><th class="wide-only">Backend / model</th><th class="wide-only">Fields</th><th class="medium-only">Duration</th><th>Outcome</th><th><span class="small">Details</span></th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="history-footer"><span id="row-count"></span><div class="pager"><button id="previous" type="button">← Previous</button><button id="next" type="button">Next →</button></div></div>
+</section>
+<p class="footnote">Counts cover calls through this observed gateway only. Health checks, page loads and analytics polling are excluded. Caller and purpose labels are self-reported, not authenticated identities. Provider attempts count gateway-to-provider calls, not a provider's internal model operations.</p>
+<footer class="footer"><span id="coverage"></span><span id="retention"></span></footer>
+</div>
+</div>
+<dialog id="detail"><button id="close-detail" class="close" type="button">Close</button><div class="eyebrow">Request details</div><h2 id="detail-title">Call</h2><dl class="facts" id="facts"></dl><h2>Provider attempts</h2><p class="small">No request or response bodies are retained.</p><pre id="attempt-detail"></pre></dialog>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const number = value => value == null ? '–' : new Intl.NumberFormat().format(value);
+const duration = ms => ms == null ? '–' : ms < 1000 ? Math.round(ms) + ' ms' : (ms / 1000).toFixed(2) + ' s';
+const date = value => value == null ? 'Not available' : new Date(typeof value === 'number' ? value * 1000 : value).toLocaleString();
+const filters = ['caller','backend','kind','outcome','purpose','model','operation_id','request_id'];
+let accessToken = '', data = null, offset = 0, snapshot = null, currentParams = null, busy = false, requestVersion = 0, controller = null;
+function el(tag, text, className) {const node = document.createElement(tag); if (text != null) node.textContent = text; if (className) node.className = className; return node;}
+function notice(text) {$('message').textContent = text || ''; $('message').hidden = !text;}
+function params() {
+ const end = new Date(); let start = new Date(end);
+ if ($('period').value === 'today') start.setHours(0,0,0,0);
+ else if ($('period').value === 'custom') {start = new Date($('from').value); end.setTime(new Date($('to').value).getTime());}
+ else start.setTime(end.getTime() - Number($('period').value) * 86400000);
+ if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || start >= end) throw new Error('Choose valid start and end dates.');
+ const p = new URLSearchParams({from:start.toISOString(),to:end.toISOString(),limit:'50',offset:String(offset)});
+ for (const key of filters) if ($(key).value.trim()) p.set(key,$(key).value.trim());
+ return p;
+}
+function headers() {return accessToken ? {Authorization:'Bearer ' + accessToken} : {};}
+async function load(reset=true, automatic=false) {
+ if (automatic && (busy || document.hidden || !$('live').checked || offset > 0 || $('detail').open)) return;
+ if (reset) {offset=0; snapshot=null;}
+ if (controller) controller.abort(); controller = new AbortController(); const version = ++requestVersion; busy=true;
+ try {
+   const p = !reset && currentParams ? new URLSearchParams(currentParams) : params(); p.set('offset',String(offset));
+   if (snapshot != null && !reset) p.set('snapshot',String(snapshot)); else p.delete('snapshot');
+   const res = await fetch('/api/analytics?' + p, {headers:headers(),signal:controller.signal,cache:'no-store'});
+   const payload = await res.json(); if (version !== requestVersion) return;
+   if (res.status === 401) {$('access').hidden=false; $('dashboard').hidden=true; throw new Error(payload.error);}
+   if (!res.ok) throw new Error(payload.error || 'Analytics could not be loaded.');
+   data=payload; snapshot=payload.snapshot; currentParams=new URLSearchParams(p); $('access').hidden=true; $('dashboard').hidden=false;
+   render();
+ } catch(error) {if (error.name === 'AbortError') return; notice(error.message); $('status').textContent='Unavailable'; $('status').className='status bad'; $('updated').textContent=data ? 'Showing previously loaded data; refresh failed' : 'No data loaded';}
+ finally {if (version === requestVersion) busy=false;}
+}
+function render() {
+ const s=data.stats, health=data.health;
+ $('requests').textContent=number(s.requests); $('attempts').textContent=number(s.provider_attempts); $('requested').textContent=number(s.fields_requested); $('completed').textContent=number(s.fields_completed); $('median').textContent=duration(s.p50_ms); $('p95').textContent=duration(s.p95_ms);
+ $('completion-hint').textContent=s.completion_unknown ? number(s.completion_unknown)+' requests with unknown completion' : 'Known returned fields';
+ $('status').textContent=health.status === 'ok' ? '● Recording healthy' : '● Recording degraded'; $('status').className='status '+(health.status === 'ok'?'ok':'bad');
+ $('updated').textContent='Updated '+new Date().toLocaleTimeString()+ ' · Last completed call: '+date(data.last_completed_at);
+ const notes=[];
+ if (health.last_error) notes.push('Recorder warning: '+health.last_error.replaceAll('_',' ')+'.');
+ if (health.dropped_updates) notes.push(number(health.dropped_updates)+' telemetry updates were dropped. Counts or outcomes may be incomplete.');
+ if (health.queued_updates) notes.push(number(health.queued_updates)+' telemetry updates are awaiting persistence.');
+ if (new Date(data.from)<new Date(health.collection_started_at)) notes.push('This range starts before collection began. Earlier activity is not available.');
+ if (data.coverage_from && new Date(data.from)<new Date(data.coverage_from) && new Date(data.coverage_from)>new Date(health.collection_started_at)) notes.push('Only retained history is available; older calls may have been removed by retention limits.');
+ notice(notes.join(' '));
+ $('coverage').textContent='Collection began '+date(health.collection_started_at); $('retention').textContent='Retention: '+health.retention_days+' days · '+number(health.max_rows)+' completed-request limit';
+ $('outcomes').replaceChildren(); for (const [key,n] of Object.entries(s.outcomes)) if(n) $('outcomes').append(el('span',key.replaceAll('_',' ')+' '+number(n),'badge '+key));
+ $('types').textContent='Requested fields: Choice '+number(s.choice_fields)+' · Score '+number(s.score_fields)+' · Noul '+number(s.noul_fields)+'. A mixed request can contain more than one field type.';
+ for (const [key,list] of [['caller','callers'],['backend','backends']]) {$(list).replaceChildren(); for(const row of data.breakdowns[key]) {const option=el('option'); option.value=row.label || 'unknown'; $(list).append(option);}}
+ chart(); breakdown(); history();
+}
+function chart() {
+ const holder=$('chart'); holder.replaceChildren(); $('chart-total').textContent=number(data.stats.requests)+' requests';
+ const step=data.bucket_seconds; $('chart-note').textContent=step===3600?'Hourly buckets · local labels · partial boundary buckets':'Daily buckets · UTC · partial boundary buckets';
+ if (!data.series.length) {const empty=el('div',null,'chart-empty'); empty.append(el('strong','No calls in this selection'),el('p','Make a decision request or change the filters.')); holder.append(empty); return;}
+ const values=new Map(data.series.map(row=>[row.timestamp,row.requests]));
+ const start=Math.floor(Math.max(new Date(data.from).getTime()/1000,new Date(data.coverage_from || data.health.collection_started_at).getTime()/1000)/step)*step;
+ const end=new Date(data.to).getTime()/1000; const series=[]; for(let t=start;t<end;t+=step) series.push({timestamp:t,requests:values.get(t)||0});
+ if(!series.length) return;
+ const W=Math.max(holder.clientWidth,300); const ns='http://www.w3.org/2000/svg'; const svg=document.createElementNS(ns,'svg'); svg.setAttribute('viewBox','0 0 '+W+' 220');svg.setAttribute('class','chart'); svg.setAttribute('role','img'); svg.setAttribute('aria-label','Incoming requests over time, '+data.stats.requests+' total');
+ function add(tag,attrs,text) {const node=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))node.setAttribute(k,v);if(text!=null)node.textContent=text;svg.append(node);return node;}
+ const max=Math.max(...series.map(r=>r.requests),1), width=(W-75)/series.length;
+ const ticks=Math.min(4,max);for(let i=0;i<=ticks;i++){const y=16+160*i/ticks;add('line',{x1:47,y1:y,x2:W-12,y2:y,class:'axis'});add('text',{x:38,y:y+4,'text-anchor':'end'},number(Math.round(max*(1-i/ticks))));}
+ series.forEach((r,i)=>{const h=r.requests/max*160,barWidth=Math.max(1,Math.min(40,width*.7));const rect=add('rect',{x:50+(i+.5)*width-barWidth/2,y:176-h,width:barWidth,height:h,rx:2,class:'bar'});const title=document.createElementNS(ns,'title');title.textContent=date(r.timestamp)+': '+number(r.requests)+' requests';rect.append(title);});
+ const indices=[...new Set([0,Math.floor((series.length-1)/2),series.length-1])];
+ for(const i of indices){const t=new Date(series[i].timestamp*1000); const text=step===3600?t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):t.toLocaleDateString([],{month:'short',day:'numeric',timeZone:'UTC'});add('text',{x:50+(i+.5)*width,y:205,'text-anchor':series.length===1?'middle':i===0?'start':i===series.length-1?'end':'middle'},text);}
+ holder.append(svg);
+}
+function breakdown(){if(!data)return;const holder=$('breakdown');holder.replaceChildren();const rows=data.breakdowns[$('breakby').value]||[];if(!rows.length){holder.append(el('p','No matching requests.'));return;}const max=Math.max(...rows.map(r=>r.requests),1);for(const row of rows){const line=el('div',null,'breakrow');const title=el('span',row.label||'unknown','breaklabel');title.title=row.label||'unknown';const track=el('div',null,'track'),fill=el('div');fill.style.width=(row.requests/max*100)+'%';track.append(fill);line.append(title,track,el('span',number(row.requests),'num'));holder.append(line);}}
+function history(){const body=$('rows');body.replaceChildren();for(const row of data.rows){const tr=el('tr');const td=(text,cls)=>el('td',text,cls);const time=td(new Date(row.started_at*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}));time.append(el('small',new Date(row.started_at*1000).toLocaleDateString()));const caller=td(row.caller);caller.append(el('small',row.purpose));const backend=td(row.backend,'wide-only');backend.append(el('small',row.model));const outcome=td();outcome.append(el('span',row.outcome.replaceAll('_',' '),'badge '+row.outcome));const details=td(),button=el('button','View','row-button');button.type='button';button.setAttribute('aria-label','View request '+row.request_id);button.onclick=()=>showDetail(row);details.append(button);tr.append(time,caller,td(row.kind,'medium-only'),backend,td(number(row.fields_completed)+' / '+number(row.fields_requested),'wide-only'),td(duration(row.duration_ms),'medium-only'),outcome,details);body.append(tr);}if(!data.rows.length){const tr=el('tr'),td=el('td','No calls match these filters.');td.colSpan=8;tr.append(td);body.append(tr);}$('row-count').textContent=data.stats.requests?number(offset+1)+'–'+number(offset+data.rows.length)+' of '+number(data.stats.requests)+' requests':'0 requests';$('previous').disabled=offset===0;$('next').disabled=!data.has_more;}
+function showDetail(row){$('detail-title').textContent=row.request_id;$('facts').replaceChildren();const fields=[['Caller',row.caller],['Purpose',row.purpose],['Backend',row.backend],['Model',row.model],['Started',date(row.started_at)],['Finished',date(row.finished_at)],['Outcome',row.outcome],['HTTP status',row.http_status??'Not available'],['Duration',duration(row.duration_ms)],['Contexts',number(row.contexts)],['Fields completed / requested',number(row.fields_completed)+' / '+number(row.fields_requested)],['Provider attempts',number(row.attempt_count)],['Operation ID',row.operation_id||'Not supplied'],['Error category',row.error_category||'None'],['Input tokens',number(row.input_tokens)],['Output tokens',number(row.output_tokens)]];for(const[k,v]of fields){const group=el('div');group.append(el('dt',k),el('dd',String(v)));$('facts').append(group);}$('attempt-detail').textContent=row.attempts.length?row.attempts.map(a=>'#'+a.ordinal+'   HTTP '+(a.http_status??'no response')+'   '+duration(a.duration_ms)+(a.error_category?'   '+a.error_category:'')).join('\n')+(row.attempts_omitted?'\n'+row.attempts_omitted+' additional attempt details omitted.':''):'No recorded outbound provider attempts.';$('detail').showModal();}
+$('filters').onsubmit=e=>{e.preventDefault();load();};$('refresh').onclick=()=>load();$('more-apply').onclick=()=>load();$('breakby').onchange=breakdown;
+$('period').onchange=()=>{const custom=$('period').value==='custom';$('from-control').hidden=$('to-control').hidden=!custom;};
+$('reset').onclick=()=>{for(const key of filters)$(key).value='';$('period').value='today';$('period').onchange();load();};
+$('next').onclick=()=>{offset+=50;load(false);};$('previous').onclick=()=>{offset=Math.max(0,offset-50);load(false);};
+$('unlock').onsubmit=e=>{e.preventDefault();accessToken=$('token').value.trim();$('token').value='';load();};
+$('close-detail').onclick=()=>$('detail').close();$('detail').onclick=e=>{if(e.target===$('detail')){const r=$('detail').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('detail').close();}};
+$('export').onclick=async()=>{if(!currentParams)return;$('export').disabled=true;try{const p=new URLSearchParams(currentParams);p.delete('offset');p.set('snapshot',String(snapshot));const res=await fetch('/api/analytics/export.csv?'+p,{headers:headers(),cache:'no-store'});if(!res.ok){const error=await res.json();throw new Error(error.error);}const url=URL.createObjectURL(await res.blob()),a=el('a');a.href=url;a.download='jev-service-calls.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(error){notice(error.message);}finally{$('export').disabled=false;}};
+window.addEventListener('resize',()=>{if(data)chart();});setInterval(()=>load(true,true),15000);load();
+})();
+</script>
+</body>
+</html>

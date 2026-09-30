@@ -26,7 +26,12 @@ mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources/web"
 cp "$build_dir/JevMenuBar" "$app_dir/Contents/MacOS/JevMenuBar"
 cp "$root_dir/Resources/Info.plist" "$app_dir/Contents/Info.plist"
 cp "$root_dir/Resources/AppIcon.icns" "$app_dir/Contents/Resources/AppIcon.icns"
-cp "$root_dir/scripts/jev_gateway.py" "$app_dir/Contents/Resources/jev_gateway.py"
+# Keep Swift's launch path stable, with the unchanged decision module alongside it.
+cp "$root_dir/scripts/jev_gateway.py" "$app_dir/Contents/Resources/jev_gateway_core.py"
+cp "$root_dir/scripts/jev_service.py" "$app_dir/Contents/Resources/jev_gateway.py"
+cp "$root_dir/scripts/jev_analytics.py" "$app_dir/Contents/Resources/jev_analytics.py"
+cp "$root_dir/Resources/Web/analytics.html" "$app_dir/Contents/Resources/web/analytics.html"
+cp "$root_dir/Resources/Web/analytics-portal.js" "$app_dir/Contents/Resources/web/analytics-portal.js"
 cp "$root_dir/Resources/Web/index.html" "$app_dir/Contents/Resources/web/index.html"
 if [[ -f "$root_dir/landing.html" ]]; then
   cp "$root_dir/landing.html" "$app_dir/Contents/Resources/web/landing.html"
@@ -67,3 +72,4 @@ else
 fi
 
 echo "Installed: $app_dir"
+echo "Service analytics: http://127.0.0.1:8096/analytics"

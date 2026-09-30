@@ -1,0 +1,51 @@
+name: Service analytics regression checks
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'Resources/Web/**'
+      - 'tests/**'
+      - 'landing.html'
+      - '.github/workflows/service-analytics.yml'
+  push:
+    branches: ['codex/service-analytics']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: service-analytics-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Runtime and syntax checks
+        shell: bash
+        run: |
+          mkdir -p verification
+          python3 --version
+          node --version
+          python3 -m py_compile scripts/jev_analytics.py scripts/jev_service.py
+          bash -n scripts/install_menubar.sh
+      - name: Python gateway and analytics tests
+        shell: bash
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee verification/python-tests.log
+      - name: JavaScript Workbench and analytics tests
+        if: always()
+        shell: bash
+        run: node --test tests/*.test.mjs 2>&1 | tee verification/javascript-tests.log
+      - name: Preserve verification logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: service-analytics-verification
+          path: verification/*.log
+          retention-days: 7
+          if-no-files-found: warn
