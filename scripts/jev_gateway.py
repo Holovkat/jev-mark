@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 import math
 import os
-import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -626,25 +625,9 @@ def profile(raw: dict, fallback_id: str) -> dict | None:
     }
 
 
-def parse_pairs(text: str) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for raw_line in text.splitlines():
-        line = raw_line.strip().strip("{},")
-        if not line or line.startswith("#") or line.startswith("["):
-            continue
-        match = re.match(r"([^:=]+)\s*[:=]\s*(.+)$", line)
-        if not match:
-            continue
-        key = match.group(1).strip().strip("\"'")
-        value = match.group(2).strip().strip(" \t\r\n{},\"'")
-        if key and value:
-            values[key] = value
-    return values
-
-
 def load_profiles() -> list[dict]:
     configs: list[dict] = []
-    for filename in ("typesafe.json", "typesafe-config.json"):
+    for filename in ("typesafe.json",):
         try:
             payload = json.loads((SECURE_DIR / filename).read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
@@ -656,45 +639,6 @@ def load_profiles() -> list[dict]:
                     item = profile(row, f"{filename}-{index + 1}")
                     if item:
                         configs.append(item)
-
-    for filename in ("typesafe.env", "env.dev", ".env"):
-        try:
-            pairs = parse_pairs((SECURE_DIR / filename).read_text(encoding="utf-8"))
-        except OSError:
-            continue
-        lowered = {key.lower(): value for key, value in pairs.items()}
-        generic = profile({
-            "id": f"typesafe-{filename.replace('.', '-')}",
-            "name": f"TypeSafe {filename}",
-            "endpoint": (
-                lowered.get("jev_url") or lowered.get("typesafe_base_url")
-                or lowered.get("typesafe_url") or lowered.get("typesafe_endpoint")
-                or lowered.get("api_url")
-            ),
-            "api_key": (
-                lowered.get("jevapi") or lowered.get("typesafe_api_key")
-                or lowered.get("typesafe_key") or lowered.get("api_key")
-            ),
-            "model": lowered.get("typesafe_model"),
-        }, filename)
-        if generic:
-            configs.append(generic)
-
-        grouped: dict[str, dict[str, str]] = {}
-        for key, value in pairs.items():
-            match = re.fullmatch(r"TYPESAFE_(.+)_(API_KEY|KEY|BASE_URL|URL|ENDPOINT|MODEL|NAME)", key.upper())
-            if match:
-                grouped.setdefault(match.group(1), {})[match.group(2)] = value
-        for identifier, values in sorted(grouped.items()):
-            item = profile({
-                "id": f"typesafe-{identifier.lower()}",
-                "name": values.get("NAME") or f"TypeSafe {identifier}",
-                "endpoint": values.get("BASE_URL") or values.get("ENDPOINT") or values.get("URL"),
-                "api_key": values.get("API_KEY") or values.get("KEY"),
-                "model": values.get("MODEL"),
-            }, identifier)
-            if item:
-                configs.append(item)
 
     unique: dict[str, dict] = {}
     for item in configs:

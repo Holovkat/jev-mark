@@ -43,7 +43,7 @@ secure_target="$HOME/Library/Application Support/JEV Menu Bar/.secure"
 if [[ -d "$secure_source" ]]; then
   mkdir -p "$secure_target"
   chmod 700 "$secure_target"
-  for name in typesafe.json typesafe-config.json typesafe.env env.dev .env; do
+  for name in typesafe.json; do
     source_file="$secure_source/$name"
     target_file="$secure_target/$name"
     if [[ -f "$source_file" && ! -e "$target_file" ]]; then

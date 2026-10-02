@@ -399,9 +399,10 @@ so primitive distributions remain available. Local Choice, Score, and Noul
 cannot be used with explicit `mode: "greedy"`, because that mode does not
 provide the full distribution required by these typed outputs.
 
-The existing single-profile `Jevapi` / `Jev_url` format in `.secure/env.dev` is
-supported. For multiple profiles, add `.secure/typesafe.json` before installing,
-or add it to the app-support `.secure` directory and refresh providers.
+All System One profiles belong in a single `typesafe.json` file.
+Add `.secure/typesafe.json` before installing, or edit the app-support
+`.secure/typesafe.json` and refresh providers. Legacy environment profile files
+and `typesafe-config.json` are no longer loaded.
 The installer only copies files absent from app support; updating an existing
 source profile file does not replace the installed configuration.
 Profiles appear under **System One API**, including local HTTP providers.

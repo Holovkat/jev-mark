@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import time
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
@@ -26,19 +25,6 @@ def normalize_endpoint(value: str) -> str:
 
 def clean(value: object) -> str:
     return str(value).strip().strip("{}[],\"'")
-
-
-def parse_pairs(text: str) -> dict[str, str]:
-    pairs: dict[str, str] = {}
-    for raw_line in text.splitlines():
-        line = raw_line.strip().strip("{},")
-        if not line or line.startswith("#") or line.startswith("["):
-            continue
-        match = re.match(r"([^:=]+)\s*[:=]\s*(.+)$", line)
-        if not match:
-            continue
-        pairs[clean(match.group(1))] = clean(match.group(2))
-    return pairs
 
 
 def profile(raw: dict[str, object], fallback_id: str) -> dict[str, str] | None:
@@ -63,7 +49,7 @@ def profile(raw: dict[str, object], fallback_id: str) -> dict[str, str] | None:
 def load_profiles() -> list[dict[str, str]]:
     secure = Path(os.environ.get("TYPESAFE_SECURE_DIR", ".secure"))
     profiles: list[dict[str, str]] = []
-    for filename in ("typesafe.json", "typesafe-config.json"):
+    for filename in ("typesafe.json",):
         path = secure / filename
         if not path.exists():
             continue
@@ -79,47 +65,6 @@ def load_profiles() -> list[dict[str, str]]:
                 for candidate in [profile(item, f"{filename}-{index + 1}")]
                 if candidate is not None
             )
-
-    for filename in ("typesafe.env", "env.dev", ".env"):
-        path = secure / filename
-        if not path.exists():
-            continue
-        try:
-            pairs = parse_pairs(path.read_text())
-        except OSError:
-            continue
-        lowered = {key.lower(): value for key, value in pairs.items()}
-        generic = profile(
-            {
-                "id": f"typesafe-{filename.replace('.', '-')}",
-                "name": f"TypeSafe {filename}",
-                "endpoint": lowered.get("jev_url") or lowered.get("typesafe_base_url") or lowered.get("typesafe_url") or lowered.get("typesafe_endpoint") or lowered.get("api_url"),
-                "api_key": lowered.get("jevapi") or lowered.get("typesafe_api_key") or lowered.get("typesafe_key") or lowered.get("api_key"),
-                "model": lowered.get("typesafe_model"),
-            },
-            filename,
-        )
-        if generic:
-            profiles.append(generic)
-
-        grouped: dict[str, dict[str, str]] = {}
-        for key, value in pairs.items():
-            match = re.fullmatch(r"TYPESAFE_(.+)_(API_KEY|KEY|BASE_URL|URL|ENDPOINT|MODEL|NAME)", key.upper())
-            if match:
-                grouped.setdefault(match.group(1), {})[match.group(2)] = value
-        for identifier, values in grouped.items():
-            candidate = profile(
-                {
-                    "id": f"typesafe-{identifier.lower()}",
-                    "name": values.get("NAME") or f"TypeSafe {identifier}",
-                    "endpoint": values.get("BASE_URL") or values.get("ENDPOINT") or values.get("URL"),
-                    "api_key": values.get("API_KEY") or values.get("KEY"),
-                    "model": values.get("MODEL"),
-                },
-                identifier,
-            )
-            if candidate:
-                profiles.append(candidate)
 
     seen: set[str] = set()
     unique: list[dict[str, str]] = []
