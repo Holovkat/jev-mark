@@ -13,6 +13,24 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import jev_gateway as gateway
+import typesafe_benchmark
+
+
+class SystemOneProfileTests(unittest.TestCase):
+    def test_provider_endpoints_preserve_explicit_decision_routes(self):
+        for endpoint in (
+            "http://127.0.0.1:11434/v1/systemone",
+            "https://openrouter.ai/api/alpha/decisions",
+            "https://api.typesafe.ai/v1/systemone",
+        ):
+            with self.subTest(endpoint=endpoint):
+                self.assertEqual(gateway.normalize_endpoint(endpoint + "/"), endpoint)
+                self.assertEqual(typesafe_benchmark.normalize_endpoint(endpoint + "/"), endpoint)
+
+    def test_existing_base_url_expansion(self):
+        self.assertEqual(gateway.normalize_endpoint("https://api.typesafe.ai/v1"),
+                         "https://api.typesafe.ai/v1/systemone")
+        self.assertIsNone(gateway.normalize_endpoint("file:///tmp/profile"))
 
 
 class FakeUpstreamHandler(BaseHTTPRequestHandler):
@@ -436,7 +454,7 @@ class TestJEVGateway(unittest.TestCase):
             "contexts": ["test"],
         })
         self.assertEqual(status, 503)
-        self.assertIn("TypeSafe profile", response["error"])
+        self.assertIn("System One profile", response["error"])
         self.assertEqual(FakeUpstreamHandler.received, [])
 
     def test_apple_backend_forwards_normalized_request_without_inventing_probabilities(self) -> None:

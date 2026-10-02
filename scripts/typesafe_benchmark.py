@@ -19,7 +19,7 @@ def normalize_endpoint(value: str) -> str:
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         raise ValueError("invalid TypeSafe endpoint")
     path = parsed.path.rstrip("/")
-    if not path.endswith("/v1/systemone"):
+    if not path.endswith(("/v1/systemone", "/alpha/decisions")):
         path = f"{path}/systemone" if path.endswith("/v1") else f"{path}/v1/systemone"
     return urlunparse((parsed.scheme, parsed.netloc, path, "", parsed.query, ""))
 

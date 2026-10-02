@@ -603,7 +603,7 @@ def normalize_endpoint(value: str) -> str | None:
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         return None
     path = parsed.path.rstrip("/")
-    if not path.endswith("/v1/systemone"):
+    if not path.endswith(("/v1/systemone", "/alpha/decisions")):
         path = f"{path}/systemone" if path.endswith("/v1") else f"{path}/v1/systemone"
     return urlunparse((parsed.scheme, parsed.netloc, path, "", parsed.query, ""))
 
@@ -1114,7 +1114,7 @@ def _record_backpressure(config: dict, retry_after: str | None) -> None:
 
 
 def call_typesafe(config: dict, payload: dict) -> dict:
-    who = config.get("label") or "TypeSafe provider"
+    who = config.get("label") or config.get("name") or "System One provider"
     schema, contexts, caller_instructions = _typed_request_parts(payload)
     clm = config.get("id") == CLM_CONFIG["id"]
     instructions_for = _clm_instructions if clm else _question_instructions
@@ -1531,7 +1531,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
             profile_id = backend.removeprefix("remote:")
             config = next((item for item in load_profiles() if item["id"] == profile_id), None)
             if config is None:
-                raise GatewayError(503, "Selected TypeSafe profile is missing or incomplete in .secure.")
+                raise GatewayError(503, "Selected System One profile is missing or incomplete in .secure.")
             response = call_typesafe(config, payload)
             self.send_json(200, response)
         except GatewayError as error:

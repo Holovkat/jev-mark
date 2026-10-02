@@ -333,10 +333,10 @@ otherwise match options against the routing text. This moved CLM from 4/11 to
 (the last step required fixing distractors that meant the same as the expected
 answer; see the 100-question suite notes).
 
-## Direct TypeSafe API profiles
+## System One API profiles
 
-The menu-bar app can route the stable JEV endpoint to TypeSafe's hosted API
-without starting a local model. On install, profiles from the ignored `.secure`
+The menu-bar app can route the stable JEV endpoint to TypeSafe, Ollama Nimble,
+or OpenRouter Decisions using the same adapter. On install, profiles from the ignored `.secure`
 directory are copied into `~/Library/Application Support/JEV Menu Bar/.secure`
 with account-only permissions; the menu-bar app and gateway use that copy. The
 app never stores an API key in `UserDefaults` or displays it. A
@@ -401,7 +401,34 @@ provide the full distribution required by these typed outputs.
 
 The existing single-profile `Jevapi` / `Jev_url` format in `.secure/env.dev` is
 supported. For multiple profiles, add `.secure/typesafe.json` before installing,
-or add it to the app-support `.secure` directory and refresh providers:
+or add it to the app-support `.secure` directory and refresh providers.
+The installer only copies files absent from app support; updating an existing
+source profile file does not replace the installed configuration.
+Profiles appear under **System One API**, including local HTTP providers.
+Nimble in this section uses Ollama's native decision API; the general Ollama
+model list uses the separate local constrained-token engine.
+
+Use these endpoint/model pairs:
+
+| Provider | `base_url` | `model` | Key |
+| --- | --- | --- | --- |
+| TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` | TypeSafe key |
+| Ollama | `http://127.0.0.1:11434/v1/systemone` | `nimble:latest` | `ollama` placeholder |
+| OpenRouter | `https://openrouter.ai/api/alpha/decisions` | `inception/mercury-decide:free` | OpenRouter key |
+
+Ollama requires version 0.35 or later and an installed Nimble model.
+See the [Ollama model contract](https://ollama.com/library/nimble) and
+[OpenRouter Decisions HTTP example](https://openrouter.ai/blog/tutorials/how-to-use-jev/).
+Full `/v1/systemone` and `/alpha/decisions` paths are preserved by
+`normalize_endpoint`; ordinary base URLs receive the existing `/v1/systemone`
+suffix. Reuse `call_typesafe` for compatible providers: it sends `model`,
+`state`, and typed `questions`, with Bearer authentication, then maps `answers`
+back to the stable JEV response. New providers need profiles, not new adapters.
+Analytics automatically records their existing `remote:<profile-id>` route.
+Keep real keys in ignored `.secure` files with mode 600; never put them in
+examples, source, or app preferences.
+
+Example configuration:
 
 ```json
 {

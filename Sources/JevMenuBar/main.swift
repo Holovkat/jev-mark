@@ -71,7 +71,7 @@ enum BackendDescriptor: Identifiable, Equatable, Sendable {
         case .local(let model): "Ollama · \(model.name)"
         case .apple: "Apple · Foundation Models"
         case .clm: "CLM · \(CLMRuntime.displayName)"
-        case .remote(let config): "TypeSafe · \(config.name)"
+        case .remote(let config): "System One · \(config.name)"
         }
     }
 
@@ -131,7 +131,7 @@ final class ServiceController: NSObject, ObservableObject {
     var selectedBackendName: String {
         if let selectedBackend { return selectedBackend.name }
         if selectedBackendID.hasPrefix("remote:") {
-            return "TypeSafe · " + String(selectedBackendID.dropFirst("remote:".count))
+            return "System One · " + String(selectedBackendID.dropFirst("remote:".count))
         }
         if selectedBackendID == BackendDescriptor.appleBackendID {
             return "Apple · Foundation Models"
@@ -409,7 +409,7 @@ final class ServiceController: NSObject, ObservableObject {
             case "misconfigured":
                 isStarting = false
                 state = .unhealthy(selectedBackendID.hasPrefix("remote:")
-                    ? "Selected TypeSafe profile is missing or incomplete"
+                    ? "Selected System One profile is missing or incomplete"
                     : "Selected JEV backend is not configured")
             case "unavailable":
                 isStarting = false
@@ -732,7 +732,7 @@ struct ContentView: View {
                             Text(CLMRuntime.displayName).tag(CLMRuntime.backendID)
                         }
                         if !controller.apiConfigs.isEmpty {
-                            Section("TypeSafe API") {
+                            Section("System One API") {
                                 ForEach(controller.apiConfigs) { config in
                                     Text(config.name).tag("remote:\(config.id)")
                                 }
