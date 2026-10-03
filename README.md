@@ -376,6 +376,28 @@ truncate or summarize evidence. Keep shared evidence relevant and compact; if
 the provider rejects its size, reduce or regroup it using the returned guidance.
 The model-specific limits are documented by [TypeSafe](https://docs.typesafe.ai/models).
 
+For local Ollama profiles on port 11434 using `/v1/systemone`, capabilities
+include `max_questions_per_request: 64` and `max_request_bytes: 65536`, the
+Ollama API question and JSON body limits. The
+Workbench explicitly splits larger suites into batches of at most 64 questions
+(for example, the 100-question suite uses two concurrent requests). Each batch
+retains the appropriate question evidence. Other remote providers receive no
+guessed question limit. Direct gateway callers must explicitly group their own
+requests; the gateway never silently partitions them.
+
+A model with a smaller context budget can explicitly tune Workbench grouping in
+its existing `typesafe.json` profile, for example:
+
+```json
+"workbench_question_batch_size": 32
+```
+
+This optional integer must be between 1 and 64 and applies only to local Ollama
+System One profiles. The Workbench uses the smaller of this configured grouping
+and the API question limit. This setting is a grouping preference, not a token
+budget guarantee; reduce it or the evidence if the model rejects the context.
+No tokenizer estimate, automatic retries, or gateway partitioning is added.
+
 A successful response includes `complete: true` and the existing `results` and
 `usage`. A failed batch returns a non-success HTTP status and `complete: false`.
 Successful answers remain in `results`, including answers from the same context
@@ -408,6 +430,23 @@ source profile file does not replace the installed configuration.
 Profiles appear under **System One API**, including local HTTP providers.
 Nimble in this section uses Ollama's native decision API; the general Ollama
 model list uses the separate local constrained-token engine.
+
+To add a downloaded Ollama decision model without rebuilding:
+
+1. Download the model in Ollama, then click **Refresh providers** in JEV Menu Bar.
+2. Expand **Ollama System One models** and check the model.
+3. Select it under **System One API** in the backend picker.
+
+For each checked model, **Questions per batch** (1–64) sets the Workbench
+grouping size and saves `workbench_question_batch_size` to `typesafe.json`.
+Lower it for models with smaller prompt limits. This is a grouping preference,
+not a promise that arbitrary evidence fits the model's context window.
+
+The checkbox records the model in the installed app-support `typesafe.json`
+using Ollama's `/v1/systemone` endpoint. Unchecking removes its Ollama API
+profile. Other provider profiles and keys are preserved. The checkbox declares
+which API the model supports; it does not convert an ordinary chat model into
+a decision model. Use **Test selected provider** to exercise the selected provider.
 
 Use these endpoint/model pairs:
 

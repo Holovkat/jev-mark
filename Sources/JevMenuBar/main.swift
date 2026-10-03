@@ -91,6 +91,10 @@ final class ServiceController: NSObject, ObservableObject {
     @Published private(set) var state: ServiceState = .stopped
     @Published private(set) var lastChecked: Date?
     @Published private(set) var models: [OllamaModel] = []
+    @Published private(set) var downloadedOllamaModels: [String] = []
+    @Published private(set) var questionBatchSizes: [String: Int] = [:]
+    @Published private(set) var systemOneModels: Set<String> = []
+    @Published private(set) var providerConfigurationError: String?
     @Published private(set) var apiConfigs: [TypesafeAPIProfile] = []
     @Published private(set) var isLoadingProviders = false
     @Published private(set) var isStarting = false
@@ -204,9 +208,18 @@ final class ServiceController: NSObject, ObservableObject {
     func refreshProviders() {
         isLoadingProviders = true
         Task.detached {
+            let downloaded = await OllamaDiscovery.downloadedModels()
             let discovered = OllamaDiscovery.models()
             let remote = await GatewayProviderDiscovery.profiles()
             await MainActor.run {
+                self.downloadedOllamaModels = downloaded
+                do {
+                    self.systemOneModels = try OllamaSystemOneStore.checkedModels(in: self.secureDirectoryURL)
+                    self.questionBatchSizes = try OllamaSystemOneStore.questionBatchSizes(in: self.secureDirectoryURL)
+                    self.providerConfigurationError = nil
+                } catch {
+                    self.providerConfigurationError = "Could not read System One model settings. Check typesafe.json."
+                }
                 self.models = discovered
                 self.apiConfigs = remote
                 if self.selectedBackend == nil && !self.selectedBackendID.hasPrefix("remote:") {
@@ -218,6 +231,31 @@ final class ServiceController: NSObject, ObservableObject {
                 }
                 self.isLoadingProviders = false
             }
+        }
+    }
+
+    func setSystemOneModel(_ model: String, enabled: Bool) {
+        do {
+            let removed = try OllamaSystemOneStore.set(model, enabled: enabled, in: secureDirectoryURL)
+            systemOneModels = try OllamaSystemOneStore.checkedModels(in: secureDirectoryURL)
+            questionBatchSizes = try OllamaSystemOneStore.questionBatchSizes(in: secureDirectoryURL)
+            providerConfigurationError = nil
+            if removed.contains(String(selectedBackendID.dropFirst("remote:".count))) && selectedBackendID.hasPrefix("remote:") {
+                selectBackend(models.first.map { "local:" + $0.id } ?? BackendDescriptor.appleBackendID)
+            }
+            refreshProviders()
+        } catch {
+            providerConfigurationError = "Could not save System One model settings. Check typesafe.json and its permissions."
+        }
+    }
+
+    func setQuestionBatchSize(_ size: Int, for model: String) {
+        do {
+            try OllamaSystemOneStore.setQuestionBatchSize(size, for: model, in: secureDirectoryURL)
+            questionBatchSizes = try OllamaSystemOneStore.questionBatchSizes(in: secureDirectoryURL)
+            providerConfigurationError = nil
+        } catch {
+            providerConfigurationError = "Could not save questions per batch. Check typesafe.json and its permissions."
         }
     }
 
@@ -580,6 +618,28 @@ final class ServiceController: NSObject, ObservableObject {
 }
 
 enum OllamaDiscovery {
+    private struct Tags: Decodable {
+        struct Model: Decodable { let name: String }
+        let models: [Model]
+    }
+
+    static func downloadedModels() async -> [String] {
+        do {
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:11434/api/tags")!)
+            request.timeoutInterval = 3
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard (response as? HTTPURLResponse)?.statusCode == 200 else { return listNames() }
+            return Array(Set(try JSONDecoder().decode(Tags.self, from: data).models.map(\.name))).sorted()
+        } catch { return listNames() }
+    }
+
+    private static func listNames() -> [String] {
+        guard let output = run(["list"]) else { return [] }
+        return output.split(separator: "\n").dropFirst().compactMap {
+            $0.split(whereSeparator: { $0 == " " || $0 == "\t" }).first.map(String.init)
+        }.sorted()
+    }
+
     static func models() -> [OllamaModel] {
         guard let output = run(["list"]) else { return [] }
         return output.split(separator: "\n").dropFirst().compactMap { line in
@@ -753,6 +813,41 @@ struct ContentView: View {
                     .buttonStyle(.link).font(.caption2).disabled(controller.isLoadingProviders)
                 Button("Open .secure") { NSWorkspace.shared.open(controller.secureDirectoryURL) }
                     .buttonStyle(.link).font(.caption2)
+            }
+            DisclosureGroup("Ollama System One models") {
+                if controller.downloadedOllamaModels.isEmpty {
+                    Text("No downloaded Ollama models found. Start Ollama and refresh providers.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                } else {
+                    Text("Check downloaded models that support System One decisions.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 6) {
+                            ForEach(controller.downloadedOllamaModels, id: \.self) { model in
+                                Toggle(model, isOn: Binding(
+                                    get: { controller.systemOneModels.contains(model) },
+                                    set: { controller.setSystemOneModel(model, enabled: $0) }
+                                ))
+                                .toggleStyle(.checkbox)
+                                .disabled(controller.isLoadingProviders)
+                                if controller.systemOneModels.contains(model) {
+                                    Stepper(value: Binding(
+                                        get: { controller.questionBatchSizes[model] ?? 64 },
+                                        set: { controller.setQuestionBatchSize($0, for: model) }
+                                    ), in: 1...64) {
+                                        Text("Questions per batch: \(controller.questionBatchSizes[model] ?? 64)")
+                                            .font(.caption2).foregroundStyle(.secondary)
+                                    }
+                                    .padding(.leading, 18)
+                                    .disabled(controller.isLoadingProviders)
+                                }
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                    }.frame(maxHeight: 150)
+                }
+            }.font(.caption)
+            if let error = controller.providerConfigurationError {
+                Text(error).font(.caption2).foregroundStyle(.red)
             }
             Toggle("Start at login", isOn: Binding(get: { controller.launchAtLogin }, set: { _ in controller.toggleLoginItem() }))
                 .font(.caption)

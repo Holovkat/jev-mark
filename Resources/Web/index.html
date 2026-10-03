@@ -1558,6 +1558,10 @@
           ? "Apple Foundation Models returned structured values but does not expose choice probabilities or calibrated confidence."
           : "The selected response includes no decision probability distribution.";
       const fieldErrors = Array.isArray(data.field_errors) ? data.field_errors : [];
+      const returnedAny = Object.keys(request.schema).some((name) => Object.prototype.hasOwnProperty.call(decision, name));
+      if (!returnedAny && fieldErrors.length) {
+        $("resultGuidance").textContent = fieldErrors[0].error || "The provider returned no decisions.";
+      }
       if (fieldErrors.length) {
         $("resultGuidance").classList.add("error-text");
         $("resultGuidance").textContent += ` ${fieldErrors.length} question${fieldErrors.length === 1 ? "" : "s"} failed individually; successful answers were retained and failures are marked below.`;
@@ -3074,10 +3078,35 @@
           }))
         : [];
       const batches = [];
+      const remoteRun = providerForRun?.selected_backend?.startsWith("remote:");
+      let batchSize = remoteRun ? schemaEntries.length : 32;
+      let batchStrategy = "The local decision engine accepts at most 32 fields per request.";
+      if (!fanOutRun && remoteRun) {
+        try {
+          await readGridProvider(providerForRun.selected_backend);
+          const response = await fetch("/capabilities", { cache: "no-store" });
+          if (!response.ok) throw new Error(`JEV capabilities returned HTTP ${response.status}.`);
+          const capabilities = await response.json();
+          if (capabilities.selected_backend !== providerForRun.selected_backend) {
+            throw new Error("The selected provider changed. Refresh providers before running this request.");
+          }
+          if (Number.isInteger(capabilities.max_questions_per_request) && capabilities.max_questions_per_request > 0) {
+            batchSize = Math.min(batchSize, capabilities.max_questions_per_request);
+            batchStrategy = `${capabilities.question_limit_source || "Selected provider"} accepts at most ${capabilities.max_questions_per_request} questions per request.`;
+          }
+          if (Number.isInteger(capabilities.workbench_question_batch_size) && capabilities.workbench_question_batch_size > 0) {
+            batchSize = Math.min(batchSize, capabilities.workbench_question_batch_size);
+            batchStrategy += ` This profile explicitly groups Workbench questions in batches of at most ${capabilities.workbench_question_batch_size}.`;
+          }
+        } catch (error) {
+          $("runNote").textContent = error.message;
+          $("runNote").style.color = "var(--red)";
+          return;
+        }
+      }
       if (!fanOutRun) {
-        // TypeSafe batching belongs to the gateway. The 32-field limit is
-        // imposed by the local decision engine, not the hosted API.
-        const batchSize = providerForRun?.selected_backend?.startsWith("remote:") ? schemaEntries.length : 32;
+        // The Workbench explicitly groups questions to the advertised route limit.
+        // The gateway keeps each supplied batch intact without automatic partitioning.
         for (let offset = 0; offset < schemaEntries.length; offset += batchSize) {
           const fieldBatch = schemaEntries.slice(offset, offset + batchSize);
           batches.push({
@@ -3099,7 +3128,8 @@
             sample_request: fanOutCalls[0]?.payload
           }
         : batches.length === 1 ? batches[0] : {
-            strategy: "Concurrent batches; the decision engine accepts at most 32 fields per request.",
+            strategy: `Concurrent Workbench batches. ${batchStrategy}`,
+            batch_size: batchSize,
             request_count: batches.length,
             batches
           };
@@ -3188,6 +3218,9 @@
               ...responses[0].body,
               results: [result],
               request_count: responses.length,
+              complete: responses.every((response) => response.body.complete !== false),
+              failed_work: responses.flatMap((response) => response.body.failed_work || []),
+              retry_requests: responses.flatMap((response) => response.body.retry_requests || []),
               batch_latencies_ms: responses.map((item) => Number(item.elapsed.toFixed(1)))
             };
           }

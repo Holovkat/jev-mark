@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 import math
 import os
+import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -616,7 +617,11 @@ def profile(raw: dict, fallback_id: str) -> dict | None:
     if not endpoint:
         return None
     identifier = str(raw.get("id") or fallback_id).strip()
+    batch_size = raw.get("workbench_question_batch_size")
+    workbench_options = ({"workbench_question_batch_size": batch_size}
+                         if type(batch_size) is int and 1 <= batch_size <= 64 else {})
     return {
+        **workbench_options,
         "id": identifier,
         "name": str(raw.get("name") or identifier),
         "endpoint": endpoint,
@@ -989,9 +994,13 @@ def _clm_criteria(criteria: dict[str, object]) -> dict[str, object]:
     return criteria
 
 
-def remote_capabilities() -> dict:
-    """Describe what the gateway can prove without guessing provider tokenization."""
-    return {
+def remote_capabilities(config: dict | None = None) -> dict:
+    """Describe proven route limits without exposing provider routing or credentials."""
+    backend = selected_backend()
+    if config is None:
+        config = next((item for item in load_profiles() if backend == f"remote:{item['id']}"), None)
+    capabilities = {
+        "selected_backend": f"remote:{config['id']}" if config else backend,
         "shared_question_batching": True,
         "automatic_question_partitioning": False,
         "token_accounting": "unavailable",
@@ -1007,6 +1016,20 @@ def remote_capabilities() -> dict:
             "evidence explicitly; the gateway never trims evidence or retries automatically."
         ),
     }
+    if config:
+        endpoint = urlparse(config["endpoint"])
+        if (endpoint.hostname in {"127.0.0.1", "localhost", "::1"}
+                and endpoint.port == 11434 and endpoint.path == "/v1/systemone"):
+            capabilities.update({
+                "max_questions_per_request": 64,
+                "max_request_bytes": 65536,
+                "guidance": ("Ollama System One accepts at most 64 questions and a 64 KiB JSON body per request. "
+                             "Group questions and reduce shared evidence explicitly; the gateway never partitions or trims requests."),
+                "question_limit_source": "Ollama System One API",
+            })
+            if "workbench_question_batch_size" in config:
+                capabilities["workbench_question_batch_size"] = config["workbench_question_batch_size"]
+    return capabilities
 
 
 def _account_key(config: dict) -> str:
@@ -1122,6 +1145,17 @@ def call_typesafe(config: dict, payload: dict) -> dict:
         except HTTPError as error:
             status = error.code
             retry_after = error.headers.get("Retry-After") if error.headers else None
+            token_rejection = None
+            if status == 400 and not clm and "max_request_bytes" in remote_capabilities(config):
+                try:
+                    provider_error = json.loads(error.read(4096)).get("error")
+                    if isinstance(provider_error, str):
+                        token_rejection = re.fullmatch(
+                            r"prompt (\d+) has (\d+) tokens; expected 1(?:-|–)(\d+) \(input is never truncated\)",
+                            provider_error.strip(), re.IGNORECASE,
+                        )
+                except (OSError, ValueError, AttributeError):
+                    pass
             error.close()
             if clm:
                 raise GatewayError(502, f"Selected {who} returned HTTP {status}.") from None
@@ -1135,6 +1169,12 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                 " Reduce or regroup shared evidence/questions explicitly; evidence was not trimmed."
                 if status in {400, 413, 422} else " Retry only unfinished work; automatic retries are disabled."
             )
+            if status in {400, 413, 422} and "max_request_bytes" in remote_capabilities(config):
+                guidance += " Ollama System One requires at most 64 questions and a 64 KiB JSON body per request."
+            if token_rejection:
+                prompt_index, token_count, token_limit = token_rejection.groups()
+                guidance += (f" Ollama prompt {prompt_index} has {token_count} tokens; the model accepts at most {token_limit}. "
+                             "Reduce evidence or the profile's workbench_question_batch_size; input was not truncated.")
             if status == 429 and _retry_delay(retry_after) is None:
                 guidance += " Provider cooldown is unknown; pause and obtain retry timing before retrying."
             raise GatewayError(status, f"Selected {who} returned HTTP {status}.{guidance}", headers=headers) from None
@@ -1257,7 +1297,7 @@ def call_typesafe(config: dict, payload: dict) -> dict:
     response = {"results": results, "usage": total_usage}
     if clm:
         return response
-    response.update({"complete": not failed_work, "capacity": remote_capabilities()})
+    response.update({"complete": not failed_work, "capacity": remote_capabilities(config)})
     if failed_work:
         retry_requests = []
         for context_index, context in enumerate(contexts):
