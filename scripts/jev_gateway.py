@@ -603,18 +603,21 @@ def normalize_endpoint(value: str) -> str | None:
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         return None
     path = parsed.path.rstrip("/")
-    if not path.endswith(("/v1/systemone", "/alpha/decisions")):
+    if not path.endswith(("/v1/systemone", "/alpha/decisions", "/v1/responses", "/v1/decisions")):
         path = f"{path}/systemone" if path.endswith("/v1") else f"{path}/v1/systemone"
     return urlunparse((parsed.scheme, parsed.netloc, path, "", parsed.query, ""))
 
 
 def profile(raw: dict, fallback_id: str) -> dict | None:
     endpoint_value = raw.get("base_url") or raw.get("baseURL") or raw.get("endpoint") or raw.get("url")
-    api_key = raw.get("api_key") or raw.get("apiKey") or raw.get("key")
+    chatgpt = raw.get("protocol") == "openai_chatgpt"
+    api_key = "chatgpt-plan" if chatgpt else raw.get("api_key") or raw.get("apiKey") or raw.get("key")
     if not isinstance(endpoint_value, str) or not isinstance(api_key, str) or not api_key.strip():
         return None
     endpoint = normalize_endpoint(endpoint_value)
     if not endpoint:
+        return None
+    if chatgpt and endpoint not in {"https://api.openai.com/v1/responses", "https://api.openai.com/v1/decisions"}:
         return None
     identifier = str(raw.get("id") or fallback_id).strip()
     batch_size = raw.get("workbench_question_batch_size")
@@ -622,12 +625,22 @@ def profile(raw: dict, fallback_id: str) -> dict | None:
                          if type(batch_size) is int and 1 <= batch_size <= 64 else {})
     return {
         **workbench_options,
+        **({"protocol": "openai_chatgpt", "credentials_path": str(SECURE_DIR / "openai-chatgpt.json"),
+            **({"reasoning_effort": "medium"} if endpoint.endswith("/responses") else {})} if chatgpt else {}),
         "id": identifier,
         "name": str(raw.get("name") or identifier),
         "endpoint": endpoint,
         "api_key": api_key.strip(),
         "model": str(raw.get("model") or "jev-latest").strip(),
     }
+
+
+def call_chatgpt(config: dict, state: str, questions: dict) -> dict:
+    if config["endpoint"] == "https://api.openai.com/v1/decisions":
+        from openai_decisions_provider import call
+    else:
+        from openai_chatgpt_provider import call
+    return call(config, state, questions, transport=urlopen, timeout=REQUEST_TIMEOUT)
 
 
 def load_profiles() -> list[dict]:
@@ -1017,6 +1030,15 @@ def remote_capabilities(config: dict | None = None) -> dict:
         ),
     }
     if config:
+        if config.get("protocol") == "openai_chatgpt":
+            native = config["endpoint"] == "https://api.openai.com/v1/decisions"
+            capabilities.update({"inference_protocol": "native_decisions" if native else "responses_structured_output",
+                                 "billing_path": "chatgpt_plan",
+                                 "probability_source": "native_decisions" if native else "model_estimates"})
+            if not native:
+                capabilities["reasoning_effort"] = "medium"
+        if "workbench_question_batch_size" in config:
+            capabilities["workbench_question_batch_size"] = config["workbench_question_batch_size"]
         endpoint = urlparse(config["endpoint"])
         if (endpoint.hostname in {"127.0.0.1", "localhost", "::1"}
                 and endpoint.port == 11434 and endpoint.path == "/v1/systemone"):
@@ -1035,7 +1057,8 @@ def remote_capabilities(config: dict | None = None) -> dict:
 def _account_key(config: dict) -> str:
     # Limits apply to the provider account, including profiles selecting other models.
     origin = urlparse(config["endpoint"]).netloc
-    return hashlib.sha256(f"{origin}\0{config['api_key']}".encode()).hexdigest()
+    credential_identity = config.get("credentials_path", config["api_key"])
+    return hashlib.sha256(f"{origin}\0{credential_identity}".encode()).hexdigest()
 
 
 def _retry_delay(value: str) -> float | None:
@@ -1140,8 +1163,11 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             },
         )
         try:
-            with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
-                raw = response.read()
+            if config.get("protocol") == "openai_chatgpt":
+                raw = json.dumps(call_chatgpt(config, context, questions)).encode("utf-8")
+            else:
+                with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
+                    raw = response.read()
         except HTTPError as error:
             status = error.code
             retry_after = error.headers.get("Retry-After") if error.headers else None
@@ -1180,6 +1206,10 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             raise GatewayError(status, f"Selected {who} returned HTTP {status}.{guidance}", headers=headers) from None
         except (URLError, TimeoutError, OSError):
             raise GatewayError(502, f"Selected {who} could not be reached.") from None
+        except RuntimeError as error:
+            if config.get("protocol") != "openai_chatgpt":
+                raise
+            raise GatewayError(502, str(error)) from None
         try:
             response = json.loads(raw)
         except (UnicodeDecodeError, json.JSONDecodeError):

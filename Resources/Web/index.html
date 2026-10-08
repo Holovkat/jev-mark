@@ -850,7 +850,7 @@
         groups.get(key).push(run);
       }
       const modelCount = new Set(runs.map((run) => run.backendId || run.modelName)).size;
-      $("reportSummary").textContent = runs.length + " successful runs · " + groups.size + " parallel test" + (groups.size === 1 ? "" : "s") + " · " + modelCount + " model" + (modelCount === 1 ? "" : "s") + ". Run another provider on the same test to append a comparison column.";
+      $("reportSummary").textContent = runs.length + " saved runs · " + groups.size + " parallel test" + (groups.size === 1 ? "" : "s") + " · " + modelCount + " model" + (modelCount === 1 ? "" : "s") + ". Run another provider on the same test to append a comparison column.";
 
       for (const [caseId, caseRuns] of groups) {
         const group = document.createElement("section");

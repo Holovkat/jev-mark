@@ -428,6 +428,14 @@ and `typesafe-config.json` are no longer loaded.
 The installer only copies files absent from app support; updating an existing
 source profile file does not replace the installed configuration.
 Profiles appear under **System One API**, including local HTTP providers.
+The **Open AI - Decision API — gpt-6-luna** option calls native `/v1/decisions`
+using the app's System One ChatGPT OAuth registration. It converts Choice, Score
+and Noul questions to native Decisions requests with no inference fallback.
+The current grant returned HTTP 401 on 8 October 2026; the route remains selected
+for later manual retesting. Native Decisions exposes no reasoning-effort setting.
+The installer preserves the installed login and other providers; the installed
+gateway owns token renewal.
+See [OpenAI integration](docs/openai-decision-integration.md) for login and test evidence.
 Nimble in this section uses Ollama's native decision API; the general Ollama
 model list uses the separate local constrained-token engine.
 

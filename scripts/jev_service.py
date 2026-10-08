@@ -70,6 +70,9 @@ class ObservedResponse:
     def __getattr__(self, name):
         return getattr(self.response, name)
 
+    def __iter__(self):
+        return iter(self.response)
+
     def __enter__(self):
         self.response.__enter__()
         return self
