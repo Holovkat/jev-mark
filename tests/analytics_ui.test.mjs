@@ -11,7 +11,7 @@ function page(pathname = '/workbench') {
     location: { origin: 'http://localhost:8096', href: 'http://localhost:8096' + pathname, pathname },
     document: {
       getElementById: id => nodes.find(node => node.id === id),
-      createElement: () => ({ style: {} }),
+      createElement: () => ({ style: {}, cloneNode() {return {...this, style:{...this.style}};} }),
       body: { append: node => nodes.push(node) }
     },
     window: { fetch: (...args) => { calls.push(args); return Promise.resolve({ status: 200 }); } }
@@ -23,7 +23,7 @@ function page(pathname = '/workbench') {
 test('adds one analytics link without replacing page content', () => {
   const { context, nodes } = page();
   vm.runInNewContext(source, context);
-  assert.equal(nodes.length, 1);
+  assert.equal(nodes.filter(node => node.id === 'jev-analytics-link').length, 1);
   assert.equal(nodes[0].href, '/analytics');
 });
 

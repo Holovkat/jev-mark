@@ -1013,7 +1013,7 @@ def remote_capabilities(config: dict | None = None) -> dict:
     if config is None:
         config = next((item for item in load_profiles() if backend == f"remote:{item['id']}"), None)
     capabilities = {
-        "selected_backend": f"remote:{config['id']}" if config else backend,
+        "selected_backend": f"remote:{config['id']}" if config and config.get("id") else backend,
         "shared_question_batching": True,
         "automatic_question_partitioning": False,
         "token_accounting": "unavailable",

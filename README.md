@@ -593,9 +593,33 @@ selected model. macOS starts the app at user login through a LaunchAgent; the
 gateway and Apple adapter start with the app, while a local model starts only
 when selected and started from the menu.
 
+## Benchmark portal
+
+[Benchmark research and integration design](docs/benchmark-portal.md) covers the
+requested Cloudflare Decision Index comparisons, dataset sources, per-model
+reporting, and current Ollama compatibility limits. Open
+`http://127.0.0.1:8096/benchmarks` for seeded samples or full native runs,
+model comparisons, durable history, cancellation/resume and JSON/CSV exports.
+
+Prepare the eight datasets with `python3 scripts/setup_benchmarks.py`; this
+creates a pinned kit and isolated Python environment under
+`~/Library/Application Support/JEV Menu Bar/benchmarks`. The installer packages
+the runner and portal. Configured decision models come from `typesafe.json`.
+Native cases that exceed a provider limit are reported as unsupported; options
+and evidence are never shortened to manufacture a comparable score.
+
+Implementation is tracked in [epic #4](https://github.com/Holovkat/jev-mark/issues/4).
+
+## Strata native decision experiment
+
+[Strata context and findings](docs/strata-assessment.md) records the Nimble
+C++/Metal port, source forks, native single/parallel comparisons and shutdown
+status. The custom llama.cpp remains our local baseline because it was faster
+in every measured case. Strata is retained as a stopped experiment.
+
 ## Service analytics
 
-The gateway-served portal and Workbench include metadata-only service analytics
+The gateway-served portal and Workbench include service analytics with historical metadata and local request/response bodies retained for 24 hours
 at `http://127.0.0.1:8096/analytics`. For future changes, use
 [docs/service-analytics.md](docs/service-analytics.md) as the implementation
 map and contract. It identifies the service wrapper, recorder, portal, installer

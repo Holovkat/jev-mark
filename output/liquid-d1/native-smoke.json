@@ -1,0 +1,38 @@
+{
+  "model": "/Volumes/Extreme SSD/3 Resources/LLLM/Ollama/blobs/sha256-2f0942d5a5f64cf69c3356d2be439b71644b1f0eb3a580912a5a0179eeaba77d",
+  "answers": {
+    "refund": {
+      "type": "noul",
+      "noul": 0.9899860512074116
+    },
+    "team": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": {
+        "billing": 0.9838222743261202,
+        "technical": 0.010461323345854118,
+        "fraud": 0.005716402328025393
+      },
+      "confidence": 0.9757334114891804
+    },
+    "urgency": {
+      "type": "score",
+      "score": 0.7590526269936735,
+      "legend": {
+        "0": "Can wait",
+        "1": "Today",
+        "2": "Blocking the customer now"
+      },
+      "probabilities": {
+        "0": 0.33733239388240777,
+        "1": 0.5662825852415112,
+        "2": 0.09638502087608117
+      },
+      "confidence": 0.3494238778622666
+    }
+  },
+  "usage": {
+    "input_tokens": 154,
+    "output_tokens": 0
+  }
+}

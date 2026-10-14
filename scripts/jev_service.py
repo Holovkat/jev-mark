@@ -10,6 +10,7 @@ import json
 import os
 import sys
 import time
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.error import HTTPError
@@ -153,6 +154,7 @@ class PayloadReader:
         raw = self.stream.read(*args, **kwargs)
         if not self.inspected:
             self.inspected = True
+            observe(self.observation, "capture_body", "request", raw)
             try:
                 value = json.loads(raw)
             except (ValueError, TypeError, UnicodeError, RecursionError):
@@ -167,6 +169,17 @@ def make_handler(gateway, store, *, assets=None, token=None):
     token = token or ""
     remote_token = token if 32 <= len(token) <= 256 and token.isascii() else ""
     roots = [Path(assets)] if assets else [Path(__file__).resolve().parent / "web", gateway.ROOT / "Resources" / "Web"]
+
+    benchmark_service = None
+    benchmark_lock = threading.Lock()
+
+    def benchmarks():
+        nonlocal benchmark_service
+        with benchmark_lock:
+            if benchmark_service is None:
+                from jev_benchmarks import BenchmarkService
+                benchmark_service = BenchmarkService(gateway)
+        return benchmark_service
 
     class AnalyticsHandler(gateway.GatewayHandler):
         _observation = None
@@ -234,6 +247,12 @@ def make_handler(gateway, store, *, assets=None, token=None):
         def do_GET(self):
             parsed = urlsplit(self.path)
             path = parsed.path
+            if path in ("/benchmarks", "/benchmarks/"):
+                self._asset("benchmarks.html", "text/html; charset=utf-8")
+                return
+            if path.startswith("/api/benchmarks"):
+                self._benchmark_api(path, parsed.query)
+                return
             if path in ("/analytics", "/analytics/"):
                 self._asset("analytics.html", "text/html; charset=utf-8")
                 return
@@ -246,6 +265,15 @@ def make_handler(gateway, store, *, assets=None, token=None):
                     return
                 if path == "/api/analytics/health":
                     self._json(200, store.health())
+                    return
+                if path.startswith("/api/analytics/payloads/"):
+                    try:
+                        result = store.payload_detail(path.removeprefix("/api/analytics/payloads/"))
+                        self._json(404 if result["status"] == "not_found" else 200, result)
+                    except ValueError as error:
+                        self._json(400, {"error": str(error)})
+                    except Exception:
+                        self._json(503, {"error": "Payloads could not be read."})
                     return
                 if path not in ("/api/analytics", "/api/analytics/export.csv"):
                     self._json(404, {"error": "Not found"})
@@ -290,6 +318,10 @@ def make_handler(gateway, store, *, assets=None, token=None):
         def send_json(self, status, value, headers=None):
             if self._observation:
                 observe(self._observation, "response", status, value)
+                try:
+                    observe(self._observation, "capture_body", "response", json.dumps(value, ensure_ascii=False).encode("utf-8"))
+                except Exception:
+                    store.lost("payload_capture_failed")
             return super().send_json(status, value, headers)
 
         def end_headers(self):
@@ -297,7 +329,59 @@ def make_handler(gateway, store, *, assets=None, token=None):
                 self.send_header("X-JEV-Request-ID", self._observation.row["request_id"])
             return super().end_headers()
 
+        def _benchmark_api(self, path, query="", mutation=False):
+            if not self._authorized():
+                self._json(401, {"error": "Benchmark access requires localhost or the configured analytics token."})
+                return
+            try:
+                service = benchmarks()
+                parts = path.removeprefix("/api/benchmarks").strip("/").split("/")
+                if mutation:
+                    if self.headers.get("Content-Type", "").split(";", 1)[0].strip() != "application/json":
+                        raise ValueError("Use application/json for benchmark requests.")
+                    length = int(self.headers.get("Content-Length", "0"))
+                    if not 0 < length <= 65536:
+                        raise ValueError("Benchmark request size must be 1–65536 bytes.")
+                    body = json.loads(self.rfile.read(length))
+                    if not isinstance(body, dict):
+                        raise ValueError("Expected a JSON object.")
+                    if parts == ["runs"]:
+                        result = service.start(body)
+                    elif len(parts) == 3 and parts[0] == "runs" and parts[2] in ("cancel", "resume"):
+                        result = getattr(service, parts[2])(parts[1])
+                    else:
+                        self._json(404, {"error": "Not found"})
+                        return
+                elif parts == ["catalog"]:
+                    result = service.catalog()
+                elif parts == ["profiles"]:
+                    result = service.profiles()
+                elif parts == ["runs"]:
+                    result = service.list_runs()
+                elif len(parts) == 2 and parts[0] == "runs":
+                    result = service.get_run(parts[1])
+                elif len(parts) == 3 and parts[0] == "runs" and parts[2] == "export":
+                    params = parse_qs(query, max_num_fields=4)
+                    formats = params.get("format", ["json"])
+                    if len(formats) != 1 or formats[0] not in ("json", "csv"):
+                        raise ValueError("Choose JSON or CSV export.")
+                    result = service.export(parts[1], formats[0])
+                    if isinstance(result, (str, bytes)):
+                        mime = "text/csv" if formats[0] == "csv" else "application/json"
+                        self._bytes(200, result.encode() if isinstance(result, str) else result, mime + "; charset=utf-8")
+                        return
+                else:
+                    self._json(404, {"error": "Not found"})
+                    return
+                self._json(200, result)
+            except (ValueError, KeyError) as error:
+                self._json(400, {"error": str(error)})
+            except Exception:
+                self._json(503, {"error": "Benchmark service is unavailable. Decision requests are unaffected."})
+
         def do_POST(self):
+            if urlsplit(self.path).path.startswith("/api/benchmarks"):
+                return self._benchmark_api(urlsplit(self.path).path, mutation=True)
             if urlsplit(self.path).path != "/v1/decision" or not store.enabled:
                 return super().do_POST()
             try:
@@ -325,7 +409,7 @@ def make_handler(gateway, store, *, assets=None, token=None):
                 CURRENT.reset(context_token)
                 observe(observation, "finish", disconnected=disconnected, unexpected=unexpected)
                 try:
-                    store.enqueue(observation.row, observation.attempts)
+                    store.enqueue(observation.row, observation.attempts, observation.bodies)
                 except Exception:
                     store.lost("request_metadata_failed")
                 self._observation = None

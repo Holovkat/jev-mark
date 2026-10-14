@@ -1,0 +1,102 @@
+{
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "latency": [
+    {
+      "fields": 1,
+      "modes": {
+        "single": {
+          "metal_ms": 206.78929099813104,
+          "llama_ms": 91.66887498577125,
+          "metal_over_llama": 2.255828829907956,
+          "metal_fresh_ms": 2876.3961249787826,
+          "llama_fresh_ms": 531.3121670042165,
+          "parity": {
+            "max_probability_delta": 0.0008584209999999981,
+            "changed_winners": [],
+            "fields": 1
+          }
+        },
+        "parallel": {
+          "metal_ms": 205.85208397824317,
+          "llama_ms": 91.52416701545008,
+          "metal_over_llama": 2.2491555038517155,
+          "metal_fresh_ms": 2280.4295840032864,
+          "llama_fresh_ms": 481.7472079885192,
+          "parity": {
+            "max_probability_delta": 0.0008584209999999981,
+            "changed_winners": [],
+            "fields": 1
+          }
+        }
+      }
+    },
+    {
+      "fields": 4,
+      "modes": {
+        "single": {
+          "metal_ms": 916.0809169989079,
+          "llama_ms": 367.2388340055477,
+          "metal_over_llama": 2.4945099269786626,
+          "metal_fresh_ms": 5778.573999996297,
+          "llama_fresh_ms": 1199.1284580144566,
+          "parity": {
+            "max_probability_delta": 0.0017738370000000003,
+            "changed_winners": [],
+            "fields": 4
+          }
+        },
+        "parallel": {
+          "metal_ms": 1624.4137080211658,
+          "llama_ms": 191.32924999576062,
+          "metal_over_llama": 8.490148307470806,
+          "metal_fresh_ms": 6742.055999988224,
+          "llama_fresh_ms": 1025.4688330169301,
+          "parity": {
+            "max_probability_delta": 0.0019168370000000046,
+            "changed_winners": [],
+            "fields": 4
+          }
+        }
+      }
+    },
+    {
+      "fields": 8,
+      "modes": {
+        "single": {
+          "metal_ms": 1954.1271250054706,
+          "llama_ms": 756.7585409851745,
+          "metal_over_llama": 2.582233326975762,
+          "metal_fresh_ms": 12129.364042019006,
+          "llama_fresh_ms": 2443.6120839964133,
+          "parity": {
+            "max_probability_delta": 0.002734291,
+            "changed_winners": [],
+            "fields": 8
+          }
+        },
+        "parallel": {
+          "metal_ms": 2338.679541979218,
+          "llama_ms": 341.90183301689103,
+          "metal_over_llama": 6.840207674065555,
+          "metal_fresh_ms": 12548.45212501823,
+          "llama_fresh_ms": 2038.9585829980206,
+          "parity": {
+            "max_probability_delta": 0.0028272910000000095,
+            "changed_winners": [],
+            "fields": 8
+          }
+        }
+      }
+    }
+  ],
+  "logic": {
+    "fields": 100,
+    "changed_winners": [],
+    "max_probability_delta": 0.016468239999999967,
+    "metal_single_parallel_max_delta": 0.0,
+    "metal_acceptable_single": 92,
+    "metal_acceptable_parallel": 92,
+    "llama_acceptable_single": 92,
+    "llama_acceptable_parallel": 92
+  }
+}

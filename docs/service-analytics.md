@@ -42,7 +42,7 @@ remain compatible.
 | Concern | Source of truth | Implementation guidance |
 | --- | --- | --- |
 | Request observation, provider-attempt instrumentation, HTTP routes and context propagation | `scripts/jev_service.py` | The observed service entry point dynamically loads the gateway core, scopes instrumentation to that module, and carries request context into worker pools. Add routes or lifecycle changes here. |
-| Allow-listed metadata, SQLite schema/writes, summaries, filters, retention and health | `scripts/jev_analytics.py` | `Observation` and `AnalyticsStore` own the telemetry contract. Update recording, queries, CSV export and existing-database handling together when fields or schema change. |
+| Allow-listed reporting metadata, short-lived bodies, SQLite schema/writes, summaries, filters, retention and health | `scripts/jev_analytics.py` | `Observation` and `AnalyticsStore` own the telemetry contract. Update recording, queries, CSV export and existing-database handling together when fields or schema change. |
 | Decision request/response contract and provider adapters | `scripts/jev_gateway.py` | This remains the core. The installer bundles it as `jev_gateway_core.py`; avoid analytics-specific changes to provider behavior. |
 | Analytics page and Workbench attribution headers | `Resources/Web/analytics.html`, `Resources/Web/analytics-portal.js` | The service serves these same-origin assets. Keep caller labels explicit and never persist credentials in browser storage or URLs. |
 | App launch and installed bundle | `Sources/JevMenuBar/main.swift`, `scripts/install_menubar.sh` | Swift continues to launch the bundled resource named `jev_gateway.py`. The installer maps the observed wrapper to that name and copies the core, recorder and web assets. Add every new runtime module or asset to this mapping. |
@@ -56,9 +56,10 @@ When changing the implementation:
   request observation across remote and temporary worker pools.
 - Keep recording best-effort and bounded. Storage, queue or metadata errors must
   not delay or change a provider call or decision response.
-- Persist only the metadata defined below. Never store prompt/evidence text,
-  schema names or values, answer bodies, provider URLs, credentials, client IPs,
-  or raw error messages.
+- Keep reporting tables and exports metadata-only. Store decision request/response
+  bodies only in the separate local `payloads` table, with 24-hour expiry and
+  the bounded capture limits below. Never capture transport headers, provider URLs
+  or client IPs in payload records.
 - Protect every `/api/analytics` route, including health and export. Preserve
   loopback-only access by default and fail closed when token protection is set.
 - For persisted-field changes, update schema initialization/upgrade behavior,
@@ -140,10 +141,16 @@ analytics through a proxy; do not publish an unauthenticated localhost proxy.
 Exporting a variable in an unrelated terminal does not reconfigure an already
 running menu-bar app. The environment must reach the app's gateway process.
 
-No context text, instructions, schema field names, choice values, answers, request
-or response bodies, authorization headers, provider URLs, client IP addresses, or
-raw error messages are persisted. Errors use fixed categories. Explicit caller,
-purpose, operation, backend and model labels are retained. The database has mode
+Reporting metadata and CSV exports contain no context text, instructions, schema
+field names, choice values, answers, or raw error messages. Reporting errors use
+fixed categories; caller, purpose, operation, backend and model labels are retained.
+Decision request and response bodies are now captured locally for a rolling 24
+hours. These bodies contain submitted evidence and returned answers, including
+any sensitive content supplied inside the body. Authorization and other transport
+headers, provider URLs and client IP addresses are not captured in body records.
+The existing restricted analytics access also protects the body-detail endpoint.
+
+The database has mode
 0600 and a newly created dedicated analytics directory has mode 0700. Custom parent
 permissions are not altered. Responses are no-store, have anti-framing/MIME-sniffing
 headers, and exports formula-escape text.
@@ -181,6 +188,41 @@ Service calls continue when recording fails. An unflushed loss counter can itsel
 be lost on a hard kill. WAL uses synchronous NORMAL, so recent committed updates
 can be lost on power failure. Calls before collection began are not reconstructed.
 
+## Local payload capture
+
+Owner-requested behavior: show recent request and response content in Service
+analytics, delete bodies after a rolling day, and preserve historical reporting.
+The existing recorder handles capture and cleanup; the call detail panel fetches
+bodies only when opened. One verification pass covers storage/upgrade, expiry,
+volume limits, access, HTTP compatibility and the browser detail flow.
+
+- `Observation.capture_body` captures the incoming `/v1/decision` body and the
+  JSON response returned to that caller. It does **not** capture the transformed
+  upstream provider wire request. The detail panel labels this boundary explicitly.
+- A separate additive `payloads` table in the existing local database is keyed by
+  request ID. Existing databases upgrade without rewriting reporting rows.
+- Expiry is 24 hours from request start. The API refuses expired bodies immediately;
+  cleanup deletes them at startup and approximately every minute while running,
+  including idle periods. After shutdown, overdue deletion runs on next startup.
+- Each body is limited to 2 MiB; larger bodies are omitted with their original byte
+  count and an explicit status. Total queued body data is limited to 32 MiB. Capture
+  pressure skips bodies while allowing metadata and decisions to continue.
+- Stored body data is capped at 512 MiB; oldest bodies are removed first, possibly
+  before 24 hours. This is a logical body-data budget, not an exact SQLite file-size
+  ceiling: metadata, SQLite pages and the WAL add overhead. Freed pages are reused.
+- SQLite secure deletion clears deleted table content, and periodic WAL
+  checkpoints release old journal pages when readers permit it. Ordinary SQL deletion is
+  not a promise of forensic erasure from backups or filesystem snapshots.
+- Historical statistics keep the existing 30-day/default row-cap policy. Bodies
+  are excluded from summary responses and CSV exports. Pre-capture calls have no
+  recoverable body; missing, expired, pending and oversize states are shown.
+- The dialog renders payloads as text, never HTML, and clears them when closed.
+  No payloads or analytics tokens are saved in browser storage.
+
+The installer already bundles all three changed runtime assets; no new runtime
+module is required. Rollback can restore the prior bundle while retaining the
+metadata database; restore the pre-change SQLite online backup if needed.
+
 ## Portal and API
 
 The portal provides Today, last 7/30 days and custom ranges, exact caller/purpose/
@@ -192,6 +234,7 @@ while details are open, and beyond the first page.
 
 ```text
 GET /analytics
+GET /api/analytics/payloads/<request-id>
 GET /api/analytics/health
 GET /api/analytics
 GET /api/analytics/export.csv

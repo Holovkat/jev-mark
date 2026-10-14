@@ -1,0 +1,119 @@
+{
+  "model": "gpt-6-luna",
+  "reasoning": "medium",
+  "endpoint": "https://api.openai.com/v1/responses",
+  "wall_ms": 20865,
+  "results": [
+    {
+      "batch": 1,
+      "questions": 16,
+      "first_question": 1,
+      "request_bytes": 31758,
+      "http_status": 400,
+      "provider_error": {
+        "code": "invalid_json_schema",
+        "param": "text.format.schema",
+        "message": "Invalid schema for response_format 'system_one_answers': In context=('properties', 'answers', 'properties', 'jev_field_6', 'properties', 'choice'), \" is not allowed in string literals for structured outputs (strict=true)."
+      },
+      "gateway_status": 400,
+      "completed": 0,
+      "wall_ms": 1267
+    },
+    {
+      "batch": 2,
+      "questions": 16,
+      "first_question": 17,
+      "request_bytes": 30810,
+      "http_status": 400,
+      "provider_error": {
+        "code": "invalid_json_schema",
+        "param": "text.format.schema",
+        "message": "Invalid schema for response_format 'system_one_answers': In context=('properties', 'answers', 'properties', 'jev_field_4', 'properties', 'choice'), \" is not allowed in string literals for structured outputs (strict=true)."
+      },
+      "gateway_status": 400,
+      "completed": 0,
+      "wall_ms": 995
+    },
+    {
+      "batch": 3,
+      "questions": 16,
+      "first_question": 33,
+      "request_bytes": 29994,
+      "http_status": 200,
+      "headers_ms": 1677,
+      "first_text_ms": 2249,
+      "usage": {
+        "input_tokens": 4993,
+        "output_tokens": 919,
+        "total_tokens": 5912,
+        "reported_reasoning_tokens": 0
+      },
+      "completed": 16,
+      "wall_ms": 18907
+    },
+    {
+      "batch": 4,
+      "questions": 16,
+      "first_question": 49,
+      "request_bytes": 32005,
+      "http_status": 200,
+      "headers_ms": 1487,
+      "first_text_ms": 2196,
+      "usage": {
+        "input_tokens": 5233,
+        "output_tokens": 1030,
+        "total_tokens": 6263,
+        "reported_reasoning_tokens": 0
+      },
+      "completed": 16,
+      "wall_ms": 20864
+    },
+    {
+      "batch": 5,
+      "questions": 16,
+      "first_question": 65,
+      "request_bytes": 31757,
+      "http_status": 400,
+      "provider_error": {
+        "code": "invalid_json_schema",
+        "param": "text.format.schema",
+        "message": "Invalid schema for response_format 'system_one_answers': In context=('properties', 'answers', 'properties', 'jev_field_7', 'properties', 'choice'), \" is not allowed in string literals for structured outputs (strict=true)."
+      },
+      "gateway_status": 400,
+      "completed": 0,
+      "wall_ms": 1196
+    },
+    {
+      "batch": 6,
+      "questions": 16,
+      "first_question": 81,
+      "request_bytes": 33900,
+      "http_status": 400,
+      "provider_error": {
+        "code": "invalid_json_schema",
+        "param": "text.format.schema",
+        "message": "Invalid schema for response_format 'system_one_answers': In context=('properties', 'answers', 'properties', 'jev_field_11', 'properties', 'choice'), \" is not allowed in string literals for structured outputs (strict=true)."
+      },
+      "gateway_status": 400,
+      "completed": 0,
+      "wall_ms": 1144
+    },
+    {
+      "batch": 7,
+      "questions": 4,
+      "first_question": 97,
+      "request_bytes": 9763,
+      "http_status": 200,
+      "headers_ms": 1703,
+      "first_text_ms": 2294,
+      "usage": {
+        "input_tokens": 1518,
+        "output_tokens": 337,
+        "total_tokens": 1855,
+        "reported_reasoning_tokens": 0
+      },
+      "completed": 4,
+      "wall_ms": 8422
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "http_status": 401,
+  "elapsed_ms": 410,
+  "body": {
+    "error": {
+      "message": "Unauthorized",
+      "type": "rejected_by_access_enforcement",
+      "code": "no_matching_rule",
+      "param": null
+    },
+    "status": 401
+  },
+  "request_id": "req_39266be6d32a49eb80c9efa7ebce9960",
+  "same_registration_responses_control": {
+    "model": "gpt-6-luna",
+    "reasoning_effort": "medium",
+    "completed": true,
+    "output_matches": true,
+    "elapsed_ms": 2777
+  }
+}

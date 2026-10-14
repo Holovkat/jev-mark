@@ -1,4 +1,4 @@
-"""Metadata-only, best-effort request telemetry. No external dependencies."""
+"""Best-effort metadata and short-lived local decision bodies. No external dependencies."""
 from __future__ import annotations
 
 import csv
@@ -16,6 +16,11 @@ from collections import Counter
 from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
+
+PAYLOAD_BODY_LIMIT = 2 * 1024 * 1024
+PAYLOAD_QUEUE_LIMIT = 32 * 1024 * 1024
+PAYLOAD_STORAGE_LIMIT = 512 * 1024 * 1024
+PAYLOAD_TTL = 86400
 
 LABEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,95}\Z")
 KINDS = {"enum": "choice", "choice": "choice", "score": "score",
@@ -41,7 +46,7 @@ def error_category(status):
 
 
 class Observation:
-    """Transient request context; only allowlisted scalar metadata reaches SQLite."""
+    """Transient metadata plus separately retained local bodies."""
     def __init__(self, headers):
         self.lock = threading.Lock()
         self.clock = time.perf_counter()
@@ -53,6 +58,15 @@ class Observation:
         self.names = set()
         self.attempts = []
         self.response_seen = False
+        self.bodies = {}
+
+    def capture_body(self, direction, raw):
+        """Capture bodies only, never transport headers or credentials from headers."""
+        if direction not in ("request", "response"):
+            return
+        size = len(raw)
+        self.bodies[direction] = {"bytes": size, "status": "captured" if size <= PAYLOAD_BODY_LIMIT else "too_large",
+                                  "text": raw.decode("utf-8", errors="replace") if size <= PAYLOAD_BODY_LIMIT else None}
 
     def payload(self, value):
         if not isinstance(value, dict):
@@ -169,6 +183,7 @@ class AnalyticsStore:
         self.stop = threading.Event()
         self.lock = threading.Lock()
         self.dropped = 0
+        self.payload_queue_bytes = 0
         self.previous_dropped = 0
         self.last_error = None
         self.started = time.time()
@@ -186,15 +201,24 @@ class AnalyticsStore:
             self.dropped += n
             self.last_error = category
 
-    def enqueue(self, row, attempts=()):
+    def enqueue(self, row, attempts=(), bodies=None):
         if not self.enabled:
             return
         if not self.worker or not self.worker.is_alive():
             self.lost("writer_unavailable")
             return
+        payload = json.dumps(bodies, ensure_ascii=False) if bodies else None
+        payload_bytes = len(payload.encode("utf-8")) if payload else 0
+        with self.lock:
+            if self.payload_queue_bytes + payload_bytes > PAYLOAD_QUEUE_LIMIT:
+                payload = json.dumps({"status": "queue_limit"})
+                payload_bytes = len(payload)
+            self.payload_queue_bytes += payload_bytes
         try:
-            self.queue.put_nowait((dict(row), list(attempts)))
+            self.queue.put_nowait((dict(row), list(attempts), payload, payload_bytes))
         except queue.Full:
+            with self.lock:
+                self.payload_queue_bytes -= payload_bytes
             self.lost()
 
     def _write_loop(self):
@@ -212,7 +236,12 @@ class AnalyticsStore:
             db.execute("PRAGMA journal_mode=WAL")
             db.execute("PRAGMA synchronous=NORMAL")
             db.execute("PRAGMA foreign_keys=ON")
+            db.execute("PRAGMA secure_delete=ON")
             db.executescript('''
+                CREATE TABLE IF NOT EXISTS payloads (
+                  request_id TEXT PRIMARY KEY REFERENCES requests(request_id) ON DELETE CASCADE,
+                  started_at REAL NOT NULL, bodies TEXT NOT NULL, bytes INTEGER NOT NULL);
+                CREATE INDEX IF NOT EXISTS payloads_time ON payloads(started_at);
                 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS requests (
                   seq INTEGER PRIMARY KEY AUTOINCREMENT, request_id TEXT UNIQUE NOT NULL,
@@ -255,15 +284,19 @@ class AnalyticsStore:
                 except queue.Empty:
                     pass
                 try:
+                    prune_due = time.time() >= next_prune
                     with db:
-                        for row, attempts in batch:
+                        for row, attempts, payload, payload_bytes in batch:
                             db.execute(sql, [row.get(c) for c in COLUMNS])
+                            if payload and row["started_at"] > time.time() - PAYLOAD_TTL:
+                                db.execute("INSERT OR REPLACE INTO payloads VALUES (?, ?, ?, ?)",
+                                           (row["request_id"], row["started_at"], payload, payload_bytes))
                             for attempt in attempts:
                                 db.execute("INSERT OR REPLACE INTO attempts VALUES (?, ?, ?, ?, ?)",
                                            (row["request_id"], attempt["ordinal"], attempt["http_status"],
                                             attempt["duration_ms"], attempt["error_category"]))
                         db.execute("UPDATE meta SET value=? WHERE key='dropped_updates'", (str(self.previous_dropped + self.dropped),))
-                        if time.time() >= next_prune:
+                        if prune_due:
                             cutoff = time.time() - self.retention_days * 86400
                             dropped_before = db.execute("SELECT MAX(started_at) FROM (SELECT started_at FROM requests WHERE outcome != 'in_progress' "
                                                         "ORDER BY started_at DESC, seq DESC LIMIT -1 OFFSET ?)", (self.max_rows,)).fetchone()[0]
@@ -273,11 +306,22 @@ class AnalyticsStore:
                             db.execute("DELETE FROM requests WHERE started_at < ? AND outcome != 'in_progress'", (cutoff,))
                             db.execute("DELETE FROM requests WHERE seq IN (SELECT seq FROM requests WHERE outcome != 'in_progress' "
                                        "ORDER BY started_at DESC, seq DESC LIMIT -1 OFFSET ?)", (self.max_rows,))
+                            db.execute("DELETE FROM payloads WHERE started_at <= ?", (time.time() - PAYLOAD_TTL,))
                             next_prune = time.time() + 60
+                        if any(item[2] for item in batch) and db.execute("SELECT COALESCE(SUM(bytes),0) FROM payloads").fetchone()[0] > PAYLOAD_STORAGE_LIMIT:
+                            # Keep the newest bodies within the separate disk budget.
+                            db.execute("DELETE FROM payloads WHERE request_id IN (SELECT request_id FROM "
+                                       "(SELECT request_id, SUM(bytes) OVER (ORDER BY started_at DESC, request_id DESC) AS total FROM payloads) "
+                                       "WHERE total > ?)", (PAYLOAD_STORAGE_LIMIT,))
+                    if prune_due:
+                        # Release old body pages from the WAL once readers permit it.
+                        db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
                 except sqlite3.Error:
                     self.lost("sqlite_write_failed", len(batch))
                 finally:
-                    for _ in batch:
+                    for _, _, _, payload_bytes in batch:
+                        with self.lock:
+                            self.payload_queue_bytes -= payload_bytes
                         self.queue.task_done()
         except (OSError, sqlite3.Error, ValueError):
             self.last_error = "storage_unavailable"
@@ -305,6 +349,8 @@ class AnalyticsStore:
                 "collection_started_at": utc(self.collection_started), "process_started_at": utc(self.started),
                 "dropped_updates": self.previous_dropped + self.dropped, "last_error": self.last_error,
                 "queued_updates": self.queue.qsize(), "retention_days": self.retention_days, "max_rows": self.max_rows,
+                "payload_retention_hours": 24, "payload_body_limit_bytes": PAYLOAD_BODY_LIMIT,
+                "payload_storage_limit_bytes": PAYLOAD_STORAGE_LIMIT,
                 "collection_scope": "POST /v1/decision through this gateway only"}
 
     def connect(self):
@@ -314,6 +360,22 @@ class AnalyticsStore:
         db.row_factory = sqlite3.Row
         db.create_aggregate("percentile", 2, Percentile)
         return db
+
+    def payload_detail(self, request_id):
+        if not isinstance(request_id, str) or not re.fullmatch(r"[0-9a-f]{32}", request_id):
+            raise ValueError("Invalid request ID.")
+        with closing(self.connect()) as db:
+            request = db.execute("SELECT started_at, outcome FROM requests WHERE request_id=?", (request_id,)).fetchone()
+            if request is None:
+                return {"status": "not_found"}
+            expires = request["started_at"] + PAYLOAD_TTL
+            if time.time() >= expires:
+                return {"status": "expired", "expires_at": utc(expires)}
+            row = db.execute("SELECT bodies FROM payloads WHERE request_id=?", (request_id,)).fetchone()
+            if row is None:
+                return {"status": "pending" if request["outcome"] == "in_progress" else "not_captured", "expires_at": utc(expires)}
+            bodies = json.loads(row[0])
+            return {"status": bodies.get("status", "available"), "expires_at": utc(expires), "bodies": bodies}
 
     @staticmethod
     def filters(params):
