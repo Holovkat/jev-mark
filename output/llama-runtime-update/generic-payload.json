@@ -1,0 +1,28 @@
+{
+  "instructions": "Classify each support request using only its stated facts.",
+  "schema": {
+    "category": {
+      "type": "enum",
+      "choices": [
+        "billing",
+        "technical",
+        "other"
+      ],
+      "description": "Which team handles this request?"
+    },
+    "urgent": {
+      "type": "boolean",
+      "description": "Does this need urgent handling?"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2,
+      "description": "0=Routine, 1=Needs attention, 2=Urgent"
+    }
+  },
+  "contexts": [
+    "I was charged twice and need a refund today. There is no software failure.",
+    "The application crashes on launch. There are no billing problems."
+  ]
+}

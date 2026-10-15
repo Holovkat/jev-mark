@@ -5,6 +5,21 @@ implementation tasks #5, #6, #7; combined verification #8. Owner instruction:
 "write up your tickets / epic etc and make it so". Local dependencies and selected
 dataset preparation are part of the implementation; hosted deployment is not.
 
+## Status — 15 October 2026
+
+The catalog, runner, portal, export controls, and service integration are
+implemented and packaged in the installed menu-bar app. The portal exposes
+checkbox dataset selection, preparation status, model profiles, identical seeded
+cohorts, and saved jobs at `http://127.0.0.1:8096/benchmarks`. The local smoke
+observations below are limited evidence; epic #4 and tasks #5–#8 remain open,
+including combined verification and owner acceptance. This document retains the
+original implementation plan as context, not as a claim that every final gate
+has passed.
+
+The new [Workbench image test](multimodal.md) is a separate synthetic smoke case.
+It does not add a visual benchmark dataset, change the eight native protocols,
+or establish image accuracy for these comparisons.
+
 ## Goal
 
 Add a **Benchmarks** section beside the existing Workbench and parallel reports.

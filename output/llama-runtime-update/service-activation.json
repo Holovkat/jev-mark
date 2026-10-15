@@ -1,0 +1,17 @@
+{
+  "before": {
+    "service": "jev-gateway",
+    "status": "ok",
+    "selected_backend": "remote:openrouter-mercury-decide",
+    "backend_status": "configured"
+  },
+  "after": {
+    "service": "jev-gateway",
+    "status": "ok",
+    "selected_backend": "remote:openrouter-mercury-decide",
+    "backend_status": "configured"
+  },
+  "runtime_replaced": true,
+  "backup": "/Volumes/Seagate/workspace/jev-mark/build/runtime-backups/20261014-hybrid-batching/bin",
+  "local_runtime_state": "idle: selected provider is remote; next local Start uses the updated binary"
+}

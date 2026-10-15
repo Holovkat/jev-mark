@@ -1,0 +1,21 @@
+{
+  "custom_base": "e6a127c32636ffcc6307a03eb241349e6c08805c",
+  "upstream_patch": "ad129b08d9f134cd298d1f8a85efc52b1b66e18e",
+  "source_checkout": "/Volumes/Seagate/workspace/jev-llama-nimble",
+  "retained_modifications": [
+    "Full candidate distributions",
+    "Nonempty shared prefix with empty context",
+    "Exact suffix whitespace"
+  ],
+  "backup": "/Volumes/Seagate/workspace/jev-mark/build/runtime-backups/20261014-hybrid-batching",
+  "source_files": {
+    "tools/parallel-decision/README.md": "50078ee55c85fbe6e8bdb639d195c6f0940857a006963b37528569f7e987a509",
+    "tools/parallel-decision/decision-engine.cpp": "2d9713fdd5aaa282c29bf53271144fd964bd9693a273a47aad1f6dfad59851a1",
+    "tools/parallel-decision/decision-engine.h": "0e980af2f55172de59b1f5fb22fc8e1675e1d2b1005ff3004b23edcfe40410fc",
+    "tools/parallel-decision/parallel-decision.cpp": "45deb2e75629decb447fa98fc67163d9b8ef938bebba6f5c05daaff9f103d9f4"
+  },
+  "server_sha256": "197eaaaf551baff85f789784bbd726c258b98a7a64081339ab98629027f5f0de",
+  "server_library_sha256": "2d4e2b1118df032010264226eda3875281d109f86bf68c147f3ad0eeb266c2d8",
+  "active_runtime": "/Volumes/Seagate/workspace/jev-mark/build/bin/llama-server",
+  "official_release_downloaded_but_not_activated": "b11609"
+}

@@ -1,7 +1,9 @@
 # Liquid d1 local test setup
 
 Installed on 14 October 2026. Select **Liquid D1 local (Q8) — d1-3B-Q8_0**
-under **System One API** in JEV Menu Bar. It is selected after installation.
+under **System One API** in JEV Menu Bar. It was selected during its installation
+smoke test; later checks selected Mercury Decide. Model selection is not fixed
+by this guide.
 The existing **Liquid D1 free** profile remains a separate hosted provider.
 
 ## Model and storage
@@ -29,7 +31,8 @@ The working runtime is the official llama.cpp **b11606 macOS arm64** release:
 <https://github.com/ggml-org/llama.cpp/releases/tag/b11606>.
 The Homebrew installation (build 9090) returned HTTP 404 for `/v1/systemone`;
 it was left unchanged. The repository's existing parallel-decision build was
-also left unchanged.
+also left unchanged during this Liquid D1 installation. Its later hybrid batching
+update is recorded separately in [runtime update](llama-runtime-update.md).
 
 - Runtime directory: `~/Library/Application Support/JEV Menu Bar/runtimes/liquid-d1/llama-b11606`
 - LaunchAgent: `~/Library/LaunchAgents/com.codex.jev.liquid-d1.plist`
@@ -55,7 +58,11 @@ After registering the persistent runtime and restarting the menu bar app,
 A request through the shared JEV endpoint passed all three primitive types in
 about 1.18 seconds on its first request after startup. These are smoke timings,
 not a latency benchmark. Vision weights are installed; image inference and
-idle wake-up have not been tested. Native UI inspection timed out; provider
+idle wake-up have not been tested. The shared gateway does not opt this profile
+into image input by default. It returns HTTP 422 for images unless the profile
+has explicitly declared a compatible `image_input: "systemone"` route after
+upstream support is verified; installed projector weights alone are not proof.
+See [image routing](multimodal.md#routes). Native UI inspection timed out; provider
 registration and selection were verified through the app's gateway.
 
 Evidence is in `output/liquid-d1/`: native smoke, installed-adapter smoke,

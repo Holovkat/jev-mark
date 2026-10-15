@@ -1,6 +1,10 @@
 # OpenAI login test and System One integration
 
-Research checked 8 October 2026. Account access requires completed live inference.
+Integration evidence below was collected on 8 October 2026; documentation
+reconciled on 15 October. The last recorded native Decisions result remains
+HTTP 401. Model selection is operator-controlled: the installed gateway selected
+Mercury Decide at the 15 October check, so the earlier selection notes below are
+historical. Account access requires completed live inference.
 
 Current owner requirement: native `/v1/decisions` through the System One ChatGPT
 connection. A direct live probe with that registration's OAuth access token
@@ -32,8 +36,9 @@ Decisions request schema does not expose a reasoning-effort parameter.
 The active profile is now labelled **Open AI - Decision API** and targets native
 `/v1/decisions` with `gpt-6-luna` through the existing System One OAuth connection.
 The gateway and benchmark runner share the native converter. It has no Responses
-or API-key fallback. The owner requested this route remain selected for manual
-retesting later in the week. Access remains rejected by the current grant.
+or API-key fallback. At that time the owner requested this route remain selected
+for manual retesting. The recorded grant was rejected; no later successful native
+inference is recorded.
 
 The earlier Responses adapter completed all 100 ambiguity questions in 18.144
 seconds after its label repair (`output/openai-choice-label-repair.json`). That
@@ -81,7 +86,15 @@ also exclude several normal Responses parameters and hosted tools.
 
 The canonical profile store remains `typesafe.json` (see README's System One
 API profiles). The installed app-support file is independent of the source
-`.secure` file: the installer does not overwrite an existing installed profile.
+`.secure` file: the installer does not replace the whole existing profile file.
+Its explicit ChatGPT registration step updates `openai-chatgpt-luna` when an
+installed ChatGPT credential exists; other profiles and credentials are preserved.
+
+The retained Responses adapter also accepts the shared image assets and expands
+their references into ordered image/text content parts. That transport is covered
+by deterministic tests; no live Responses image inference is recorded. Native
+Decisions image input is unsupported by this gateway and returns HTTP 422 before
+inference. See [shared image decisions](multimodal.md).
 
 The native converter sends `input` and ordered named questions to `/v1/decisions`,
 validates named answers and distributions, and maps Choice/Score/Predicate results

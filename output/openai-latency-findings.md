@@ -1,6 +1,14 @@
 # OpenAI Workbench latency investigation
 
-8 October 2026. Investigation only; app configuration and selected provider unchanged.
+8 October 2026 investigation snapshot; app configuration and selected provider
+were unchanged during that investigation.
+
+Resolution recorded by 15 October: the Responses adapter now uses opaque option
+IDs and restores original labels; the repaired 100-question run completed in
+18.144 seconds (`openai-choice-label-repair.json`). The later native Decisions
+probe returned HTTP 401 (`openai-decisions-chatgpt-probe.json`). Consequently the
+recommendations and "not tested" statement below describe the earlier snapshot.
+See [current integration status](../docs/openai-decision-integration.md).
 
 Replayed the Workbench's exact 100-question ambiguity payload: six batches of
 16 plus four questions, seven concurrent calls, GPT-6-Luna with medium reasoning.

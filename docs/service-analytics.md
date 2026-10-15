@@ -2,11 +2,13 @@
 
 The observed gateway adds a **Service analytics** link to the portal and Workbench.
 After reinstalling the menu-bar app, open `http://127.0.0.1:8096/analytics` on the service Mac.
-The original decision adapters and the Swift launcher are unchanged.
+Analytics wraps the shared decision adapters without changing their request or
+response behavior. The Swift launcher keeps the same bundled entry-point name.
 
 ## Installation
 
-After reviewing and merging this feature, update the local repository and run:
+The observed service is installed with the menu-bar app. After updating the
+local source, rebuild and install with:
 
 ```bash
 ./scripts/install_menubar.sh
@@ -25,7 +27,7 @@ The installer preserves the launcher's existing bundled filename:
 | Repository source | Installed resource |
 | --- | --- |
 | `scripts/jev_service.py` | `jev_gateway.py`, observed entry point |
-| `scripts/jev_gateway.py` | `jev_gateway_core.py`, unchanged adapters |
+| `scripts/jev_gateway.py` | `jev_gateway_core.py`, shared decision adapters |
 | `scripts/jev_analytics.py` | `jev_analytics.py` |
 | `Resources/Web/analytics.html` | `web/analytics.html` |
 | `Resources/Web/analytics-portal.js` | `web/analytics-portal.js` |
@@ -219,9 +221,17 @@ volume limits, access, HTTP compatibility and the browser detail flow.
 - The dialog renders payloads as text, never HTML, and clears them when closed.
   No payloads or analytics tokens are saved in browser storage.
 
-The installer already bundles all three changed runtime assets; no new runtime
-module is required. Rollback can restore the prior bundle while retaining the
-metadata database; restore the pre-change SQLite online backup if needed.
+Image requests use the same capture policy: an inline `assets` map, including
+base64 image data, is part of the incoming body. A body up to 2 MiB can therefore
+be retained locally until expiry; a larger body is omitted from capture even if
+the decision endpoint accepts it. The dialog displays JSON text rather than
+rendering image assets, and does not capture transformed upstream image parts.
+See [the shared image contract](multimodal.md).
+
+The installer bundles the service, recorder and portal assets. The image adapter
+adds its own `jev_images.py` dependency to the same installer. Rollback can
+restore the prior bundle while retaining the metadata database; restore the
+pre-change SQLite online backup if needed.
 
 ## Portal and API
 

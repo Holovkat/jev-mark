@@ -2,6 +2,11 @@
 
 ## Current decision and shutdown context - 14 October 2026
 
+The custom llama.cpp has since received the upstream hybrid batching improvement
+while retaining our mods. See [runtime update](llama-runtime-update.md) for the
+installed version, regression evidence and rollback. The Strata comparison below
+remains the recorded pre-update measurement; no new speed comparison was run.
+
 Keep the existing custom llama.cpp decision engine as our local baseline. The
 Strata experiment is retained for future investigation and comparison, with its
 services stopped. Shutdown was checked against processes and the experiment

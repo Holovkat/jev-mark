@@ -1,8 +1,28 @@
 # JEV / parallel-decision local evaluation
 
-This workspace builds the `thecodacus/llama.cpp` `parallel-decision` branch and
-runs its decision endpoint against the locally installed Ollama `gemma4:12b`
-GGUF blobs.
+JEV provides a macOS menu-bar app, browser Workbench, and one shared
+`POST /v1/decision` endpoint for local and hosted decision models. Callers use
+Choice, Score, and Noul schemas while the gateway adapts the request to the
+selected provider. The custom llama.cpp engine loads existing Ollama GGUF blobs;
+System One profiles connect TypeSafe, Ollama decision models, OpenRouter,
+Liquid D1, and the OpenAI adapters.
+
+## Recent changes — 8–15 October 2026
+
+| Area | Delivered behavior and evidence |
+| --- | --- |
+| Image decisions | Shared PNG/JPEG `assets` contract, TypeSafe image opt-in header, Responses image inputs, and preserved assets in retries. Text-only routes return HTTP 422. The installed Workbench opens **Visual tests → Square colour · image** first, with the image already loaded. [Contract and smoke evidence](docs/multimodal.md). |
+| OpenAI | Native Decisions adapter through the JEV ChatGPT OAuth connection, plus exact choice-label restoration in the retained Responses adapter. Recorded native access returned HTTP 401; successful Responses runs do not prove native Decisions access. [Integration status](docs/openai-decision-integration.md). |
+| Benchmarks | Eight prepared datasets, frozen model profiles, identical seeded cohorts, durable jobs, cancel/resume, native metrics, and JSON/CSV exports at `/benchmarks`. Unsupported protocols remain visible. The epic's combined verification and owner acceptance remain open. [Portal guide](docs/benchmark-portal.md). |
+| Analytics | Incoming request and outgoing response bodies in call details for up to 24 hours, with size/storage limits. Historical metadata keeps its separate retention policy. [Analytics contract](docs/service-analytics.md). |
+| Local engines | Liquid D1 has a separate local System One runtime. Strata's native Nimble comparison retained custom llama.cpp as the baseline. The custom runtime then received upstream hybrid batching while preserving the decision fixes; generic outputs were unchanged, with no new speed claim. [Liquid D1](docs/liquid-d1-local.md), [Strata findings](docs/strata-assessment.md), [runtime update](docs/llama-runtime-update.md). |
+
+The menu-bar app was rebuilt and installed on 15 October. Its gateway on port
+8096 serves the visual library and image adapter. The selected profile at that
+check was Mercury Decide, whose current adapter rejects images; select TypeSafe
+to run the verified image path. Model selection is operator-controlled.
+See the [documentation index](docs/README.md) for setup, contracts, evidence,
+and the remaining verification boundaries.
 
 ## What this tests
 
@@ -22,7 +42,8 @@ chat or another generation path.
 
 ## Current setup
 
-- Source: `llama.cpp/`, checked out at the `parallel-decision` branch.
+- Source: custom decision module in `llama.cpp/`, with our probability/prompt fixes
+  and upstream hybrid batching update `ad129b0`. See [runtime update](docs/llama-runtime-update.md).
 - Build: `build/bin/llama-server` with Metal enabled.
 - Model: existing Ollama `gemma4:12b` model blob, no model copy or conversion.
 - Local model server: `http://127.0.0.1:8097` with 12 decision sequences.
@@ -46,7 +67,9 @@ any device that can reach port 8096 can submit decisions through the selected
 provider. Do not expose it on public or untrusted networks. The Ollama and
 Apple provider ports remain bound to loopback. The Workbench provides the
 original logic-baseline questions, the ambiguity and common-sense reasoning
-question sets, and Score/Noul examples. Select a case, edit its question or
+question sets, Score/Noul examples, and a **Visual tests** section at the top
+of the library. It opens by default and loads **Square colour · image**, including
+the picture and question. Select a case, edit its question or
 evidence, and run it through the same selected provider used by agents. The
 right panel shows the returned fields, available probabilities, reference
 comparison when applicable, latency, and raw response. Reference answers are
@@ -222,17 +245,63 @@ The server script uses the already-built binary and keeps the model in the
 Ollama store. Stop a foreground server with Ctrl-C. Normal callers and skills
 use the menu-bar gateway on port 8096; it routes to the selected provider.
 
+## Multimodal image decisions
+
+Open [the installed Workbench](http://127.0.0.1:8096/workbench), select a
+vision-capable profile in JEV Menu Bar, and choose **Visual tests → Square colour
+· image**. Press **Run decision** to compare the model's answer with the known
+reference. Custom tests can attach PNG/JPEG files with thumbnails and removal
+controls; selecting another case clears the attachments. Use the local Mac's
+Workbench for image controls.
+
+API callers add an optional `assets` map to the existing `schema` + `contexts`
+request. Image entries contain `type: "image"`, `format: "png"` or `"jpg"` /
+`"jpeg"`, and standard padded `data_base64`. Use UUID references in context,
+instructions, or nested criteria. Do not put files or remote URLs in the request.
+The gateway forwards only relevant assets and retains them in failed-work retries.
+
+| Selected route | Image behavior |
+| --- | --- |
+| Official TypeSafe System One | Native assets with `TypeSafe-Danger-Zone-Images: true`; verified with `jev-latest`. |
+| ChatGPT Responses profile | Ordered text/image content parts; transport covered by tests, live image inference not yet verified. |
+| Other System One profile | Explicit `"image_input": "systemone"` opt-in when the upstream supports this exact asset contract. |
+| Local finite-decision engine, Apple, CLM, native OpenAI Decisions, other unconfigured routes | HTTP 422 before inference; no image-to-text fallback or model substitution. |
+
+`/providers` and `/capabilities` advertise the image adapter. Actual model support
+and full image decoding are validated upstream. The gateway accepts JSON only,
+at most 32 images, a 16 MiB total HTTP body, and PNG/JPEG signatures with strict
+base64. Workbench images must be 256–1568 pixels per side and at least 78,400
+pixels overall; images are never resized silently. Audio, video, multipart uploads,
+and Box output are outside this implementation.
+
+Select TypeSafe before exercising the installed gateway:
+
+```bash
+python3 scripts/image_smoke.py --url http://127.0.0.1:8096
+```
+
+The smoke sends only a generated shape image and does not change model selection.
+A direct adapter check can use `--profile <configured-profile-id>` instead;
+that reads source `.secure/typesafe.json` unless `TYPESAFE_SECURE_DIR` overrides it.
+See [the full image contract and verification record](docs/multimodal.md).
+Submitted images follow the existing [local analytics payload policy](docs/service-analytics.md#local-payload-capture).
+
 ## Build
 
 ```bash
-cmake -B build -S llama.cpp \
+cmake -B build/custom-runtime -S llama.cpp \
   -DGGML_METAL=ON -DGGML_NATIVE=ON \
   -DLLAMA_OPENSSL=OFF \
   -DLLAMA_BUILD_TESTS=OFF \
   -DLLAMA_BUILD_EXAMPLES=ON \
   -DLLAMA_BUILD_SERVER=ON
-cmake --build build --config Release -j 10
+cmake --build build/custom-runtime --config Release --target llama-server llama-parallel-decision -j 10
 ```
+
+This produces `build/custom-runtime/bin`. Stop the menu-bar app and its local
+model before activating a rebuild: keep a copy of `build/bin`, then overlay the
+new binary directory including its matching dylibs onto `build/bin`. See the
+[runtime update and rollback notes](docs/llama-runtime-update.md).
 
 `LLAMA_OPENSSL=OFF` is intentional for this local HTTP-only server: the
 machine's OpenSSL headers and linked library do not expose the same symbol set.
@@ -247,9 +316,11 @@ the new location.
 
 The first request against `gemma4:12b` returned a valid decision and field
 probabilities. On the current machine the cold request measured approximately
-1.07 s total (`937 ms` prefill, `132 ms` scoring). The next step is to collect
-warm-cache and batch measurements against the Ollama baseline before deciding
-where this belongs in a real application.
+1.07 s total (`937 ms` prefill, `132 ms` scoring). This is the original
+connectivity observation, not the current performance baseline. Later native single/parallel measurements are recorded in the
+[Strata comparison](docs/strata-assessment.md); the subsequent
+[hybrid batching update](docs/llama-runtime-update.md) has regression evidence
+but no new speed measurement.
 
 ## Judging agent responses
 
@@ -392,9 +463,10 @@ its existing `typesafe.json` profile, for example:
 "workbench_question_batch_size": 32
 ```
 
-This optional integer must be between 1 and 64 and applies only to local Ollama
-System One profiles. The Workbench uses the smaller of this configured grouping
-and the API question limit. This setting is a grouping preference, not a token
+This optional integer must be between 1 and 64 and applies to configured remote
+System One profiles, including loopback Ollama, Liquid D1, and OpenAI profiles.
+The Workbench uses the smaller of this configured grouping and any advertised
+API question limit. This setting is a grouping preference, not a token
 budget guarantee; reduce it or the evidence if the model rejects the context.
 No tokenizer estimate, automatic retries, or gateway partitioning is added.
 
@@ -403,8 +475,8 @@ A successful response includes `complete: true` and the existing `results` and
 Successful answers remain in `results`, including answers from the same context
 as a missing or malformed sibling answer. `failed_work` identifies unfinished
 fields and their errors. `retry_requests` contains each unfinished request as
-`{context_index, request: {schema, contexts, instructions?}}`, preserving the
-original evidence and instructions. Retry those requests rather than repeating
+`{context_index, request: {schema, contexts, instructions?, assets?}}`, preserving
+the original evidence, instructions, and relevant images. Retry those requests rather than repeating
 successful work. HTTP 429 and `Retry-After` are preserved. When the provider
 supplies a valid `Retry-After`, the gateway shares that timed cooldown across
 callers. A missing or invalid header does not create an invented wait. The
@@ -425,14 +497,17 @@ All System One profiles belong in a single `typesafe.json` file.
 Add `.secure/typesafe.json` before installing, or edit the app-support
 `.secure/typesafe.json` and refresh providers. Legacy environment profile files
 and `typesafe-config.json` are no longer loaded.
-The installer only copies files absent from app support; updating an existing
-source profile file does not replace the installed configuration.
+The installer copies credential/configuration files only when absent from app
+support; editing source profiles does not replace the installed configuration.
+Its explicit exception registers or updates `openai-chatgpt-luna` for native
+Decisions when an installed ChatGPT credential exists, while preserving other
+profiles and the credential record.
 Profiles appear under **System One API**, including local HTTP providers.
 The **Open AI - Decision API — gpt-6-luna** option calls native `/v1/decisions`
 using the app's System One ChatGPT OAuth registration. It converts Choice, Score
 and Noul questions to native Decisions requests with no inference fallback.
-The current grant returned HTTP 401 on 8 October 2026; the route remains selected
-for later manual retesting. Native Decisions exposes no reasoning-effort setting.
+The recorded grant returned HTTP 401 on 8 October 2026. No later successful
+native Decisions inference is recorded; provider selection can change independently. Native Decisions exposes no reasoning-effort setting.
 The installer preserves the installed login and other providers; the installed
 gateway owns token renewal.
 See [OpenAI integration](docs/openai-decision-integration.md) for login and test evidence.
@@ -471,7 +546,8 @@ Full `/v1/systemone` and `/alpha/decisions` paths are preserved by
 `normalize_endpoint`; ordinary base URLs receive the existing `/v1/systemone`
 suffix. Reuse `call_typesafe` for compatible providers: it sends `model`,
 `state`, and typed `questions`, with Bearer authentication, then maps `answers`
-back to the stable JEV response. New providers need profiles, not new adapters.
+back to the stable JEV response. Compatible System One providers need profiles; different wire protocols require
+explicit adapters.
 Analytics automatically records their existing `remote:<profile-id>` route.
 Keep real keys in ignored `.secure` files with mode 600; never put them in
 examples, source, or app preferences.
@@ -574,7 +650,7 @@ TypeSafe profiles behind one stable endpoint.
 ## macOS menu-bar service
 
 The repository includes a native menu-bar controller and LAN-accessible
-gateway. The gateway stays at port 8096 and routes requests to a selected TypeSafe
+gateway. The gateway stays at port 8096 and routes requests to a selected System One
 profile, the Apple on-device adapter at port 8098, or the selected local model
 engine at port 8097. The menu provides health status, local-model
 start/stop/restart, provider tests, gateway/model logs, and a launch-at-login
@@ -609,13 +685,16 @@ Native cases that exceed a provider limit are reported as unsupported; options
 and evidence are never shortened to manufacture a comparable score.
 
 Implementation is tracked in [epic #4](https://github.com/Holovkat/jev-mark/issues/4).
+The portal and local smoke evidence exist; [combined verification #8](https://github.com/Holovkat/jev-mark/issues/8)
+and owner acceptance remain open. Published Cloudflare values are external
+references, not scores obtained by this Mac or a full eight-task reproduction.
 
 ## Strata native decision experiment
 
 [Strata context and findings](docs/strata-assessment.md) records the Nimble
 C++/Metal port, source forks, native single/parallel comparisons and shutdown
 status. The custom llama.cpp remains our local baseline because it was faster
-in every measured case. Strata is retained as a stopped experiment.
+in every measured native C++/Metal case. Strata is retained as a stopped experiment.
 
 ## Service analytics
 
