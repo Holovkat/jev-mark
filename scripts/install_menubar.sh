@@ -26,6 +26,7 @@ mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources/web"
 cp "$build_dir/JevMenuBar" "$app_dir/Contents/MacOS/JevMenuBar"
 cp "$root_dir/Resources/Info.plist" "$app_dir/Contents/Info.plist"
 cp "$root_dir/Resources/AppIcon.icns" "$app_dir/Contents/Resources/AppIcon.icns"
+cp "$root_dir/scripts/jev_images.py" "$app_dir/Contents/Resources/jev_images.py"
 # Keep Swift's launch path stable, with the unchanged decision module alongside it.
 cp "$root_dir/scripts/jev_gateway.py" "$app_dir/Contents/Resources/jev_gateway_core.py"
 cp "$root_dir/scripts/openai_chatgpt_provider.py" "$app_dir/Contents/Resources/openai_chatgpt_provider.py"

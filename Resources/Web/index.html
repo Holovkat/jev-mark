@@ -528,6 +528,14 @@
           <span class="field-label">Additional instructions <span class="field-hint">optional rubric / guardrails</span></span>
           <textarea id="guidance" name="guidance" placeholder="Add a rubric or a rule for handling missing evidence…" style="min-height:60px"></textarea>
         </label>
+        <fieldset class="field" style="border:1px solid var(--line);padding:12px">
+          <legend class="field-label">Image evidence</legend>
+          <label for="imageFiles" class="field-hint">Attach PNG or JPEG images. They are sent only when you run a decision.</label>
+          <input id="imageFiles" type="file" accept="image/png,image/jpeg" multiple>
+          <div id="imageAttachments" aria-live="polite"></div>
+          <p id="imageRoute" class="field-hint"></p>
+          <p id="imageNotice" class="field-hint">TypeSafe images are experimental. Prepare images at 256–1568 px per side and at least 78,400 pixels. Text-only routes return vision unsupported.</p>
+        </fieldset>
         <div id="providerWarning" class="provider-warning"></div>
         <div class="form-footer">
           <button id="runButton" class="button" type="submit"><span class="spinner" aria-hidden="true"></span><span id="runLabel">Run decision</span><span aria-hidden="true">↗</span></button>
@@ -623,7 +631,7 @@
 
   <script>
     const $ = (id) => document.getElementById(id);
-    const state = { suites: [], selected: null, edited: false, provider: null, profiles: [], lastRequest: null, reportRuns: [], gridGames: [], screen: "workbench", openSuite: null };
+    const state = { images: [], imageLoading: false, suites: [], selected: null, edited: false, provider: null, profiles: [], lastRequest: null, reportRuns: [], gridGames: [], screen: "workbench", openSuite: null };
     const panelWidthsKey = "jev-workbench-panel-widths-v1";
     const parallelReportKey = "jev-workbench-parallel-report-v1";
     const gridGamesKey = "jev-workbench-grid-games-v1";
@@ -1051,6 +1059,10 @@
         const profiles = profilesResponse.ok ? await profilesResponse.json() : { providers: [] };
         state.provider = health;
         state.profiles = profiles.providers || [];
+        const imageProfile = state.profiles.find((profile) => health.selected_backend === `remote:${profile.id}`);
+        $("imageRoute").textContent = ["systemone", "responses"].includes(imageProfile?.image_input)
+          ? "Selected route accepts image evidence; the provider validates model support."
+          : "Selected route: vision unsupported. Image requests return an explicit error.";
         $("providerName").textContent = displayName(health.selected_backend);
         $("statusDetail").textContent = health.backend_status || health.status || "unknown";
         badge.className = "provider-status " + (["running", "configured"].includes(health.backend_status) ? "good" : ["stopped", "unavailable", "misconfigured"].includes(health.backend_status) ? "warn" : "bad");
@@ -1153,6 +1165,10 @@
     }
 
     function selectCase(item) {
+      state.images = caseImages(item);
+      renderImages();
+      $("imageNotice").textContent = "Attach PNG/JPEG evidence, or choose a case from Visual tests in the library. Nothing is sent until Run decision.";
+      if (state.images.length) $("imageNotice").textContent = "Test image loaded. Run decision to compare the selected model with the reference answer.";
       state.selected = item;
       state.edited = false;
       $("primitive").value = item.type || "choice";
@@ -1223,11 +1239,91 @@
       return schema;
     }
 
+    // IMAGE-REQUEST-CORE-START
+    function filterRequestImages(payload) {
+      if (!payload.assets) return payload;
+      const texts = [];
+      const visit = (value) => {
+        if (typeof value === "string") texts.push(value);
+        else if (Array.isArray(value)) value.forEach(visit);
+        else if (value && typeof value === "object") Object.values(value).forEach(visit);
+      };
+      const fields = Object.values(payload.schema || {}).map((field) =>
+        field && typeof field === "object" ? [field.instructions, field.description, field.criteria] : []);
+      visit([payload.contexts, payload.instructions, fields]);
+      payload.assets = Object.fromEntries(Object.entries(payload.assets).filter(([ref]) => texts.some((text) => text.includes(ref))));
+      if (!Object.keys(payload.assets).length) delete payload.assets;
+      return payload;
+    }
+    // IMAGE-REQUEST-CORE-END
+
+    function renderImages() {
+      const list = $("imageAttachments");
+      list.replaceChildren();
+      for (const image of state.images) {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;gap:10px;margin:10px 0;overflow-wrap:anywhere";
+        const preview = document.createElement("img");
+        preview.src = `data:image/${image.asset.format};base64,${image.asset.data_base64}`;
+        preview.alt = image.name;
+        preview.style.cssText = "width:64px;height:64px;object-fit:contain;flex-shrink:0";
+        const label = document.createElement("span");
+        label.style.cssText = "min-width:0;flex:1;font-size:11px";
+        label.textContent = `${image.name} · ${image.width}×${image.height} · ${image.ref}`;
+        const remove = document.createElement("button");
+        remove.className = "quiet-button";
+        remove.style.cssText = "flex-shrink:0;white-space:nowrap";
+        remove.type = "button";
+        remove.textContent = "Remove";
+        remove.setAttribute("aria-label", `Remove ${image.name}`);
+        remove.onclick = () => { state.images = state.images.filter((item) => item !== image); renderImages(); markEdited(); };
+        row.append(preview, label, remove);
+        list.append(row);
+      }
+    }
+
+    $("imageFiles").addEventListener("change", async (event) => {
+      const files = [...event.target.files];
+      const selectedCase = state.selected;
+      state.imageLoading = true;
+      $("imageNotice").textContent = "Reading image evidence…";
+      try {
+        if (state.images.length + files.length > 32) throw new Error("Attach at most 32 images.");
+        const additions = [];
+        for (const file of files) {
+          if (!["image/png", "image/jpeg"].includes(file.type) || file.size > 16 * 1024 * 1024) throw new Error("Use PNG/JPEG files up to 16 MiB each.");
+          const url = await new Promise((resolve, reject) => {
+            const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(new Error("Image could not be read.")); reader.readAsDataURL(file);
+          });
+          const bitmap = new Image(); bitmap.src = url; await bitmap.decode();
+          const width = bitmap.naturalWidth, height = bitmap.naturalHeight;
+          if (Math.min(width, height) < 256 || Math.max(width, height) > 1568 || width * height < 78400) throw new Error(`${file.name}: prepare at 256–1568 px per side and at least 78,400 pixels. Images are not resized automatically.`);
+          additions.push({ ref: crypto.randomUUID(), name: file.name, width, height,
+            asset: { type: "image", format: file.type === "image/png" ? "png" : "jpg", data_base64: url.split(",")[1] } });
+        }
+        if (state.selected !== selectedCase) throw new Error("The test changed while reading images; attach them again.");
+        state.images.push(...additions); renderImages(); markEdited();
+        $("imageNotice").textContent = "Images attached. Their references are added to context and can also be used in instructions or criteria. Nothing is sent until Run decision.";
+      } catch (error) { $("imageNotice").textContent = error.message; }
+      finally { state.imageLoading = false; event.target.value = ""; }
+    });
+
+    function caseImages(item) {
+      if (item.image_fixture !== "visual-shapes") return [];
+      const canvas = document.createElement("canvas"); canvas.width = canvas.height = 320;
+      const ctx = canvas.getContext("2d"); ctx.fillStyle = "white"; ctx.fillRect(0, 0, 320, 320);
+      ctx.fillStyle = "red"; ctx.fillRect(35, 95, 110, 110);
+      ctx.fillStyle = "blue"; ctx.beginPath(); ctx.arc(235, 150, 55, 0, Math.PI * 2); ctx.fill();
+      return [{ ref: crypto.randomUUID(), name: "visual-shapes.png", width: 320, height: 320,
+        asset: { type: "image", format: "png", data_base64: canvas.toDataURL("image/png").split(",")[1] } }];
+    }
+
     function buildRequest() {
       const type = $("primitive").value;
       const question = $("question").value.trim();
       const context = $("context").value.trim();
-      if (!question || !context) throw new Error("Enter both a decision question and evidence/context.");
+      if (state.imageLoading) throw new Error("Wait for the images to finish loading.");
+      if (!question || (!context && !state.images.length)) throw new Error("Enter a decision question and evidence/context or an image.");
       const schema = {};
       if (type === "parallel") {
         Object.assign(schema, buildParallelSchema());
@@ -1253,7 +1349,8 @@
           ? [question, $("guidance").value.trim()].filter(Boolean).join("\n\n")
           : $("guidance").value.trim() || "Evaluate only the supplied evidence and apply each field's instructions.",
         schema,
-        contexts: [context]
+        contexts: [[context, ...state.images.map((image) => image.ref)].filter(Boolean).join("\n\n")],
+        ...(state.images.length ? { assets: Object.fromEntries(state.images.map((image) => [image.ref, image.asset])) } : {})
       };
     }
 
@@ -3133,6 +3230,7 @@
             request_count: batches.length,
             batches
           };
+      for (const payload of fanOutRun ? fanOutCalls.map((call) => call.payload) : batches) filterRequestImages(payload);
       $("requestPreview").textContent = JSON.stringify(requestPlan, null, 2);
       $("emptyState").hidden = true;
       $("resultState").className = "result-state visible";
@@ -3265,7 +3363,7 @@
         state.suites = payload.suites || [];
         renderLibrary();
         const first = state.suites[0]?.cases?.[0];
-        if (first) selectCase(first);
+        if (first) { state.openSuite = first.suite; selectCase(first); }
       } catch (error) {
         $("suites").textContent = error.message || "Could not load examples.";
         $("caseCount").textContent = "offline";

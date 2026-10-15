@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+from jev_images import validate_assets, used_assets, request_evidence
 import hashlib
 import threading
 from datetime import datetime, timezone
@@ -301,6 +302,18 @@ def example_suites() -> list[dict]:
         }
 
     suites = [
+        {
+            "id": "visual",
+            "name": "Visual tests",
+            "description": "Image decisions with a supplied picture and a known reference answer.",
+            "cases": [{
+                "id": "visual-shapes", "suite": "visual", "name": "Square colour · image",
+                "type": "choice", "image_fixture": "visual-shapes",
+                "question": "What colour is the square in the image?",
+                "context": "Inspect the supplied image. Answer using only visual evidence.",
+                "choices": ["red", "blue", "green"], "expected": "red",
+            }],
+        },
         {
             "id": "logic",
             "name": "Logic baseline",
@@ -625,6 +638,7 @@ def profile(raw: dict, fallback_id: str) -> dict | None:
                          if type(batch_size) is int and 1 <= batch_size <= 64 else {})
     return {
         **workbench_options,
+        **({"image_input": "systemone"} if raw.get("image_input") == "systemone" else {}),
         **({"protocol": "openai_chatgpt", "credentials_path": str(SECURE_DIR / "openai-chatgpt.json"),
             **({"reasoning_effort": "medium"} if endpoint.endswith("/responses") else {})} if chatgpt else {}),
         "id": identifier,
@@ -635,12 +649,13 @@ def profile(raw: dict, fallback_id: str) -> dict | None:
     }
 
 
-def call_chatgpt(config: dict, state: str, questions: dict) -> dict:
+def call_chatgpt(config: dict, state: str, questions: dict, assets=None) -> dict:
     if config["endpoint"] == "https://api.openai.com/v1/decisions":
         from openai_decisions_provider import call
     else:
         from openai_chatgpt_provider import call
-    return call(config, state, questions, transport=urlopen, timeout=REQUEST_TIMEOUT)
+    return call(config, state, questions, transport=urlopen, timeout=REQUEST_TIMEOUT,
+                **({"assets": assets} if assets else {}))
 
 
 def load_profiles() -> list[dict]:
@@ -755,8 +770,32 @@ def _typed_request_parts(payload: dict) -> tuple[dict, list[str], object]:
     return schema, contexts, caller_instructions
 
 
+def image_assets(payload: dict) -> dict:
+    try:
+        return validate_assets(payload)
+    except ValueError as error:
+        raise GatewayError(400, str(error)) from None
+
+
+def image_capability(config=None) -> str:
+    if not config:
+        return "unsupported"
+    if config.get("protocol") == "openai_chatgpt":
+        return "responses" if config["endpoint"].endswith("/responses") else "unsupported"
+    endpoint = urlparse(config["endpoint"])
+    if endpoint.hostname == "api.typesafe.ai" or config.get("image_input") == "systemone":
+        return "systemone"
+    return "unsupported"
+
+
+def reject_images(payload):
+    if image_assets(payload):
+        raise GatewayError(422, "Selected model route does not support images. Select a vision-capable profile; image evidence was not discarded.")
+
+
 def apple_payload(payload: dict) -> dict:
     """Normalize the shared JEV request for Apple's structured-generation API."""
+    reject_images(payload)
     schema, contexts, caller_instructions = _typed_request_parts(payload)
 
     normalized_schema = {}
@@ -817,6 +856,7 @@ def call_apple(payload: dict) -> dict:
 
 def local_payload(payload: dict) -> dict:
     """Make structured question guidance visible to the text-only local engine."""
+    reject_images(payload)
     result = dict(payload)
     if "instructions" in result and not isinstance(result["instructions"], str):
         if not _entry(result["instructions"]):
@@ -1014,6 +1054,8 @@ def remote_capabilities(config: dict | None = None) -> dict:
         config = next((item for item in load_profiles() if backend == f"remote:{item['id']}"), None)
     capabilities = {
         "selected_backend": f"remote:{config['id']}" if config and config.get("id") else backend,
+        "image_input": image_capability(config),
+        "image_formats": ["png", "jpg", "jpeg"],
         "shared_question_batching": True,
         "automatic_question_partitioning": False,
         "token_accounting": "unavailable",
@@ -1104,6 +1146,9 @@ def _record_backpressure(config: dict, retry_after: str | None) -> None:
 
 
 def call_typesafe(config: dict, payload: dict) -> dict:
+    assets = image_assets(payload)
+    if assets and image_capability(config) == "unsupported":
+        reject_images(payload)
     who = config.get("label") or config.get("name") or "System One provider"
     schema, contexts, caller_instructions = _typed_request_parts(payload)
     clm = config.get("id") == CLM_CONFIG["id"]
@@ -1153,18 +1198,21 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             _check_backpressure(config)
             if rate_limited.is_set():
                 raise GatewayError(429, "This request encountered provider rate limiting; retry only unfinished work.")
-        body = json.dumps({"state": context, "model": config["model"], "questions": questions}).encode("utf-8")
+        context_assets = used_assets(assets, [context, questions])
+        body = json.dumps({"state": context, "model": config["model"], "questions": questions,
+                           **({"assets": context_assets} if context_assets else {})}).encode("utf-8")
         request = Request(
             config["endpoint"],
             data=body,
             headers={
                 "Authorization": f"Bearer {config['api_key']}",
                 "Content-Type": "application/json",
+                **({"TypeSafe-Danger-Zone-Images": "true"} if context_assets else {}),
             },
         )
         try:
             if config.get("protocol") == "openai_chatgpt":
-                raw = json.dumps(call_chatgpt(config, context, questions)).encode("utf-8")
+                raw = json.dumps(call_chatgpt(config, context, questions, **({"assets": context_assets} if context_assets else {}))).encode("utf-8")
             else:
                 with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
                     raw = response.read()
@@ -1339,6 +1387,9 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                              "contexts": [context]}
             if "instructions" in payload:
                 retry_payload["instructions"] = payload["instructions"]
+            retry_assets = used_assets(assets, request_evidence(retry_payload))
+            if retry_assets:
+                retry_payload["assets"] = retry_assets
             retry_requests.append({"context_index": context_index, "request": retry_payload})
         response.update({"failed_work": failed_work, "retry_requests": retry_requests})
         status = 429 if any(item["status"] == 429 for item in failed_work) else failed_work[0]["status"]
@@ -1431,12 +1482,13 @@ class GatewayHandler(BaseHTTPRequestHandler):
             else:
                 self.send_json(200, {"shared_question_batching": True,
                                      "automatic_question_partitioning": False,
-                                     "capacity_status": "adapter_managed"})
+                                     "capacity_status": "adapter_managed", "image_input": "unsupported"})
             return
         if path == "/providers":
             self.send_json(200, {
                 "providers": [
-                    {"id": item["id"], "name": f"{item['name']} — {item['model']}"}
+                    {"id": item["id"], "name": f"{item['name']} — {item['model']}",
+                     "image_input": image_capability(item)}
                     for item in load_profiles()
                 ]
             })

@@ -227,7 +227,7 @@ def _stream_result(response):
         raise RuntimeError('ChatGPT returned unreadable structured answers') from None
 
 
-def call(config, state, questions, *, transport=None, timeout=180):
+def call(config, state, questions, *, transport=None, timeout=180, assets=None):
     """Return {answers: {id: native answer with type}, usage: Responses usage}.
 
     config requires credentials_path; defaults model=gpt-6-luna and
@@ -251,12 +251,13 @@ def call(config, state, questions, *, transport=None, timeout=180):
                 'score is their probability-weighted mean. '
                 'Confidence is your estimated confidence, not measured logprobs. Noul is the probability '
                 'the predicate is true. Do not invent extra fields.')
+    from jev_images import responses_content
+    content = responses_content({'state': state, 'questions': questions, 'choice_options': choice_options}, assets or {})
     body = {'model': config.get('model', 'gpt-6-luna'),
             'reasoning': {'effort': config.get('reasoning_effort', 'medium')},
             'store': False, 'stream': True,
             'input': [{'role': 'developer', 'content': guidance},
-                      {'role': 'user', 'content': json.dumps({'state': state, 'questions': questions,
-                                                            'choice_options': choice_options}, ensure_ascii=False)}],
+                      {'role': 'user', 'content': content}],
             'text': {'format': {'type': 'json_schema', 'name': 'system_one_answers', 'strict': True, 'schema': schema}}}
     request = Request(API + '/responses', data=json.dumps(body).encode(),
                       headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})

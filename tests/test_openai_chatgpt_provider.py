@@ -71,6 +71,20 @@ class ProviderTests(unittest.TestCase):
         self.assertTrue(body['text']['format']['strict'])
         self.assertNotIn('api_key', body)
 
+    def test_image_evidence_uses_responses_content_parts(self):
+        from image_smoke import payload
+        packet = payload()
+        transport = unittest.mock.Mock(return_value=self.stream(self.success()))
+        with patch.object(provider, 'urlopen') as refresh:
+            result = provider.call(self.config, packet['contexts'][0], self.questions,
+                                   assets=packet['assets'], transport=transport)
+        refresh.assert_not_called()
+        body = json.loads(transport.call_args.args[0].data)
+        content = body['input'][1]['content']
+        self.assertEqual(sum(part['type'] == 'input_image' for part in content), 1)
+        self.assertTrue(next(part['image_url'] for part in content if part['type'] == 'input_image').startswith('data:image/png;base64,'))
+        self.assertEqual(result['answers'], self.answers)
+
     def test_schema_has_strict_objects_and_native_ranges(self):
         schema = provider.answer_schema(self.questions)
         def check(node):
