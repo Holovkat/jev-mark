@@ -1,8 +1,6 @@
 """Shared inline-image contract. No filesystem paths or remote URLs are fetched."""
 import base64
 import binascii
-import json
-import re
 
 MAX_IMAGE_BYTES = 16 * 1024 * 1024
 MAX_ASSETS = 32
@@ -58,51 +56,3 @@ def validate_assets(payload):
     if len(used_assets(assets, evidence)) != len(assets):
         raise ValueError('Every image asset must be referenced in context, instructions or criteria.')
     return assets
-
-
-def responses_content(value, assets):
-    """Expand references in JSON string values, preserving each image's position."""
-    text = json.dumps(value, ensure_ascii=False)
-    if not assets:
-        return text
-    pattern = re.compile('|'.join(re.escape(ref) for ref in sorted(assets, key=len, reverse=True)))
-    content = []
-
-    def text_part(text):
-        if content and content[-1]['type'] == 'input_text':
-            content[-1]['text'] += text
-        else:
-            content.append({'type': 'input_text', 'text': text})
-
-    def emit(value):
-        if isinstance(value, str):
-            position = 0
-            # Whole string references take precedence over substring matches.
-            matches = [(0, len(value), value)] if value in assets else [
-                (match.start(), match.end(), match.group()) for match in pattern.finditer(value)]
-            text_part('"')
-            for start, end, ref in matches:
-                text_part(json.dumps(value[position:start], ensure_ascii=False)[1:-1])
-                asset = assets[ref]
-                mime = 'png' if asset['format'] == 'png' else 'jpeg'
-                content.append({'type': 'input_image', 'image_url': 'data:image/' + mime + ';base64,' + asset['data_base64']})
-                position = end
-            text_part(json.dumps(value[position:], ensure_ascii=False)[1:-1] + '"')
-        elif isinstance(value, dict):
-            text_part('{')
-            for index, (key, item) in enumerate(value.items()):
-                text_part((', ' if index else '') + json.dumps(key, ensure_ascii=False) + ': ')
-                emit(item)
-            text_part('}')
-        elif isinstance(value, list):
-            text_part('[')
-            for index, item in enumerate(value):
-                if index:
-                    text_part(', ')
-                emit(item)
-            text_part(']')
-        else:
-            text_part(json.dumps(value, ensure_ascii=False))
-
-    emit(value)
-    return content

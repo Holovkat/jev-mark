@@ -10,7 +10,7 @@ from urllib.error import HTTPError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import jev_gateway as gateway
-from jev_images import validate_assets, responses_content
+from jev_images import validate_assets
 
 from image_smoke import shape_png
 IMAGE = {'type': 'image', 'format': 'png', 'data_base64': base64.b64encode(shape_png()).decode()}
@@ -28,7 +28,7 @@ def config():
 class ImageTests(unittest.TestCase):
     def test_existing_text_packet_unchanged(self):
         self.assertEqual(validate_assets({'contexts': ['text']}), {})
-        self.assertEqual(responses_content({'state': 'text'}, {}), '{"state": "text"}')
+        self.assertEqual(gateway.profile(dict(config(), image_input='systemone'), 'x')['image_input'], 'systemone')
 
     def test_validation_and_nested_references(self):
         p = packet()
@@ -56,7 +56,7 @@ class ImageTests(unittest.TestCase):
         with patch.object(gateway, 'urlopen') as transport:
             for fn in [gateway.local_payload, gateway.apple_payload,
                        lambda p: gateway.call_typesafe(dict(config(), endpoint='http://127.0.0.1:11434/v1/systemone'), p),
-                       lambda p: gateway.call_typesafe(dict(config(), protocol='openai_chatgpt', endpoint='https://api.openai.com/v1/decisions'), p)]:
+                       lambda p: gateway.call_typesafe(dict(config(), protocol='openai_decisions', endpoint='https://api.openai.com/v1/decisions'), p)]:
                 with self.assertRaises(gateway.GatewayError) as caught:
                     fn(p)
                 self.assertEqual(caught.exception.status, 422)
@@ -105,23 +105,6 @@ class ImageTests(unittest.TestCase):
         self.assertEqual(len(retry), 1)
         self.assertEqual(retry[0]['request']['assets'], p['assets'])
         self.assertEqual(retry[0]['context_index'], 0)
-
-    def test_responses_images_expand_values_only_in_order(self):
-        value = {REF: 'key stays text', 'state': ['before ' + REF + ' after', REF]}
-        parts = responses_content(value, {REF: IMAGE})
-        self.assertEqual(sum(part['type'] == 'input_image' for part in parts), 2)
-        self.assertIn('"' + REF + '":', parts[0]['text'])
-        self.assertTrue(parts[1]['image_url'].startswith('data:image/png;base64,'))
-        self.assertIn('after', parts[2]['text'])
-
-    def test_responses_gateway_dispatch_and_capabilities(self):
-        c = dict(config(), protocol='openai_chatgpt', endpoint='https://api.openai.com/v1/responses')
-        with patch.object(gateway, 'call_chatgpt', return_value={'answers': {'jev_field_0': {'noul': .9}}}) as adapter:
-            self.assertTrue(gateway.call_typesafe(c, packet())['complete'])
-        self.assertEqual(adapter.call_args.kwargs['assets'], packet()['assets'])
-        self.assertEqual(gateway.remote_capabilities(c)['image_input'], 'responses')
-        self.assertEqual(gateway.profile(dict(config(), image_input='systemone'), 'x')['image_input'], 'systemone')
-
 
 if __name__ == '__main__':
     unittest.main()

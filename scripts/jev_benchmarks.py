@@ -77,7 +77,7 @@ class BenchmarkService:
                 host = '[' + host + ']'
             safe_endpoint = endpoint._replace(query='', fragment='', netloc=f'{host}:{endpoint.port}').geturl()
         return {k: profile[k] for k in ('id', 'name', 'model')} | {'endpoint': safe_endpoint, 'endpoint_hash': hashlib.sha256(profile['endpoint'].encode()).hexdigest(),
-                **({k: profile[k] for k in ('protocol', 'reasoning_effort') if k in profile} if profile.get('protocol') == 'openai_chatgpt' else {})}
+                **({'protocol': 'openai_decisions'} if profile.get('protocol') == 'openai_decisions' else {})}
 
     @staticmethod
     def _is_ollama(profile):
@@ -307,8 +307,8 @@ class BenchmarkService:
                           headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + profile['api_key']})
         started = time.perf_counter()
         try:
-            if profile.get('protocol') == 'openai_chatgpt':
-                raw = json.dumps(self.gateway.call_chatgpt(profile, case['state'], case['questions'])).encode()
+            if profile.get('protocol') == 'openai_decisions':
+                raw = json.dumps(self.gateway.call_openai(profile, case['state'], case['questions'])).encode()
             else:
                 with self.gateway.urlopen(request, timeout=self.gateway.REQUEST_TIMEOUT) as response:
                     raw = response.read(4 * 1024 * 1024 + 1)

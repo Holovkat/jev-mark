@@ -28,6 +28,10 @@ def clean(value: object) -> str:
 
 
 def profile(raw: dict[str, object], fallback_id: str) -> dict[str, str] | None:
+    # This legacy runner sends System One requests directly; native OpenAI
+    # Decisions profiles are handled by the app's shared benchmark service.
+    if raw.get("protocol") == "openai_decisions":
+        return None
     endpoint = raw.get("base_url") or raw.get("baseURL") or raw.get("endpoint") or raw.get("url")
     api_key = raw.get("api_key") or raw.get("apiKey") or raw.get("key")
     if not endpoint or not api_key:

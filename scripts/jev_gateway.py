@@ -623,14 +623,21 @@ def normalize_endpoint(value: str) -> str | None:
 
 def profile(raw: dict, fallback_id: str) -> dict | None:
     endpoint_value = raw.get("base_url") or raw.get("baseURL") or raw.get("endpoint") or raw.get("url")
-    chatgpt = raw.get("protocol") == "openai_chatgpt"
-    api_key = "chatgpt-plan" if chatgpt else raw.get("api_key") or raw.get("apiKey") or raw.get("key")
+    if raw.get("protocol") == "openai_chatgpt":
+        return None
+    decisions_api = raw.get("protocol") == "openai_decisions"
+    api_key = raw.get("api_key") or raw.get("apiKey") or raw.get("key")
     if not isinstance(endpoint_value, str) or not isinstance(api_key, str) or not api_key.strip():
         return None
     endpoint = normalize_endpoint(endpoint_value)
     if not endpoint:
         return None
-    if chatgpt and endpoint not in {"https://api.openai.com/v1/responses", "https://api.openai.com/v1/decisions"}:
+    if decisions_api and endpoint != "https://api.openai.com/v1/decisions":
+        return None
+    if decisions_api and any(
+        value is not None and (not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", value))
+        for value in (raw.get("organization_id"), raw.get("project_id"))
+    ):
         return None
     identifier = str(raw.get("id") or fallback_id).strip()
     batch_size = raw.get("workbench_question_batch_size")
@@ -639,23 +646,21 @@ def profile(raw: dict, fallback_id: str) -> dict | None:
     return {
         **workbench_options,
         **({"image_input": "systemone"} if raw.get("image_input") == "systemone" else {}),
-        **({"protocol": "openai_chatgpt", "credentials_path": str(SECURE_DIR / "openai-chatgpt.json"),
-            **({"reasoning_effort": "medium"} if endpoint.endswith("/responses") else {})} if chatgpt else {}),
+        **({"protocol": "openai_decisions", **{key: raw[key] for key in ("organization_id", "project_id")
+                                                if raw.get(key) is not None}} if decisions_api else {}),
         "id": identifier,
         "name": str(raw.get("name") or identifier),
         "endpoint": endpoint,
         "api_key": api_key.strip(),
-        "model": str(raw.get("model") or "jev-latest").strip(),
+        "model": str(raw.get("model") or ("gpt-6-luna" if decisions_api else "jev-latest")).strip(),
     }
 
 
-def call_chatgpt(config: dict, state: str, questions: dict, assets=None) -> dict:
-    if config["endpoint"] == "https://api.openai.com/v1/decisions":
-        from openai_decisions_provider import call
-    else:
-        from openai_chatgpt_provider import call
-    return call(config, state, questions, transport=urlopen, timeout=REQUEST_TIMEOUT,
-                **({"assets": assets} if assets else {}))
+def call_openai(config: dict, state: str, questions: dict) -> dict:
+    if config.get("protocol") != "openai_decisions":
+        raise RuntimeError("Unsupported OpenAI provider protocol")
+    from openai_decisions_provider import call
+    return call(config, state, questions, transport=urlopen, timeout=REQUEST_TIMEOUT)
 
 
 def load_profiles() -> list[dict]:
@@ -780,8 +785,8 @@ def image_assets(payload: dict) -> dict:
 def image_capability(config=None) -> str:
     if not config:
         return "unsupported"
-    if config.get("protocol") == "openai_chatgpt":
-        return "responses" if config["endpoint"].endswith("/responses") else "unsupported"
+    if config.get("protocol") == "openai_decisions":
+        return "unsupported"
     endpoint = urlparse(config["endpoint"])
     if endpoint.hostname == "api.typesafe.ai" or config.get("image_input") == "systemone":
         return "systemone"
@@ -1072,13 +1077,9 @@ def remote_capabilities(config: dict | None = None) -> dict:
         ),
     }
     if config:
-        if config.get("protocol") == "openai_chatgpt":
-            native = config["endpoint"] == "https://api.openai.com/v1/decisions"
-            capabilities.update({"inference_protocol": "native_decisions" if native else "responses_structured_output",
-                                 "billing_path": "chatgpt_plan",
-                                 "probability_source": "native_decisions" if native else "model_estimates"})
-            if not native:
-                capabilities["reasoning_effort"] = "medium"
+        if config.get("protocol") == "openai_decisions":
+            capabilities.update({"inference_protocol": "native_decisions", "billing_path": "openai_api",
+                                 "probability_source": "native_decisions"})
         if "workbench_question_batch_size" in config:
             capabilities["workbench_question_batch_size"] = config["workbench_question_batch_size"]
         endpoint = urlparse(config["endpoint"])
@@ -1211,8 +1212,8 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             },
         )
         try:
-            if config.get("protocol") == "openai_chatgpt":
-                raw = json.dumps(call_chatgpt(config, context, questions, **({"assets": context_assets} if context_assets else {}))).encode("utf-8")
+            if config.get("protocol") == "openai_decisions":
+                raw = json.dumps(call_openai(config, context, questions)).encode("utf-8")
             else:
                 with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
                     raw = response.read()
@@ -1239,10 +1240,12 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                 rate_limited.set()
                 _record_backpressure(config, retry_after)
             headers = {"Retry-After": retry_after} if retry_after is not None else {}
-            guidance = (
-                " Reduce or regroup shared evidence/questions explicitly; evidence was not trimmed."
-                if status in {400, 413, 422} else " Retry only unfinished work; automatic retries are disabled."
-            )
+            if status in {401, 403} and config.get("protocol") == "openai_decisions":
+                guidance = " Check the selected OpenAI credential and organization/project access."
+            elif status in {400, 413, 422}:
+                guidance = " Reduce or regroup shared evidence/questions explicitly; evidence was not trimmed."
+            else:
+                guidance = " Retry only unfinished work; automatic retries are disabled."
             if status in {400, 413, 422} and "max_request_bytes" in remote_capabilities(config):
                 guidance += " Ollama System One requires at most 64 questions and a 64 KiB JSON body per request."
             if token_rejection:
@@ -1255,7 +1258,7 @@ def call_typesafe(config: dict, payload: dict) -> dict:
         except (URLError, TimeoutError, OSError):
             raise GatewayError(502, f"Selected {who} could not be reached.") from None
         except RuntimeError as error:
-            if config.get("protocol") != "openai_chatgpt":
+            if config.get("protocol") != "openai_decisions":
                 raise
             raise GatewayError(502, str(error)) from None
         try:

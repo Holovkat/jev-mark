@@ -13,8 +13,7 @@ import openai_decisions_provider as provider
 
 class DecisionsProviderTests(unittest.TestCase):
     def setUp(self):
-        self.config = {'credentials_path': '/app/own-grant.json', 'model': 'gpt-6-luna',
-                       'reasoning_effort': 'medium'}
+        self.config = {'protocol': 'openai_decisions', 'api_key': 'sk-proj-test', 'model': 'gpt-6-luna'}
         self.questions = {
             'choose': {'type': 'choice', 'instructions': {'task': 'Choose carefully'},
                        'criteria': {'"Quoted" café': {'description': 'Keep \\ and " exactly'}, 'no': 'Reject'}},
@@ -29,10 +28,6 @@ class DecisionsProviderTests(unittest.TestCase):
                                {'value': 1, 'label': '1', 'probability': .7}]},
             {'name': 'check', 'type': 'predicate', 'probability': .9}],
             'usage': {'input_tokens': 12}}
-        self.token_patch = patch.object(provider, 'access_token', return_value='own-chatgpt-token')
-        self.token = self.token_patch.start()
-        self.addCleanup(self.token_patch.stop)
-
     def invoke(self, native=None):
         transport = Mock(return_value=io.BytesIO(json.dumps(self.native if native is None else native).encode()))
         result = provider.call(self.config, {'candidate': 'Evidence'}, self.questions, transport=transport)
@@ -42,8 +37,7 @@ class DecisionsProviderTests(unittest.TestCase):
         result, transport = self.invoke()
         request = transport.call_args.args[0]
         self.assertEqual(request.full_url, 'https://api.openai.com/v1/decisions')
-        self.assertEqual(request.get_header('Authorization'), 'Bearer own-chatgpt-token')
-        self.token.assert_called_once_with('/app/own-grant.json')
+        self.assertEqual(request.get_header('Authorization'), 'Bearer sk-proj-test')
         body = json.loads(request.data)
         self.assertEqual(set(body), {'model', 'input', 'questions'})
         self.assertEqual(body['model'], 'gpt-6-luna')
@@ -79,6 +73,31 @@ class DecisionsProviderTests(unittest.TestCase):
         self.assertEqual(raised.exception.read(), b'{"code":"no_matching_rule"}')
         transport.assert_called_once()
         default_transport.assert_not_called()
+
+    def test_api_key_mode_sends_explicit_key_and_optional_routing_headers(self):
+        config = {'protocol': 'openai_decisions', 'api_key': 'sk-proj-test',
+                  'endpoint': provider.ENDPOINT, 'model': provider.MODEL,
+                  'organization_id': 'org-test', 'project_id': 'proj_test'}
+        transport = Mock(return_value=io.BytesIO(json.dumps(self.native).encode()))
+        result = provider.call(config, 'Evidence', self.questions, transport=transport)
+        request = transport.call_args.args[0]
+        self.assertEqual(request.get_header('Authorization'), 'Bearer sk-proj-test')
+        self.assertEqual(request.get_header('Openai-organization'), 'org-test')
+        self.assertEqual(request.get_header('Openai-project'), 'proj_test')
+        self.assertEqual(request.full_url, provider.ENDPOINT)
+        self.assertEqual(set(json.loads(request.data)), {'model', 'input', 'questions'})
+        self.assertEqual(result['answers']['check']['noul'], .9)
+
+    def test_api_key_mode_rejects_invalid_credentials_and_routing(self):
+        config = {'protocol': 'openai_decisions', 'api_key': 'sk-proj-test'}
+        for field, value in (('api_key', ''), ('api_key', 'bad\r\nkey'),
+                             ('organization_id', 'org-test\nInjected: value'),
+                             ('project_id', ''), ('endpoint', 'https://other.example/v1/decisions'),
+                             ('protocol', 'unknown'), ('protocol', 'openai_chatgpt')):
+            transport = Mock()
+            with self.subTest(field=field), self.assertRaises(RuntimeError):
+                provider.call({**config, field: value}, 'Evidence', self.questions, transport=transport)
+            transport.assert_not_called()
 
     def test_refusal_is_explicit_failure(self):
         native = copy.deepcopy(self.native)
@@ -118,7 +137,6 @@ class DecisionsProviderTests(unittest.TestCase):
             config = {**self.config, field: value}
             with self.assertRaises(RuntimeError):
                 provider.call(config, 'Evidence', self.questions)
-        self.token.assert_not_called()
 
     def test_unreadable_response_is_safe_failure(self):
         for raw in (b'not json containing private text', b'\xff'):
@@ -134,7 +152,6 @@ class DecisionsProviderTests(unittest.TestCase):
                           {'x': {'type': 'unknown'}}):
             with self.assertRaises(RuntimeError):
                 provider.call(self.config, 'Evidence', questions)
-        self.token.assert_not_called()
 
 
 if __name__ == '__main__':

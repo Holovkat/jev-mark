@@ -35,8 +35,6 @@ Failed-work retry packets retain their relevant assets.
 
 - Official TypeSafe `/v1/systemone`: native assets and
   `TypeSafe-Danger-Zone-Images: true`. Jev 1.13 and 1.14 accept images.
-- ChatGPT Responses profiles: image references become ordered `input_image`
-  content parts alongside the same structured question/answer contract.
 - Other System One profiles: opt in with `"image_input": "systemone"` in the
   existing `typesafe.json` profile only when that upstream accepts TypeSafe's
   asset contract. The provider validates actual model support.
@@ -44,8 +42,8 @@ Failed-work retry packets retain their relevant assets.
   OpenAI Decisions, and unconfigured remote adapters: HTTP 422 before inference.
   Text requests continue using their existing path.
 
-`/providers` and `/capabilities` expose `image_input` as `systemone`,
-`responses`, or `unsupported`. This describes the adapter; it is not a claim
+`/providers` and `/capabilities` expose `image_input` as `systemone`
+or `unsupported`. This describes the adapter; it is not a claim
 that every model offered by the upstream is a vision model.
 
 ## Workbench
@@ -89,8 +87,7 @@ change menu-bar selection or credentials. `--profile` tests an adapter directly;
 image decision, not general image accuracy.
 
 Sources: [TypeSafe images](https://docs.typesafe.ai/images),
-[release announcement](https://typesafe.ai/blog/jev-1-14),
-[OpenAI vision inputs](https://developers.openai.com/api/docs/guides/images-vision).
+[release announcement](https://typesafe.ai/blog/jev-1-14).
 
 ## Local evidence — 15 October 2026
 
@@ -99,15 +96,15 @@ Sources: [TypeSafe images](https://docs.typesafe.ai/images),
 - Browser shape test: red, reference match, 245 ms. Upload and removal verified.
 - Browser text-only selection: HTTP 422 with the unsupported-image message.
 - Focused checks: 65 Python tests and 34 JavaScript tests passed; Python compile,
-  shell syntax and diff whitespace checks passed. Responses image transport was
-  covered by a mocked SSE/transport test; no live Responses vision claim.
+  shell syntax and diff whitespace checks passed. The former ChatGPT Responses
+  adapter was covered by a mocked test at that time and was later removed.
 - Broad Python run: 158 of 159 passed at that point. The failure is the untouched
   Pi native-loader fixture, whose installed `core/extensions/loader.js` path no
   longer exists. No Pi package or loader integration was changed for this feature.
 
 The menu-bar app was subsequently rebuilt and installed with
 `scripts/install_menubar.sh`. App signature verification passed; installed
-gateway, image module, Responses adapter and Workbench bytes match source.
+gateway, image module, then-existing Responses adapter and Workbench bytes matched source.
 The restarted gateway on port 8096 serves the Visual tests catalog and image
 loader. Existing selection `remote:openrouter-mercury-decide` was preserved;
 an image request correctly returned HTTP 422 on that unsupported route.

@@ -9,7 +9,7 @@ changes from 8–15 October.
 | Guide | Use it for |
 | --- | --- |
 | [Shared image decisions](multimodal.md) | PNG/JPEG assets, route support, Visual tests library case, CLI smoke, limits, and installed-app evidence. |
-| [OpenAI integration](openai-decision-integration.md) | OAuth setup, native Decisions versus Responses, recorded access rejection, exact choice labels, and image support boundaries. |
+| [OpenAI integration](openai-decision-integration.md) | Project-key native Decisions setup, credited organization, and verification evidence. |
 | [Liquid D1 local runtime](liquid-d1-local.md) | Separate native runtime, cached weights, LaunchAgent, profile and text-decision smoke evidence. |
 | [Benchmark portal](benchmark-portal.md) | Eight datasets, native protocols/scorers, pinned setup, frozen profiles, durable jobs, comparisons, exports, and open verification gates. |
 | [Service analytics](service-analytics.md) | Request metadata, local body capture/expiry, privacy/access controls, storage, API and implementation map. |

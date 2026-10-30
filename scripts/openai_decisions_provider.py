@@ -1,12 +1,11 @@
-"""Native Decisions using JEV's own ChatGPT OAuth grant; no fallback route."""
+"""Native OpenAI Decisions using an explicitly configured project API key."""
 from __future__ import annotations
 
 import json
 import math
+import re
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-
-from openai_chatgpt_provider import access_token
 
 ENDPOINT = 'https://api.openai.com/v1/decisions'
 MODEL = 'gpt-6-luna'
@@ -125,21 +124,34 @@ def _normalize(result, questions):
 
 
 def call(config, state, questions, *, transport=None, timeout=180):
-    """Call only /v1/decisions. Preserve HTTPError, including OAuth rejection.
+    """Call only /v1/decisions with the configured credential; never fall back.
 
     Native Decisions has no reasoning effort, store or streaming parameters.
-    No API key or Responses fallback is attempted.
     """
     if config.get('endpoint', ENDPOINT) != ENDPOINT:
         raise RuntimeError('Decisions requires the official Decisions endpoint')
     if config.get('model', MODEL) != MODEL:
         raise RuntimeError('Decisions currently requires gpt-6-luna')
     body = {'model': MODEL, 'input': _text(state), 'questions': native_questions(questions)}
-    if not config.get('credentials_path'):
-        raise RuntimeError('JEV ChatGPT credential path is required')
-    token = access_token(config['credentials_path'])
+    protocol = config.get('protocol', 'openai_decisions')
+    headers = {'Content-Type': 'application/json'}
+    if protocol != 'openai_decisions':
+        raise RuntimeError('Unsupported OpenAI Decisions credential mode')
+    token = config.get('api_key')
+    if not isinstance(token, str) or not token.strip():
+        raise RuntimeError('OpenAI Decisions API key is required')
+    token = token.strip()
+    if not token.isascii() or any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in token):
+        raise RuntimeError('Invalid OpenAI Decisions API key')
+    for field, header in (('organization_id', 'OpenAI-Organization'), ('project_id', 'OpenAI-Project')):
+        value = config.get(field)
+        if value is not None:
+            if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', value):
+                raise RuntimeError(f'Invalid OpenAI {field}')
+            headers[header] = value
+    headers['Authorization'] = 'Bearer ' + token
     request = Request(ENDPOINT, data=json.dumps(body, ensure_ascii=False).encode('utf-8'),
-                      headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
+                      headers=headers)
     try:
         with (transport or urlopen)(request, timeout=timeout) as response:
             result = json.load(response)

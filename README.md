@@ -11,8 +11,8 @@ Liquid D1, and the OpenAI adapters.
 
 | Area | Delivered behavior and evidence |
 | --- | --- |
-| Image decisions | Shared PNG/JPEG `assets` contract, TypeSafe image opt-in header, Responses image inputs, and preserved assets in retries. Text-only routes return HTTP 422. The installed Workbench opens **Visual tests → Square colour · image** first, with the image already loaded. [Contract and smoke evidence](docs/multimodal.md). |
-| OpenAI | Native Decisions adapter through the JEV ChatGPT OAuth connection, plus exact choice-label restoration in the retained Responses adapter. Recorded native access returned HTTP 401; successful Responses runs do not prove native Decisions access. [Integration status](docs/openai-decision-integration.md). |
+| Image decisions | Shared PNG/JPEG `assets` contract, TypeSafe image opt-in header, and preserved assets in retries. Text-only routes return HTTP 422. The installed Workbench opens **Visual tests → Square colour · image** first, with the image already loaded. [Contract and smoke evidence](docs/multimodal.md). |
+| OpenAI | Native Decisions adapter using a project API key and the credited API organization. [Integration status](docs/openai-decision-integration.md). |
 | Benchmarks | Eight prepared datasets, frozen model profiles, identical seeded cohorts, durable jobs, cancel/resume, native metrics, and JSON/CSV exports at `/benchmarks`. Unsupported protocols remain visible. The epic's combined verification and owner acceptance remain open. [Portal guide](docs/benchmark-portal.md). |
 | Analytics | Incoming request and outgoing response bodies in call details for up to 24 hours, with size/storage limits. Historical metadata keeps its separate retention policy. [Analytics contract](docs/service-analytics.md). |
 | Local engines | Liquid D1 has a separate local System One runtime. Strata's native Nimble comparison retained custom llama.cpp as the baseline. The custom runtime then received upstream hybrid batching while preserving the decision fixes; generic outputs were unchanged, with no new speed claim. [Liquid D1](docs/liquid-d1-local.md), [Strata findings](docs/strata-assessment.md), [runtime update](docs/llama-runtime-update.md). |
@@ -263,7 +263,6 @@ The gateway forwards only relevant assets and retains them in failed-work retrie
 | Selected route | Image behavior |
 | --- | --- |
 | Official TypeSafe System One | Native assets with `TypeSafe-Danger-Zone-Images: true`; verified with `jev-latest`. |
-| ChatGPT Responses profile | Ordered text/image content parts; transport covered by tests, live image inference not yet verified. |
 | Other System One profile | Explicit `"image_input": "systemone"` opt-in when the upstream supports this exact asset contract. |
 | Local finite-decision engine, Apple, CLM, native OpenAI Decisions, other unconfigured routes | HTTP 422 before inference; no image-to-text fallback or model substitution. |
 
@@ -499,18 +498,12 @@ Add `.secure/typesafe.json` before installing, or edit the app-support
 and `typesafe-config.json` are no longer loaded.
 The installer copies credential/configuration files only when absent from app
 support; editing source profiles does not replace the installed configuration.
-Its explicit exception registers or updates `openai-chatgpt-luna` for native
-Decisions when an installed ChatGPT credential exists, while preserving other
-profiles and the credential record.
 Profiles appear under **System One API**, including local HTTP providers.
-The **Open AI - Decision API — gpt-6-luna** option calls native `/v1/decisions`
-using the app's System One ChatGPT OAuth registration. It converts Choice, Score
-and Noul questions to native Decisions requests with no inference fallback.
-The recorded grant returned HTTP 401 on 8 October 2026. No later successful
-native Decisions inference is recorded; provider selection can change independently. Native Decisions exposes no reasoning-effort setting.
-The installer preserves the installed login and other providers; the installed
-gateway owns token renewal.
-See [OpenAI integration](docs/openai-decision-integration.md) for login and test evidence.
+The **OpenAI Decisions API (API credits)** profile calls native `/v1/decisions`
+with a project API key, converting Choice, Score and Noul questions without a
+fallback. The installed profile passed live inference against the credited API
+organization. Native Decisions exposes no reasoning-effort setting. See the
+[OpenAI integration guide](docs/openai-decision-integration.md) for setup and evidence.
 Nimble in this section uses Ollama's native decision API; the general Ollama
 model list uses the separate local constrained-token engine.
 
@@ -588,8 +581,9 @@ Benchmark the direct API profiles against local JEV/Gemma with:
 python3 scripts/typesafe_benchmark.py
 ```
 
-The benchmark sends the same bounded-choice questions to each profile and to
-the local JEV engine (port 8097 by default), then writes
+The legacy benchmark sends the same bounded-choice questions to each compatible
+System One profile and to the local JEV engine (port 8097 by default). Native
+OpenAI Decisions profiles use the app's benchmark service instead. This runner writes
 `typesafe-benchmark-results.json` without including API keys. Set
 `JEV_LOCAL_BASE_URL` to override the local comparison endpoint.
 

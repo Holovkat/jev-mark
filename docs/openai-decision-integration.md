@@ -1,121 +1,63 @@
-# OpenAI login test and System One integration
+# OpenAI Decisions API integration
 
-Integration evidence below was collected on 8 October 2026; documentation
-reconciled on 15 October. The last recorded native Decisions result remains
-HTTP 401. Model selection is operator-controlled: the installed gateway selected
-Mercury Decide at the 15 October check, so the earlier selection notes below are
-historical. Account access requires completed live inference.
+JEV uses OpenAI's native `/v1/decisions` endpoint with an explicitly configured
+project API key. The installed profile is **OpenAI Decisions API (API credits)
+— gpt-6-luna** under **System One API**. The gateway and benchmark service share
+the native converter for Choice, Score and Noul; no credential or inference
+fallback is used. Native Decisions image inputs are not supported by this JEV
+adapter and return HTTP 422 before inference.
 
-Current owner requirement: native `/v1/decisions` through the System One ChatGPT
-connection. A direct live probe with that registration's OAuth access token
-returned HTTP 401, `rejected_by_access_enforcement` / `no_matching_rule`.
-The same registration successfully listed models and completed a GPT-6-Luna
-Responses control request. This proves the current grant is rejected for the
-Decisions route; it does not establish that every ChatGPT account or future grant
-is unsupported. No API-key fallback was tested or configured. Evidence:
-`output/openai-decisions-chatgpt-probe.json`.
+## API credits and configuration
 
-Live test passed on 8 October: the owner registered the display name **System
-One**. OAuth identity and direct plan permission validated, the public models
-endpoint returned seven visible models, and a `gpt-6.1-sol` Responses request
-produced the expected greeting and `response.completed`. This proves that
-request's account access; it does not establish Decisions endpoint access or
-benchmark performance. Six local smoke-tool tests passed, and specialist review
-found no blocking issue. No existing provider selection was changed.
+OpenAI's [API credits guide](https://developers.openai.com/api/docs/guides/chatgpt-api-credits)
+includes Decisions. Credits belong to the linked API organization, so use a
+project key from that organization. The verified profile uses the credited
+organization and project configured by the owner. Organization and project IDs
+are supplied as explicit request headers; they may be omitted when the project
+key identifies the correct organization and project.
 
-The owner selected Luna as the preferred cost-conscious starting point. A second
-live Responses smoke test with `gpt-6-luna` also passed with the expected greeting
-and `response.completed`. The helper now defaults to that exact model and stops
-if it is absent from the account catalog. This is connectivity proof, not a
-decision-quality benchmark.
+All provider profiles use the existing owner-only
+`~/Library/Application Support/JEV Menu Bar/.secure/typesafe.json` file. A
+separate project-key profile has this shape:
 
-The Responses smoke tool explicitly requests `reasoning: {"effort": "medium"}`
-per owner preference. This setting applies to Responses; the documented native
-Decisions request schema does not expose a reasoning-effort parameter.
-
-The active profile is now labelled **Open AI - Decision API** and targets native
-`/v1/decisions` with `gpt-6-luna` through the existing System One OAuth connection.
-The gateway and benchmark runner share the native converter. It has no Responses
-or API-key fallback. At that time the owner requested this route remain selected
-for manual retesting. The recorded grant was rejected; no later successful native
-inference is recorded.
-
-The earlier Responses adapter completed all 100 ambiguity questions in 18.144
-seconds after its label repair (`output/openai-choice-label-repair.json`). That
-historical result is Responses evidence and does not measure native Decisions.
-
-## Two authentication paths
-
-| Path | Endpoint | Credential | Status |
-| --- | --- | --- | --- |
-| ChatGPT plan inference | `GET /v1/models`, `POST /v1/responses` | SIWC OAuth token with `chatgpt.tokens.use.direct` | Documented for eligible local/open-source apps |
-| Native decisions | `POST /v1/decisions`, model `gpt-6-luna` | OpenAI API key in official examples | Public beta; SIWC authorization for this route is not documented |
-
-ChatGPT identity login alone does not authorize inference. A saved Codex token
-does not establish a JEV registration or grant. Use a JEV-specific consent flow.
-Paid/remote application eligibility needs separate consideration under the
-[SIWC overview](https://developers.openai.com/siwc/token-sharing-open-source).
-
-## Repeatable login smoke test
-
-From the repository root, with Python, PyJWT and cryptography installed:
-
-```sh
-python3 scripts/openai_chatgpt_smoke.py --login
+```json
+{
+  "id": "openai-decisions-api",
+  "name": "OpenAI Decisions API (API credits)",
+  "protocol": "openai_decisions",
+  "base_url": "https://api.openai.com/v1/decisions",
+  "model": "gpt-6-luna",
+  "api_key": "<project API key>",
+  "organization_id": "<optional organization ID>",
+  "project_id": "<optional project ID>"
+}
 ```
 
-Complete OpenAI login and plan consent in the browser. The helper validates
-state, the issued client ID, ID-token signature, issuer, audience, expiry and
-nonce before saving credentials in ignored `.secure/openai-chatgpt.json` with
-owner-only permissions. A persistent host ID lives beside that record.
+Keep credentials out of source control and maintain owner-only permissions.
+Refresh providers after changing the profile. The installer preserves an
+existing app-support profile file and does not copy over configured keys.
 
-It retrieves the live account catalog, selects `gpt-6-luna` by default (or an
-explicit `--model` slug), and sends a small greeting request. If the selected
-model is unavailable, it stops rather than choosing a more expensive model. Success requires
-both matching output and `response.completed`; partial output is insufficient.
-It does not change the selected JEV provider. Existing valid JEV credentials can
-be retested without `--login`. Expired credentials require another sign-in;
-automatic refresh and production account management are outside this smoke tool.
+## Verification — 30 October 2026
 
-The request follows the [published inference contract](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference):
-`store: false`, `stream: true`, full context in an input array. No automatic
-API-key fallback is permitted. [Preview restrictions](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations)
-also exclude several normal Responses parameters and hosted tools.
+A live source-gateway request using the credited organization and project
+returned HTTP 200 with Choice, Noul and Score answers (`billing`, `true`, and
+`1.0`). It reported 536 input tokens and zero output tokens. The installed
+gateway listed the API-key profile and a one-case ANLI benchmark through the
+running service completed without failed or unsupported cases.
+The owner subsequently tested the profile and reported that it looked good.
+These checks establish connectivity and the exercised contract, not general
+model accuracy.
 
-## Fit with JEV's existing model list
-
-The canonical profile store remains `typesafe.json` (see README's System One
-API profiles). The installed app-support file is independent of the source
-`.secure` file: the installer does not replace the whole existing profile file.
-Its explicit ChatGPT registration step updates `openai-chatgpt-luna` when an
-installed ChatGPT credential exists; other profiles and credentials are preserved.
-
-The retained Responses adapter also accepts the shared image assets and expands
-their references into ordered image/text content parts. That transport is covered
-by deterministic tests; no live Responses image inference is recorded. Native
-Decisions image input is unsupported by this gateway and returns HTTP 422 before
-inference. See [shared image decisions](multimodal.md).
-
-The native converter sends `input` and ordered named questions to `/v1/decisions`,
-validates named answers and distributions, and maps Choice/Score/Predicate results
-back to the gateway's Choice/Score/Noul contract. It preserves native confidence
-and fractional scores. Refusals and malformed answers fail explicitly. HTTP
-errors remain visible without switching routes or retrying automatically.
-
-The installer bundles both adapters, updates the existing `openai-chatgpt-luna`
-profile to the native route and preserves other profiles and installed OAuth
-credentials. Native Decisions has no reasoning parameter; medium remains a
-setting only in the retained Responses smoke tool.
-
-Installed and restarted `/Applications/JEV Menu Bar.app` on 8 October 2026.
-The live provider list shows **Open AI - Decision API — gpt-6-luna**, and the
-selected gateway reports `native_decisions` through the ChatGPT plan. A live
-installed predicate test returned HTTP 401. This verifies route wiring and the
-current access rejection, not successful Decisions inference. Code-signature
-verification, native adapter tests and gateway/batching checks passed; specialist
-review found no blockers.
+The earlier ChatGPT sign-in route was retired at the owner's request. Its
+historical native Decisions test returned HTTP 401; that result does not apply
+to the successful project-key route above. On 30 October 2026, the owner also
+requested removal of its cached login, host identity and lock files from the
+source checkout and installed app-support directory.
+After removal, the rebuilt installed app retained the selected API-key profile,
+the retired profile and adapter were absent, and an HTTP request through the
+running `/v1/decision` endpoint returned complete OpenAI API answers (`billing`
+and `true`), HTTP 200.
 
 Sources: [Decisions guide](https://developers.openai.com/api/docs/guides/decisions),
-[API schema](https://developers.openai.com/api/reference/resources/decisions/methods/create),
-[SIWC registration](https://developers.openai.com/siwc/token-sharing-open-source/sign-in),
-[SIWC errors](https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery).
+[Decisions API reference](https://developers.openai.com/api/reference/resources/decisions/methods/create),
+[OpenAI API authentication](https://developers.openai.com/api/reference/overview#authentication).
