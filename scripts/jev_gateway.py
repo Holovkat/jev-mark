@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+from jev_images import validate_assets, used_assets, request_evidence
 import hashlib
 import threading
 from datetime import datetime, timezone
@@ -301,6 +302,18 @@ def example_suites() -> list[dict]:
         }
 
     suites = [
+        {
+            "id": "visual",
+            "name": "Visual tests",
+            "description": "Image decisions with a supplied picture and a known reference answer.",
+            "cases": [{
+                "id": "visual-shapes", "suite": "visual", "name": "Square colour · image",
+                "type": "choice", "image_fixture": "visual-shapes",
+                "question": "What colour is the square in the image?",
+                "context": "Inspect the supplied image. Answer using only visual evidence.",
+                "choices": ["red", "blue", "green"], "expected": "red",
+            }],
+        },
         {
             "id": "logic",
             "name": "Logic baseline",
@@ -603,48 +616,56 @@ def normalize_endpoint(value: str) -> str | None:
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         return None
     path = parsed.path.rstrip("/")
-    if not path.endswith("/v1/systemone"):
+    if not path.endswith(("/v1/systemone", "/alpha/decisions", "/v1/responses", "/v1/decisions")):
         path = f"{path}/systemone" if path.endswith("/v1") else f"{path}/v1/systemone"
     return urlunparse((parsed.scheme, parsed.netloc, path, "", parsed.query, ""))
 
 
 def profile(raw: dict, fallback_id: str) -> dict | None:
     endpoint_value = raw.get("base_url") or raw.get("baseURL") or raw.get("endpoint") or raw.get("url")
+    if raw.get("protocol") == "openai_chatgpt":
+        return None
+    decisions_api = raw.get("protocol") == "openai_decisions"
     api_key = raw.get("api_key") or raw.get("apiKey") or raw.get("key")
     if not isinstance(endpoint_value, str) or not isinstance(api_key, str) or not api_key.strip():
         return None
     endpoint = normalize_endpoint(endpoint_value)
     if not endpoint:
         return None
+    if decisions_api and endpoint != "https://api.openai.com/v1/decisions":
+        return None
+    if decisions_api and any(
+        value is not None and (not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", value))
+        for value in (raw.get("organization_id"), raw.get("project_id"))
+    ):
+        return None
     identifier = str(raw.get("id") or fallback_id).strip()
+    batch_size = raw.get("workbench_question_batch_size")
+    workbench_options = ({"workbench_question_batch_size": batch_size}
+                         if type(batch_size) is int and 1 <= batch_size <= 64 else {})
     return {
+        **workbench_options,
+        **({"image_input": "systemone"} if raw.get("image_input") == "systemone" else {}),
+        **({"protocol": "openai_decisions", **{key: raw[key] for key in ("organization_id", "project_id")
+                                                if raw.get(key) is not None}} if decisions_api else {}),
         "id": identifier,
         "name": str(raw.get("name") or identifier),
         "endpoint": endpoint,
         "api_key": api_key.strip(),
-        "model": str(raw.get("model") or "jev-latest").strip(),
+        "model": str(raw.get("model") or ("gpt-6-luna" if decisions_api else "jev-latest")).strip(),
     }
 
 
-def parse_pairs(text: str) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for raw_line in text.splitlines():
-        line = raw_line.strip().strip("{},")
-        if not line or line.startswith("#") or line.startswith("["):
-            continue
-        match = re.match(r"([^:=]+)\s*[:=]\s*(.+)$", line)
-        if not match:
-            continue
-        key = match.group(1).strip().strip("\"'")
-        value = match.group(2).strip().strip(" \t\r\n{},\"'")
-        if key and value:
-            values[key] = value
-    return values
+def call_openai(config: dict, state: str, questions: dict) -> dict:
+    if config.get("protocol") != "openai_decisions":
+        raise RuntimeError("Unsupported OpenAI provider protocol")
+    from openai_decisions_provider import call
+    return call(config, state, questions, transport=urlopen, timeout=REQUEST_TIMEOUT)
 
 
 def load_profiles() -> list[dict]:
     configs: list[dict] = []
-    for filename in ("typesafe.json", "typesafe-config.json"):
+    for filename in ("typesafe.json",):
         try:
             payload = json.loads((SECURE_DIR / filename).read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
@@ -656,45 +677,6 @@ def load_profiles() -> list[dict]:
                     item = profile(row, f"{filename}-{index + 1}")
                     if item:
                         configs.append(item)
-
-    for filename in ("typesafe.env", "env.dev", ".env"):
-        try:
-            pairs = parse_pairs((SECURE_DIR / filename).read_text(encoding="utf-8"))
-        except OSError:
-            continue
-        lowered = {key.lower(): value for key, value in pairs.items()}
-        generic = profile({
-            "id": f"typesafe-{filename.replace('.', '-')}",
-            "name": f"TypeSafe {filename}",
-            "endpoint": (
-                lowered.get("jev_url") or lowered.get("typesafe_base_url")
-                or lowered.get("typesafe_url") or lowered.get("typesafe_endpoint")
-                or lowered.get("api_url")
-            ),
-            "api_key": (
-                lowered.get("jevapi") or lowered.get("typesafe_api_key")
-                or lowered.get("typesafe_key") or lowered.get("api_key")
-            ),
-            "model": lowered.get("typesafe_model"),
-        }, filename)
-        if generic:
-            configs.append(generic)
-
-        grouped: dict[str, dict[str, str]] = {}
-        for key, value in pairs.items():
-            match = re.fullmatch(r"TYPESAFE_(.+)_(API_KEY|KEY|BASE_URL|URL|ENDPOINT|MODEL|NAME)", key.upper())
-            if match:
-                grouped.setdefault(match.group(1), {})[match.group(2)] = value
-        for identifier, values in sorted(grouped.items()):
-            item = profile({
-                "id": f"typesafe-{identifier.lower()}",
-                "name": values.get("NAME") or f"TypeSafe {identifier}",
-                "endpoint": values.get("BASE_URL") or values.get("ENDPOINT") or values.get("URL"),
-                "api_key": values.get("API_KEY") or values.get("KEY"),
-                "model": values.get("MODEL"),
-            }, identifier)
-            if item:
-                configs.append(item)
 
     unique: dict[str, dict] = {}
     for item in configs:
@@ -793,8 +775,32 @@ def _typed_request_parts(payload: dict) -> tuple[dict, list[str], object]:
     return schema, contexts, caller_instructions
 
 
+def image_assets(payload: dict) -> dict:
+    try:
+        return validate_assets(payload)
+    except ValueError as error:
+        raise GatewayError(400, str(error)) from None
+
+
+def image_capability(config=None) -> str:
+    if not config:
+        return "unsupported"
+    if config.get("protocol") == "openai_decisions":
+        return "unsupported"
+    endpoint = urlparse(config["endpoint"])
+    if endpoint.hostname == "api.typesafe.ai" or config.get("image_input") == "systemone":
+        return "systemone"
+    return "unsupported"
+
+
+def reject_images(payload):
+    if image_assets(payload):
+        raise GatewayError(422, "Selected model route does not support images. Select a vision-capable profile; image evidence was not discarded.")
+
+
 def apple_payload(payload: dict) -> dict:
     """Normalize the shared JEV request for Apple's structured-generation API."""
+    reject_images(payload)
     schema, contexts, caller_instructions = _typed_request_parts(payload)
 
     normalized_schema = {}
@@ -855,6 +861,7 @@ def call_apple(payload: dict) -> dict:
 
 def local_payload(payload: dict) -> dict:
     """Make structured question guidance visible to the text-only local engine."""
+    reject_images(payload)
     result = dict(payload)
     if "instructions" in result and not isinstance(result["instructions"], str):
         if not _entry(result["instructions"]):
@@ -1045,9 +1052,15 @@ def _clm_criteria(criteria: dict[str, object]) -> dict[str, object]:
     return criteria
 
 
-def remote_capabilities() -> dict:
-    """Describe what the gateway can prove without guessing provider tokenization."""
-    return {
+def remote_capabilities(config: dict | None = None) -> dict:
+    """Describe proven route limits without exposing provider routing or credentials."""
+    backend = selected_backend()
+    if config is None:
+        config = next((item for item in load_profiles() if backend == f"remote:{item['id']}"), None)
+    capabilities = {
+        "selected_backend": f"remote:{config['id']}" if config and config.get("id") else backend,
+        "image_input": image_capability(config),
+        "image_formats": ["png", "jpg", "jpeg"],
         "shared_question_batching": True,
         "automatic_question_partitioning": False,
         "token_accounting": "unavailable",
@@ -1063,12 +1076,32 @@ def remote_capabilities() -> dict:
             "evidence explicitly; the gateway never trims evidence or retries automatically."
         ),
     }
+    if config:
+        if config.get("protocol") == "openai_decisions":
+            capabilities.update({"inference_protocol": "native_decisions", "billing_path": "openai_api",
+                                 "probability_source": "native_decisions"})
+        if "workbench_question_batch_size" in config:
+            capabilities["workbench_question_batch_size"] = config["workbench_question_batch_size"]
+        endpoint = urlparse(config["endpoint"])
+        if (endpoint.hostname in {"127.0.0.1", "localhost", "::1"}
+                and endpoint.port == 11434 and endpoint.path == "/v1/systemone"):
+            capabilities.update({
+                "max_questions_per_request": 64,
+                "max_request_bytes": 65536,
+                "guidance": ("Ollama System One accepts at most 64 questions and a 64 KiB JSON body per request. "
+                             "Group questions and reduce shared evidence explicitly; the gateway never partitions or trims requests."),
+                "question_limit_source": "Ollama System One API",
+            })
+            if "workbench_question_batch_size" in config:
+                capabilities["workbench_question_batch_size"] = config["workbench_question_batch_size"]
+    return capabilities
 
 
 def _account_key(config: dict) -> str:
     # Limits apply to the provider account, including profiles selecting other models.
     origin = urlparse(config["endpoint"]).netloc
-    return hashlib.sha256(f"{origin}\0{config['api_key']}".encode()).hexdigest()
+    credential_identity = config.get("credentials_path", config["api_key"])
+    return hashlib.sha256(f"{origin}\0{credential_identity}".encode()).hexdigest()
 
 
 def _retry_delay(value: str) -> float | None:
@@ -1114,7 +1147,10 @@ def _record_backpressure(config: dict, retry_after: str | None) -> None:
 
 
 def call_typesafe(config: dict, payload: dict) -> dict:
-    who = config.get("label") or "TypeSafe provider"
+    assets = image_assets(payload)
+    if assets and image_capability(config) == "unsupported":
+        reject_images(payload)
+    who = config.get("label") or config.get("name") or "System One provider"
     schema, contexts, caller_instructions = _typed_request_parts(payload)
     clm = config.get("id") == CLM_CONFIG["id"]
     instructions_for = _clm_instructions if clm else _question_instructions
@@ -1163,21 +1199,38 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             _check_backpressure(config)
             if rate_limited.is_set():
                 raise GatewayError(429, "This request encountered provider rate limiting; retry only unfinished work.")
-        body = json.dumps({"state": context, "model": config["model"], "questions": questions}).encode("utf-8")
+        context_assets = used_assets(assets, [context, questions])
+        body = json.dumps({"state": context, "model": config["model"], "questions": questions,
+                           **({"assets": context_assets} if context_assets else {})}).encode("utf-8")
         request = Request(
             config["endpoint"],
             data=body,
             headers={
                 "Authorization": f"Bearer {config['api_key']}",
                 "Content-Type": "application/json",
+                **({"TypeSafe-Danger-Zone-Images": "true"} if context_assets else {}),
             },
         )
         try:
-            with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
-                raw = response.read()
+            if config.get("protocol") == "openai_decisions":
+                raw = json.dumps(call_openai(config, context, questions)).encode("utf-8")
+            else:
+                with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
+                    raw = response.read()
         except HTTPError as error:
             status = error.code
             retry_after = error.headers.get("Retry-After") if error.headers else None
+            token_rejection = None
+            if status == 400 and not clm and "max_request_bytes" in remote_capabilities(config):
+                try:
+                    provider_error = json.loads(error.read(4096)).get("error")
+                    if isinstance(provider_error, str):
+                        token_rejection = re.fullmatch(
+                            r"prompt (\d+) has (\d+) tokens; expected 1(?:-|–)(\d+) \(input is never truncated\)",
+                            provider_error.strip(), re.IGNORECASE,
+                        )
+                except (OSError, ValueError, AttributeError):
+                    pass
             error.close()
             if clm:
                 raise GatewayError(502, f"Selected {who} returned HTTP {status}.") from None
@@ -1187,15 +1240,27 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                 rate_limited.set()
                 _record_backpressure(config, retry_after)
             headers = {"Retry-After": retry_after} if retry_after is not None else {}
-            guidance = (
-                " Reduce or regroup shared evidence/questions explicitly; evidence was not trimmed."
-                if status in {400, 413, 422} else " Retry only unfinished work; automatic retries are disabled."
-            )
+            if status in {401, 403} and config.get("protocol") == "openai_decisions":
+                guidance = " Check the selected OpenAI credential and organization/project access."
+            elif status in {400, 413, 422}:
+                guidance = " Reduce or regroup shared evidence/questions explicitly; evidence was not trimmed."
+            else:
+                guidance = " Retry only unfinished work; automatic retries are disabled."
+            if status in {400, 413, 422} and "max_request_bytes" in remote_capabilities(config):
+                guidance += " Ollama System One requires at most 64 questions and a 64 KiB JSON body per request."
+            if token_rejection:
+                prompt_index, token_count, token_limit = token_rejection.groups()
+                guidance += (f" Ollama prompt {prompt_index} has {token_count} tokens; the model accepts at most {token_limit}. "
+                             "Reduce evidence or the profile's workbench_question_batch_size; input was not truncated.")
             if status == 429 and _retry_delay(retry_after) is None:
                 guidance += " Provider cooldown is unknown; pause and obtain retry timing before retrying."
             raise GatewayError(status, f"Selected {who} returned HTTP {status}.{guidance}", headers=headers) from None
         except (URLError, TimeoutError, OSError):
             raise GatewayError(502, f"Selected {who} could not be reached.") from None
+        except RuntimeError as error:
+            if config.get("protocol") != "openai_decisions":
+                raise
+            raise GatewayError(502, str(error)) from None
         try:
             response = json.loads(raw)
         except (UnicodeDecodeError, json.JSONDecodeError):
@@ -1313,7 +1378,7 @@ def call_typesafe(config: dict, payload: dict) -> dict:
     response = {"results": results, "usage": total_usage}
     if clm:
         return response
-    response.update({"complete": not failed_work, "capacity": remote_capabilities()})
+    response.update({"complete": not failed_work, "capacity": remote_capabilities(config)})
     if failed_work:
         retry_requests = []
         for context_index, context in enumerate(contexts):
@@ -1325,6 +1390,9 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                              "contexts": [context]}
             if "instructions" in payload:
                 retry_payload["instructions"] = payload["instructions"]
+            retry_assets = used_assets(assets, request_evidence(retry_payload))
+            if retry_assets:
+                retry_payload["assets"] = retry_assets
             retry_requests.append({"context_index": context_index, "request": retry_payload})
         response.update({"failed_work": failed_work, "retry_requests": retry_requests})
         status = 429 if any(item["status"] == 429 for item in failed_work) else failed_work[0]["status"]
@@ -1417,12 +1485,13 @@ class GatewayHandler(BaseHTTPRequestHandler):
             else:
                 self.send_json(200, {"shared_question_batching": True,
                                      "automatic_question_partitioning": False,
-                                     "capacity_status": "adapter_managed"})
+                                     "capacity_status": "adapter_managed", "image_input": "unsupported"})
             return
         if path == "/providers":
             self.send_json(200, {
                 "providers": [
-                    {"id": item["id"], "name": f"{item['name']} — {item['model']}"}
+                    {"id": item["id"], "name": f"{item['name']} — {item['model']}",
+                     "image_input": image_capability(item)}
                     for item in load_profiles()
                 ]
             })
@@ -1531,7 +1600,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
             profile_id = backend.removeprefix("remote:")
             config = next((item for item in load_profiles() if item["id"] == profile_id), None)
             if config is None:
-                raise GatewayError(503, "Selected TypeSafe profile is missing or incomplete in .secure.")
+                raise GatewayError(503, "Selected System One profile is missing or incomplete in .secure.")
             response = call_typesafe(config, payload)
             self.send_json(200, response)
         except GatewayError as error:

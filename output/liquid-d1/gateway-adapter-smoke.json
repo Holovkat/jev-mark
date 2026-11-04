@@ -1,0 +1,109 @@
+{
+  "results": [
+    {
+      "decision": {
+        "refund": true,
+        "team": "billing",
+        "urgency": 0.5424767143503321
+      },
+      "fields": {
+        "refund": {
+          "value": true,
+          "noul": 0.9879370634550941,
+          "probability": 0.9879370634550941
+        },
+        "team": {
+          "value": "billing",
+          "probability": 0.980875476220966,
+          "probabilities": {
+            "billing": 0.980875476220966,
+            "technical": 0.012432593196462014,
+            "fraud": 0.006691930582571805
+          },
+          "confidence": 0.9713132143314489
+        },
+        "urgency": {
+          "value": 0.5424767143503321,
+          "score": 0.5424767143503321,
+          "legend": {
+            "0": "Can wait",
+            "1": "Today",
+            "2": "Blocking the customer now"
+          },
+          "probabilities": {
+            "0": 0.49825518555963627,
+            "1": 0.46101291453039517,
+            "2": 0.040731899909968464
+          },
+          "confidence": 0.18628492847450184
+        }
+      },
+      "context_index": 0,
+      "usage": {
+        "input_tokens": 309,
+        "output_tokens": 0
+      }
+    },
+    {
+      "decision": {
+        "refund": false,
+        "team": "technical",
+        "urgency": 1.0044408469136055
+      },
+      "fields": {
+        "refund": {
+          "value": false,
+          "noul": 0.017582219690707057,
+          "probability": 0.9824177803092929
+        },
+        "team": {
+          "value": "technical",
+          "probability": 0.9663936023564419,
+          "probabilities": {
+            "billing": 0.026810775174602775,
+            "technical": 0.9663936023564419,
+            "fraud": 0.006795622468955535
+          },
+          "confidence": 0.9495904035346628
+        },
+        "urgency": {
+          "value": 1.0044408469136055,
+          "score": 1.0044408469136055,
+          "legend": {
+            "0": "Can wait",
+            "1": "Today",
+            "2": "Blocking the customer now"
+          },
+          "probabilities": {
+            "0": 0.29299025917733146,
+            "1": 0.40957863473173145,
+            "2": 0.297431106090937
+          },
+          "confidence": 0.11436795209759743
+        }
+      },
+      "context_index": 1,
+      "usage": {
+        "input_tokens": 315,
+        "output_tokens": 0
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 624,
+    "output_tokens": 0
+  },
+  "complete": true,
+  "capacity": {
+    "selected_backend": "remote:liquid-d1-local",
+    "shared_question_batching": true,
+    "automatic_question_partitioning": false,
+    "token_accounting": "unavailable",
+    "capacity_status": "unknown",
+    "capacity_validation": "provider",
+    "preflight_verified": false,
+    "global_upstream_workers": 8,
+    "worker_limit_source": "Existing gateway worker bound, shared across callers",
+    "guidance": "Submit compact shared evidence and independent questions together. The provider validates context capacity; no authoritative local tokenizer or count endpoint is published. On capacity rejection, reduce or regroup evidence explicitly; the gateway never trims evidence or retries automatically."
+  }
+}

@@ -3,6 +3,7 @@ import contextvars
 import csv
 import io
 import json
+import sqlite3
 import sys
 import tempfile
 import threading
@@ -20,7 +21,7 @@ from urllib.request import Request
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from jev_analytics import AnalyticsStore, Observation
+from jev_analytics import AnalyticsStore, Observation, PAYLOAD_BODY_LIMIT
 from jev_service import ContextExecutor, ObservedResponse, load_gateway, make_handler
 
 PAYLOAD = {'contexts': ['PRIVATE_CONTEXT_456'], 'schema': {'PRIVATE_FIELD_123': {'type': 'choice', 'choices': ['yes', 'no']}}}
@@ -110,7 +111,7 @@ class StoreTests(unittest.TestCase):
         observation.payload({'contexts': ['a'], 'schema': {'x': {'type': []}}})
         self.assertEqual(observation.row['kind'], 'other')
 
-    def test_private_content_never_persisted(self):
+    def test_metadata_recording_without_body_capture_never_persists_private_content(self):
         observation = Observation({'Authorization': 'SUPER_SECRET_TOKEN'})
         observation.payload(PAYLOAD)
         observation.response(200, {'results': [{'decision': {'PRIVATE_FIELD_123': 'SECRET_ANSWER'}}], 'error': 'PRIVATE_CONTEXT_456'})
@@ -122,6 +123,68 @@ class StoreTests(unittest.TestCase):
             self.assertNotIn(secret, data)
             for file in self.path.parent.iterdir():
                 self.assertNotIn(secret.encode(), file.read_bytes())
+
+    def captured(self, when=None):
+        observation = record(self.store, when=when)
+        observation.capture_body('request', b'{"contexts":["private evidence"]}')
+        observation.capture_body('response', b'{"answer":"private answer"}')
+        self.store.enqueue(observation.row, bodies=observation.bodies)
+        self.assertTrue(self.store.flush())
+        return observation
+
+    def test_bodies_are_on_demand_and_excluded_from_metadata_and_csv(self):
+        observation = self.captured()
+        detail = self.store.payload_detail(observation.row['request_id'])
+        self.assertEqual(detail['status'], 'available')
+        self.assertIn('private evidence', detail['bodies']['request']['text'])
+        self.assertIn('private answer', detail['bodies']['response']['text'])
+        self.assertNotIn('private evidence', json.dumps(self.store.query({})))
+        self.assertNotIn('private answer', self.store.query({}, export=True))
+
+    def test_payload_expiry_deletes_bodies_but_preserves_history_and_attempts(self):
+        observation = self.captured()
+        with closing(sqlite3.connect(self.path)) as db:
+            db.execute('UPDATE payloads SET started_at=?', (time.time() - 86401,))
+            db.execute('UPDATE requests SET started_at=?', (time.time() - 86401,))
+            db.commit()
+        # Access denies expired content immediately, even before periodic pruning.
+        self.assertEqual(self.store.payload_detail(observation.row['request_id'])['status'], 'expired')
+        self.store.close()
+        self.store = AnalyticsStore(self.path)
+        record(self.store)  # Wait for startup prune transaction to complete.
+        with closing(self.store.connect()) as db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM payloads').fetchone()[0], 0)
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM requests').fetchone()[0], 2)
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM attempts').fetchone()[0], 2)
+
+    def test_oversize_bodies_are_explicitly_omitted(self):
+        observation = Observation({})
+        observation.capture_body('request', b'x' * (PAYLOAD_BODY_LIMIT + 1))
+        self.assertEqual(observation.bodies['request']['status'], 'too_large')
+        self.assertIsNone(observation.bodies['request']['text'])
+
+    def test_payload_queue_budget_keeps_metadata(self):
+        with patch('jev_analytics.PAYLOAD_QUEUE_LIMIT', 0):
+            observation = self.captured()
+        self.assertEqual(self.store.payload_detail(observation.row['request_id'])['status'], 'queue_limit')
+        self.assertEqual(self.store.query({})['stats']['requests'], 1)
+        self.assertEqual(self.store.payload_queue_bytes, 0)
+
+    def test_payload_disk_budget_keeps_metadata(self):
+        with patch('jev_analytics.PAYLOAD_STORAGE_LIMIT', 1):
+            observation = self.captured()
+        self.assertEqual(self.store.payload_detail(observation.row['request_id'])['status'], 'not_captured')
+        self.assertEqual(self.store.query({})['stats']['requests'], 1)
+
+    def test_metadata_database_upgrade_preserves_existing_rows(self):
+        observation = record(self.store)
+        self.store.close()
+        with closing(sqlite3.connect(self.path)) as db:
+            db.execute('DROP TABLE payloads')
+            db.commit()
+        self.store = AnalyticsStore(self.path)
+        self.assertEqual(self.store.query({})['stats']['requests'], 1)
+        self.assertEqual(self.store.payload_detail(observation.row['request_id'])['status'], 'not_captured')
 
     def test_unfinished_start_survives_restart_as_interrupted(self):
         self.store.enqueue(Observation({}).row)
@@ -324,7 +387,9 @@ class HTTPTests(unittest.TestCase):
         self.store = AnalyticsStore(root / 'data' / 'calls.sqlite3')
         self.gateway = fake_gateway(root)
         handler = make_handler(self.gateway, self.store, assets=ROOT / 'Resources/Web')
-        self.server = ThreadingHTTPServer(('127.0.0.1', 0), handler)
+        class TestServer(ThreadingHTTPServer):
+            request_queue_size = 32
+        self.server = TestServer(('127.0.0.1', 0), handler)
         self.server.handle_error = lambda *args: None
         self.port = self.server.server_port
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
@@ -355,6 +420,26 @@ class HTTPTests(unittest.TestCase):
         row = self.http()[2]['rows'][0]
         self.assertEqual(row['request_id'], headers['X-JEV-Request-ID'])
         self.assertEqual((row['caller'], row['attempt_count'], row['model'], row['outcome']), ('external-agent', 1, 'test-model', 'complete'))
+
+    def test_payload_api_captures_bodies_without_authorization_headers(self):
+        _, headers, response = self.http('POST', '/v1/decision', PAYLOAD, {'Authorization': 'PRIVATE_HEADER_TOKEN'})
+        self.assertTrue(self.store.flush())
+        path = '/api/analytics/payloads/' + headers['X-JEV-Request-ID']
+        status, result_headers, payload = self.http(path=path)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(payload['bodies']['request']['text']), PAYLOAD)
+        self.assertEqual(json.loads(payload['bodies']['response']['text']), response)
+        self.assertNotIn('PRIVATE_HEADER_TOKEN', json.dumps(payload))
+        self.assertEqual(result_headers['Cache-Control'], 'no-store')
+        self.assertEqual(self.http(path=path, headers={'Origin': 'https://foreign.example'})[0], 401)
+        self.assertEqual(self.http(path='/api/analytics/payloads/not-an-id')[0], 400)
+        self.assertEqual(self.http(path='/api/analytics/payloads/' + '0' * 32)[0], 404)
+
+    def test_invalid_request_body_is_available_for_diagnosis(self):
+        _, headers, _ = self.http('POST', '/v1/decision', b'not json')
+        self.assertTrue(self.store.flush())
+        payload = self.http(path='/api/analytics/payloads/' + headers['X-JEV-Request-ID'])[2]
+        self.assertEqual(payload['bodies']['request']['text'], 'not json')
 
     def test_invalid_json_is_counted_without_attempt(self):
         self.assertEqual(self.http('POST', '/v1/decision', b'not json')[0], 400)

@@ -1,0 +1,14 @@
+{
+  "model_repo": "LiquidAI/d1-3B-GGUF",
+  "model_revision": "bb1e436ea78eb96a3f1acb6da865f70c2fbeb563",
+  "model_sha256": "2f0942d5a5f64cf69c3356d2be439b71644b1f0eb3a580912a5a0179eeaba77d",
+  "vision_sha256": "2505920ce464b7c54acd8b7b74a931c0c671f06d0c8833760b2fbceeb253e92a",
+  "runtime_release": "b11606",
+  "runtime_archive_digest": "sha256:a39c5a9c4bbb5b989ed9274300629d5feb5920e52c3257a8e615f3868db44f35",
+  "official_runtime_archive_digest": "sha256:a39c5a9c4bbb5b989ed9274300629d5feb5920e52c3257a8e615f3868db44f35",
+  "runtime_download_url": "https://github.com/ggml-org/llama.cpp/releases/download/b11606/llama-b11606-bin-macos-arm64.tar.gz",
+  "ollama_version": "0.40.3",
+  "ollama_native_error": "unsupported decision encoding \"lfm2-d1\"",
+  "provider_id": "liquid-d1-local",
+  "endpoint": "http://127.0.0.1:8101/v1/systemone"
+}

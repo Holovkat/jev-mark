@@ -1,0 +1,108 @@
+{
+  "installed_binary": "build/bin/llama-server",
+  "invalid_schema_status": 400,
+  "valid_request_after_invalid": true,
+  "unchanged_generic_decisions": true,
+  "max_probability_delta": 0.0,
+  "completion_endpoint_works": true,
+  "results": [
+    {
+      "decision": {
+        "category": "billing",
+        "urgent": true,
+        "priority": 2
+      },
+      "fields": {
+        "category": {
+          "value": "billing",
+          "probability": 0.9965773224830627,
+          "probabilities": {
+            "billing": 0.9965773224830627,
+            "technical": 0.0027756812050938606,
+            "other": 0.0006470232619903982
+          },
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "urgent": {
+          "value": true,
+          "probability": 0.9909269213676453,
+          "probabilities": {
+            "true": 0.9909269213676453,
+            "false": 0.009073102846741676
+          },
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "priority": {
+          "interval_p10_p90": [
+            1,
+            2
+          ],
+          "value": 2,
+          "probability": 0.6425185799598694,
+          "probabilities": {
+            "0": 0.011375241912901402,
+            "1": 0.3461061716079712,
+            "2": 0.6425185799598694
+          },
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 22,
+        "scored_rows": 15
+      }
+    },
+    {
+      "decision": {
+        "category": "technical",
+        "urgent": false,
+        "priority": 1
+      },
+      "fields": {
+        "category": {
+          "value": "technical",
+          "probability": 0.9957295656204224,
+          "probabilities": {
+            "billing": 0.004029636736959219,
+            "technical": 0.9957295656204224,
+            "other": 0.00024078723799902946
+          },
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "urgent": {
+          "value": false,
+          "probability": 0.976025402545929,
+          "probabilities": {
+            "true": 0.023974573239684105,
+            "false": 0.976025402545929
+          },
+          "scored_nodes": 1,
+          "tree": true
+        },
+        "priority": {
+          "interval_p10_p90": [
+            1,
+            2
+          ],
+          "value": 1,
+          "probability": 0.7812286019325256,
+          "probabilities": {
+            "0": 0.019936243072152138,
+            "1": 0.7812286019325256,
+            "2": 0.19883516430854797
+          },
+          "scored_nodes": 1,
+          "tree": true
+        }
+      },
+      "usage": {
+        "context_tokens": 18,
+        "scored_rows": 15
+      }
+    }
+  ]
+}

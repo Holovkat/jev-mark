@@ -1,0 +1,359 @@
+{
+  "url": "direct-custom-llama-worker",
+  "checks": {
+    "single_parallel": {
+      "max_probability_delta": 6.20000000000065e-05,
+      "changed_winners": [],
+      "fields": 3
+    },
+    "fresh_warm": {
+      "max_probability_delta": 0.0,
+      "changed_winners": [],
+      "fields": 3
+    },
+    "branch_order": {
+      "max_probability_delta": 2.9999999999752447e-06,
+      "changed_winners": [],
+      "fields": 3
+    },
+    "state_isolation": {
+      "max_probability_delta": 0.0,
+      "changed_winners": [],
+      "fields": 3
+    },
+    "after_invalid": {
+      "max_probability_delta": 0.0,
+      "changed_winners": [],
+      "fields": 3
+    },
+    "invalid_requests_rejected": 4
+  },
+  "responses": {
+    "single": {
+      "model": "nimble:latest",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.990762,
+            "technical": 0.00923754
+          },
+          "confidence": 0.9243042929337496,
+          "choice": "billing"
+        },
+        "a_long_question_name_to_exercise_unequal_suffix_padding": {
+          "type": "score",
+          "probabilities": {
+            "0": 0.404,
+            "1": 0.368281,
+            "2": 0.227719
+          },
+          "confidence": 0.025148772671550024,
+          "score": 0.8237190000000001,
+          "legend": {
+            "0": "Routine",
+            "1": "Needs attention",
+            "2": "Urgent"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.993802
+        }
+      },
+      "usage": {
+        "input_tokens": 974,
+        "output_tokens": 0
+      },
+      "experiment": {
+        "engine": "llama-nimble-native",
+        "execution_mode": "single",
+        "manifest_sha256": "dfed4f707396966698374b7ffe21bd4586271b772551a02f0114e5c79fd24a21",
+        "timings": {
+          "prefill_ms": 513.281958,
+          "scoring_ms": 268.24890000000005,
+          "batches": [
+            1,
+            1,
+            1
+          ],
+          "internal_rounds": 3,
+          "effective_batch_limit": 1,
+          "prefix_cache_hit": false,
+          "shared_tokens": 305
+        },
+        "total_ms": 800.6295000086538
+      }
+    },
+    "parallel": {
+      "model": "nimble:latest",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.990758,
+            "technical": 0.00924187
+          },
+          "confidence": 0.9242755607235922,
+          "choice": "billing"
+        },
+        "a_long_question_name_to_exercise_unequal_suffix_padding": {
+          "type": "score",
+          "probabilities": {
+            "0": 0.404,
+            "1": 0.368281,
+            "2": 0.227719
+          },
+          "confidence": 0.025148772671550024,
+          "score": 0.8237190000000001,
+          "legend": {
+            "0": "Routine",
+            "1": "Needs attention",
+            "2": "Urgent"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.993864
+        }
+      },
+      "usage": {
+        "input_tokens": 974,
+        "output_tokens": 0
+      },
+      "experiment": {
+        "engine": "llama-nimble-native",
+        "execution_mode": "parallel",
+        "manifest_sha256": "dfed4f707396966698374b7ffe21bd4586271b772551a02f0114e5c79fd24a21",
+        "timings": {
+          "prefill_ms": 503.153,
+          "scoring_ms": 170.0,
+          "batches": [
+            3
+          ],
+          "internal_rounds": 1,
+          "effective_batch_limit": 8,
+          "prefix_cache_hit": false,
+          "shared_tokens": 305
+        },
+        "total_ms": 679.7899999946821
+      }
+    },
+    "warm": {
+      "model": "nimble:latest",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.990758,
+            "technical": 0.00924187
+          },
+          "confidence": 0.9242755607235922,
+          "choice": "billing"
+        },
+        "a_long_question_name_to_exercise_unequal_suffix_padding": {
+          "type": "score",
+          "probabilities": {
+            "0": 0.404,
+            "1": 0.368281,
+            "2": 0.227719
+          },
+          "confidence": 0.025148772671550024,
+          "score": 0.8237190000000001,
+          "legend": {
+            "0": "Routine",
+            "1": "Needs attention",
+            "2": "Urgent"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.993864
+        }
+      },
+      "usage": {
+        "input_tokens": 974,
+        "output_tokens": 0
+      },
+      "experiment": {
+        "engine": "llama-nimble-native",
+        "execution_mode": "parallel",
+        "manifest_sha256": "dfed4f707396966698374b7ffe21bd4586271b772551a02f0114e5c79fd24a21",
+        "timings": {
+          "prefill_ms": 0.047792,
+          "scoring_ms": 168.543,
+          "batches": [
+            3
+          ],
+          "internal_rounds": 1,
+          "effective_batch_limit": 8,
+          "prefix_cache_hit": true,
+          "shared_tokens": 305
+        },
+        "total_ms": 174.93400000967085
+      }
+    },
+    "reversed": {
+      "model": "nimble:latest",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.990758,
+            "technical": 0.00924187
+          },
+          "confidence": 0.9242755607235922,
+          "choice": "billing"
+        },
+        "a_long_question_name_to_exercise_unequal_suffix_padding": {
+          "type": "score",
+          "probabilities": {
+            "0": 0.404,
+            "1": 0.368281,
+            "2": 0.227719
+          },
+          "confidence": 0.025148772671550024,
+          "score": 0.8237190000000001,
+          "legend": {
+            "0": "Routine",
+            "1": "Needs attention",
+            "2": "Urgent"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.993867
+        }
+      },
+      "usage": {
+        "input_tokens": 974,
+        "output_tokens": 0
+      },
+      "experiment": {
+        "engine": "llama-nimble-native",
+        "execution_mode": "parallel",
+        "manifest_sha256": "dfed4f707396966698374b7ffe21bd4586271b772551a02f0114e5c79fd24a21",
+        "timings": {
+          "prefill_ms": 0.045,
+          "scoring_ms": 168.06,
+          "batches": [
+            3
+          ],
+          "internal_rounds": 1,
+          "effective_batch_limit": 8,
+          "prefix_cache_hit": true,
+          "shared_tokens": 305
+        },
+        "total_ms": 174.6910410001874
+      }
+    },
+    "changed_evidence": {
+      "model": "nimble:latest",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.00170419,
+            "technical": 0.998296
+          },
+          "confidence": 0.9818708224321023,
+          "choice": "technical"
+        },
+        "a_long_question_name_to_exercise_unequal_suffix_padding": {
+          "type": "score",
+          "probabilities": {
+            "0": 0.0434413,
+            "1": 0.546333,
+            "2": 0.410226
+          },
+          "confidence": 0.2426350980640758,
+          "score": 1.366785,
+          "legend": {
+            "0": "Routine",
+            "1": "Needs attention",
+            "2": "Urgent"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.00822679
+        }
+      },
+      "usage": {
+        "input_tokens": 986,
+        "output_tokens": 0
+      },
+      "experiment": {
+        "engine": "llama-nimble-native",
+        "execution_mode": "parallel",
+        "manifest_sha256": "dfed4f707396966698374b7ffe21bd4586271b772551a02f0114e5c79fd24a21",
+        "timings": {
+          "prefill_ms": 498.898,
+          "scoring_ms": 170.924,
+          "batches": [
+            3
+          ],
+          "internal_rounds": 1,
+          "effective_batch_limit": 8,
+          "prefix_cache_hit": false,
+          "shared_tokens": 309
+        },
+        "total_ms": 676.8899589951616
+      }
+    },
+    "restored": {
+      "model": "nimble:latest",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.990758,
+            "technical": 0.00924187
+          },
+          "confidence": 0.9242755607235922,
+          "choice": "billing"
+        },
+        "a_long_question_name_to_exercise_unequal_suffix_padding": {
+          "type": "score",
+          "probabilities": {
+            "0": 0.404,
+            "1": 0.368281,
+            "2": 0.227719
+          },
+          "confidence": 0.025148772671550024,
+          "score": 0.8237190000000001,
+          "legend": {
+            "0": "Routine",
+            "1": "Needs attention",
+            "2": "Urgent"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.993864
+        }
+      },
+      "usage": {
+        "input_tokens": 974,
+        "output_tokens": 0
+      },
+      "experiment": {
+        "engine": "llama-nimble-native",
+        "execution_mode": "parallel",
+        "manifest_sha256": "dfed4f707396966698374b7ffe21bd4586271b772551a02f0114e5c79fd24a21",
+        "timings": {
+          "prefill_ms": 504.34,
+          "scoring_ms": 176.26,
+          "batches": [
+            3
+          ],
+          "internal_rounds": 1,
+          "effective_batch_limit": 8,
+          "prefix_cache_hit": false,
+          "shared_tokens": 305
+        },
+        "total_ms": 687.0278329879511
+      }
+    }
+  }
+}

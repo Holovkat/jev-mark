@@ -1,0 +1,85 @@
+{
+  "model": "gpt-6-luna",
+  "reasoning": "medium",
+  "wall_ms": 18144,
+  "completed": 100,
+  "results": [
+    {
+      "batch": 1,
+      "requested": 16,
+      "completed": 16,
+      "status": "complete",
+      "wall_ms": 18143,
+      "usage": {
+        "input_tokens": 5587,
+        "output_tokens": 741
+      }
+    },
+    {
+      "batch": 2,
+      "requested": 16,
+      "completed": 16,
+      "status": "complete",
+      "wall_ms": 15172,
+      "usage": {
+        "input_tokens": 5292,
+        "output_tokens": 731
+      }
+    },
+    {
+      "batch": 3,
+      "requested": 16,
+      "completed": 16,
+      "status": "complete",
+      "wall_ms": 17001,
+      "usage": {
+        "input_tokens": 5406,
+        "output_tokens": 759
+      }
+    },
+    {
+      "batch": 4,
+      "requested": 16,
+      "completed": 16,
+      "status": "complete",
+      "wall_ms": 15530,
+      "usage": {
+        "input_tokens": 5555,
+        "output_tokens": 759
+      }
+    },
+    {
+      "batch": 5,
+      "requested": 16,
+      "completed": 16,
+      "status": "complete",
+      "wall_ms": 15976,
+      "usage": {
+        "input_tokens": 5588,
+        "output_tokens": 759
+      }
+    },
+    {
+      "batch": 6,
+      "requested": 16,
+      "completed": 16,
+      "status": "complete",
+      "wall_ms": 17226,
+      "usage": {
+        "input_tokens": 5616,
+        "output_tokens": 837
+      }
+    },
+    {
+      "batch": 7,
+      "requested": 4,
+      "completed": 4,
+      "status": "complete",
+      "wall_ms": 5495,
+      "usage": {
+        "input_tokens": 1572,
+        "output_tokens": 195
+      }
+    }
+  ]
+}

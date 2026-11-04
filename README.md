@@ -1,8 +1,28 @@
 # JEV / parallel-decision local evaluation
 
-This workspace builds the `thecodacus/llama.cpp` `parallel-decision` branch and
-runs its decision endpoint against the locally installed Ollama `gemma4:12b`
-GGUF blobs.
+JEV provides a macOS menu-bar app, browser Workbench, and one shared
+`POST /v1/decision` endpoint for local and hosted decision models. Callers use
+Choice, Score, and Noul schemas while the gateway adapts the request to the
+selected provider. The custom llama.cpp engine loads existing Ollama GGUF blobs;
+System One profiles connect TypeSafe, Ollama decision models, OpenRouter,
+Liquid D1, and the OpenAI adapters.
+
+## Recent changes — 8–15 October 2026
+
+| Area | Delivered behavior and evidence |
+| --- | --- |
+| Image decisions | Shared PNG/JPEG `assets` contract, TypeSafe image opt-in header, and preserved assets in retries. Text-only routes return HTTP 422. The installed Workbench opens **Visual tests → Square colour · image** first, with the image already loaded. [Contract and smoke evidence](docs/multimodal.md). |
+| OpenAI | Native Decisions adapter using a project API key and the credited API organization. [Integration status](docs/openai-decision-integration.md). |
+| Benchmarks | Eight prepared datasets, frozen model profiles, identical seeded cohorts, durable jobs, cancel/resume, native metrics, and JSON/CSV exports at `/benchmarks`. Unsupported protocols remain visible. The epic's combined verification and owner acceptance remain open. [Portal guide](docs/benchmark-portal.md). |
+| Analytics | Incoming request and outgoing response bodies in call details for up to 24 hours, with size/storage limits. Historical metadata keeps its separate retention policy. [Analytics contract](docs/service-analytics.md). |
+| Local engines | Liquid D1 has a separate local System One runtime. Strata's native Nimble comparison retained custom llama.cpp as the baseline. The custom runtime then received upstream hybrid batching while preserving the decision fixes; generic outputs were unchanged, with no new speed claim. [Liquid D1](docs/liquid-d1-local.md), [Strata findings](docs/strata-assessment.md), [runtime update](docs/llama-runtime-update.md). |
+
+The menu-bar app was rebuilt and installed on 15 October. Its gateway on port
+8096 serves the visual library and image adapter. The selected profile at that
+check was Mercury Decide, whose current adapter rejects images; select TypeSafe
+to run the verified image path. Model selection is operator-controlled.
+See the [documentation index](docs/README.md) for setup, contracts, evidence,
+and the remaining verification boundaries.
 
 ## What this tests
 
@@ -22,7 +42,8 @@ chat or another generation path.
 
 ## Current setup
 
-- Source: `llama.cpp/`, checked out at the `parallel-decision` branch.
+- Source: custom decision module in `llama.cpp/`, with our probability/prompt fixes
+  and upstream hybrid batching update `ad129b0`. See [runtime update](docs/llama-runtime-update.md).
 - Build: `build/bin/llama-server` with Metal enabled.
 - Model: existing Ollama `gemma4:12b` model blob, no model copy or conversion.
 - Local model server: `http://127.0.0.1:8097` with 12 decision sequences.
@@ -46,7 +67,9 @@ any device that can reach port 8096 can submit decisions through the selected
 provider. Do not expose it on public or untrusted networks. The Ollama and
 Apple provider ports remain bound to loopback. The Workbench provides the
 original logic-baseline questions, the ambiguity and common-sense reasoning
-question sets, and Score/Noul examples. Select a case, edit its question or
+question sets, Score/Noul examples, and a **Visual tests** section at the top
+of the library. It opens by default and loads **Square colour · image**, including
+the picture and question. Select a case, edit its question or
 evidence, and run it through the same selected provider used by agents. The
 right panel shows the returned fields, available probabilities, reference
 comparison when applicable, latency, and raw response. Reference answers are
@@ -222,17 +245,62 @@ The server script uses the already-built binary and keeps the model in the
 Ollama store. Stop a foreground server with Ctrl-C. Normal callers and skills
 use the menu-bar gateway on port 8096; it routes to the selected provider.
 
+## Multimodal image decisions
+
+Open [the installed Workbench](http://127.0.0.1:8096/workbench), select a
+vision-capable profile in JEV Menu Bar, and choose **Visual tests → Square colour
+· image**. Press **Run decision** to compare the model's answer with the known
+reference. Custom tests can attach PNG/JPEG files with thumbnails and removal
+controls; selecting another case clears the attachments. Use the local Mac's
+Workbench for image controls.
+
+API callers add an optional `assets` map to the existing `schema` + `contexts`
+request. Image entries contain `type: "image"`, `format: "png"` or `"jpg"` /
+`"jpeg"`, and standard padded `data_base64`. Use UUID references in context,
+instructions, or nested criteria. Do not put files or remote URLs in the request.
+The gateway forwards only relevant assets and retains them in failed-work retries.
+
+| Selected route | Image behavior |
+| --- | --- |
+| Official TypeSafe System One | Native assets with `TypeSafe-Danger-Zone-Images: true`; verified with `jev-latest`. |
+| Other System One profile | Explicit `"image_input": "systemone"` opt-in when the upstream supports this exact asset contract. |
+| Local finite-decision engine, Apple, CLM, native OpenAI Decisions, other unconfigured routes | HTTP 422 before inference; no image-to-text fallback or model substitution. |
+
+`/providers` and `/capabilities` advertise the image adapter. Actual model support
+and full image decoding are validated upstream. The gateway accepts JSON only,
+at most 32 images, a 16 MiB total HTTP body, and PNG/JPEG signatures with strict
+base64. Workbench images must be 256–1568 pixels per side and at least 78,400
+pixels overall; images are never resized silently. Audio, video, multipart uploads,
+and Box output are outside this implementation.
+
+Select TypeSafe before exercising the installed gateway:
+
+```bash
+python3 scripts/image_smoke.py --url http://127.0.0.1:8096
+```
+
+The smoke sends only a generated shape image and does not change model selection.
+A direct adapter check can use `--profile <configured-profile-id>` instead;
+that reads source `.secure/typesafe.json` unless `TYPESAFE_SECURE_DIR` overrides it.
+See [the full image contract and verification record](docs/multimodal.md).
+Submitted images follow the existing [local analytics payload policy](docs/service-analytics.md#local-payload-capture).
+
 ## Build
 
 ```bash
-cmake -B build -S llama.cpp \
+cmake -B build/custom-runtime -S llama.cpp \
   -DGGML_METAL=ON -DGGML_NATIVE=ON \
   -DLLAMA_OPENSSL=OFF \
   -DLLAMA_BUILD_TESTS=OFF \
   -DLLAMA_BUILD_EXAMPLES=ON \
   -DLLAMA_BUILD_SERVER=ON
-cmake --build build --config Release -j 10
+cmake --build build/custom-runtime --config Release --target llama-server llama-parallel-decision -j 10
 ```
+
+This produces `build/custom-runtime/bin`. Stop the menu-bar app and its local
+model before activating a rebuild: keep a copy of `build/bin`, then overlay the
+new binary directory including its matching dylibs onto `build/bin`. See the
+[runtime update and rollback notes](docs/llama-runtime-update.md).
 
 `LLAMA_OPENSSL=OFF` is intentional for this local HTTP-only server: the
 machine's OpenSSL headers and linked library do not expose the same symbol set.
@@ -247,9 +315,11 @@ the new location.
 
 The first request against `gemma4:12b` returned a valid decision and field
 probabilities. On the current machine the cold request measured approximately
-1.07 s total (`937 ms` prefill, `132 ms` scoring). The next step is to collect
-warm-cache and batch measurements against the Ollama baseline before deciding
-where this belongs in a real application.
+1.07 s total (`937 ms` prefill, `132 ms` scoring). This is the original
+connectivity observation, not the current performance baseline. Later native single/parallel measurements are recorded in the
+[Strata comparison](docs/strata-assessment.md); the subsequent
+[hybrid batching update](docs/llama-runtime-update.md) has regression evidence
+but no new speed measurement.
 
 ## Judging agent responses
 
@@ -333,10 +403,10 @@ otherwise match options against the routing text. This moved CLM from 4/11 to
 (the last step required fixing distractors that meant the same as the expected
 answer; see the 100-question suite notes).
 
-## Direct TypeSafe API profiles
+## System One API profiles
 
-The menu-bar app can route the stable JEV endpoint to TypeSafe's hosted API
-without starting a local model. On install, profiles from the ignored `.secure`
+The menu-bar app can route the stable JEV endpoint to TypeSafe, Ollama Nimble,
+or OpenRouter Decisions using the same adapter. On install, profiles from the ignored `.secure`
 directory are copied into `~/Library/Application Support/JEV Menu Bar/.secure`
 with account-only permissions; the menu-bar app and gateway use that copy. The
 app never stores an API key in `UserDefaults` or displays it. A
@@ -376,13 +446,36 @@ truncate or summarize evidence. Keep shared evidence relevant and compact; if
 the provider rejects its size, reduce or regroup it using the returned guidance.
 The model-specific limits are documented by [TypeSafe](https://docs.typesafe.ai/models).
 
+For local Ollama profiles on port 11434 using `/v1/systemone`, capabilities
+include `max_questions_per_request: 64` and `max_request_bytes: 65536`, the
+Ollama API question and JSON body limits. The
+Workbench explicitly splits larger suites into batches of at most 64 questions
+(for example, the 100-question suite uses two concurrent requests). Each batch
+retains the appropriate question evidence. Other remote providers receive no
+guessed question limit. Direct gateway callers must explicitly group their own
+requests; the gateway never silently partitions them.
+
+A model with a smaller context budget can explicitly tune Workbench grouping in
+its existing `typesafe.json` profile, for example:
+
+```json
+"workbench_question_batch_size": 32
+```
+
+This optional integer must be between 1 and 64 and applies to configured remote
+System One profiles, including loopback Ollama, Liquid D1, and OpenAI profiles.
+The Workbench uses the smaller of this configured grouping and any advertised
+API question limit. This setting is a grouping preference, not a token
+budget guarantee; reduce it or the evidence if the model rejects the context.
+No tokenizer estimate, automatic retries, or gateway partitioning is added.
+
 A successful response includes `complete: true` and the existing `results` and
 `usage`. A failed batch returns a non-success HTTP status and `complete: false`.
 Successful answers remain in `results`, including answers from the same context
 as a missing or malformed sibling answer. `failed_work` identifies unfinished
 fields and their errors. `retry_requests` contains each unfinished request as
-`{context_index, request: {schema, contexts, instructions?}}`, preserving the
-original evidence and instructions. Retry those requests rather than repeating
+`{context_index, request: {schema, contexts, instructions?, assets?}}`, preserving
+the original evidence, instructions, and relevant images. Retry those requests rather than repeating
 successful work. HTTP 429 and `Retry-After` are preserved. When the provider
 supplies a valid `Retry-After`, the gateway shares that timed cooldown across
 callers. A missing or invalid header does not create an invented wait. The
@@ -399,9 +492,60 @@ so primitive distributions remain available. Local Choice, Score, and Noul
 cannot be used with explicit `mode: "greedy"`, because that mode does not
 provide the full distribution required by these typed outputs.
 
-The existing single-profile `Jevapi` / `Jev_url` format in `.secure/env.dev` is
-supported. For multiple profiles, add `.secure/typesafe.json` before installing,
-or add it to the app-support `.secure` directory and refresh providers:
+All System One profiles belong in a single `typesafe.json` file.
+Add `.secure/typesafe.json` before installing, or edit the app-support
+`.secure/typesafe.json` and refresh providers. Legacy environment profile files
+and `typesafe-config.json` are no longer loaded.
+The installer copies credential/configuration files only when absent from app
+support; editing source profiles does not replace the installed configuration.
+Profiles appear under **System One API**, including local HTTP providers.
+The **OpenAI Decisions API (API credits)** profile calls native `/v1/decisions`
+with a project API key, converting Choice, Score and Noul questions without a
+fallback. The installed profile passed live inference against the credited API
+organization. Native Decisions exposes no reasoning-effort setting. See the
+[OpenAI integration guide](docs/openai-decision-integration.md) for setup and evidence.
+Nimble in this section uses Ollama's native decision API; the general Ollama
+model list uses the separate local constrained-token engine.
+
+To add a downloaded Ollama decision model without rebuilding:
+
+1. Download the model in Ollama, then click **Refresh providers** in JEV Menu Bar.
+2. Expand **Ollama System One models** and check the model.
+3. Select it under **System One API** in the backend picker.
+
+For each checked model, **Questions per batch** (1–64) sets the Workbench
+grouping size and saves `workbench_question_batch_size` to `typesafe.json`.
+Lower it for models with smaller prompt limits. This is a grouping preference,
+not a promise that arbitrary evidence fits the model's context window.
+
+The checkbox records the model in the installed app-support `typesafe.json`
+using Ollama's `/v1/systemone` endpoint. Unchecking removes its Ollama API
+profile. Other provider profiles and keys are preserved. The checkbox declares
+which API the model supports; it does not convert an ordinary chat model into
+a decision model. Use **Test selected provider** to exercise the selected provider.
+
+Use these endpoint/model pairs:
+
+| Provider | `base_url` | `model` | Key |
+| --- | --- | --- | --- |
+| TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` | TypeSafe key |
+| Ollama | `http://127.0.0.1:11434/v1/systemone` | `nimble:latest` | `ollama` placeholder |
+| OpenRouter | `https://openrouter.ai/api/alpha/decisions` | `inception/mercury-decide:free` | OpenRouter key |
+
+Ollama requires version 0.35 or later and an installed Nimble model.
+See the [Ollama model contract](https://ollama.com/library/nimble) and
+[OpenRouter Decisions HTTP example](https://openrouter.ai/blog/tutorials/how-to-use-jev/).
+Full `/v1/systemone` and `/alpha/decisions` paths are preserved by
+`normalize_endpoint`; ordinary base URLs receive the existing `/v1/systemone`
+suffix. Reuse `call_typesafe` for compatible providers: it sends `model`,
+`state`, and typed `questions`, with Bearer authentication, then maps `answers`
+back to the stable JEV response. Compatible System One providers need profiles; different wire protocols require
+explicit adapters.
+Analytics automatically records their existing `remote:<profile-id>` route.
+Keep real keys in ignored `.secure` files with mode 600; never put them in
+examples, source, or app preferences.
+
+Example configuration:
 
 ```json
 {
@@ -437,8 +581,9 @@ Benchmark the direct API profiles against local JEV/Gemma with:
 python3 scripts/typesafe_benchmark.py
 ```
 
-The benchmark sends the same bounded-choice questions to each profile and to
-the local JEV engine (port 8097 by default), then writes
+The legacy benchmark sends the same bounded-choice questions to each compatible
+System One profile and to the local JEV engine (port 8097 by default). Native
+OpenAI Decisions profiles use the app's benchmark service instead. This runner writes
 `typesafe-benchmark-results.json` without including API keys. Set
 `JEV_LOCAL_BASE_URL` to override the local comparison endpoint.
 
@@ -499,7 +644,7 @@ TypeSafe profiles behind one stable endpoint.
 ## macOS menu-bar service
 
 The repository includes a native menu-bar controller and LAN-accessible
-gateway. The gateway stays at port 8096 and routes requests to a selected TypeSafe
+gateway. The gateway stays at port 8096 and routes requests to a selected System One
 profile, the Apple on-device adapter at port 8098, or the selected local model
 engine at port 8097. The menu provides health status, local-model
 start/stop/restart, provider tests, gateway/model logs, and a launch-at-login
@@ -509,10 +654,57 @@ toggle. Build/install it with:
 ./scripts/install_menubar.sh
 ```
 
-It installs to `~/Applications/JEV Menu Bar.app` and manages the gateway, Apple
+It installs to `/Applications/JEV Menu Bar.app` by default (`JEV_APP_DIR` can
+override the target) and manages the gateway, Apple
 adapter, and selected local Ollama-backed server. The provider picker discovers
 models already installed in Ollama and secure TypeSafe API profiles, plus the
 on-device Apple option; changing a local model while it is running reloads the
 selected model. macOS starts the app at user login through a LaunchAgent; the
 gateway and Apple adapter start with the app, while a local model starts only
 when selected and started from the menu.
+
+## Benchmark portal
+
+[Benchmark research and integration design](docs/benchmark-portal.md) covers the
+requested Cloudflare Decision Index comparisons, dataset sources, per-model
+reporting, and current Ollama compatibility limits. Open
+`http://127.0.0.1:8096/benchmarks` for seeded samples or full native runs,
+model comparisons, durable history, cancellation/resume and JSON/CSV exports.
+
+Prepare the eight datasets with `python3 scripts/setup_benchmarks.py`; this
+creates a pinned kit and isolated Python environment under
+`~/Library/Application Support/JEV Menu Bar/benchmarks`. The installer packages
+the runner and portal. Configured decision models come from `typesafe.json`.
+Native cases that exceed a provider limit are reported as unsupported; options
+and evidence are never shortened to manufacture a comparable score.
+
+Implementation is tracked in [epic #4](https://github.com/Holovkat/jev-mark/issues/4).
+The portal and local smoke evidence exist; [combined verification #8](https://github.com/Holovkat/jev-mark/issues/8)
+and owner acceptance remain open. Published Cloudflare values are external
+references, not scores obtained by this Mac or a full eight-task reproduction.
+
+## Strata native decision experiment
+
+[Strata context and findings](docs/strata-assessment.md) records the Nimble
+C++/Metal port, source forks, native single/parallel comparisons and shutdown
+status. The custom llama.cpp remains our local baseline because it was faster
+in every measured native C++/Metal case. Strata is retained as a stopped experiment.
+
+## Service analytics
+
+The gateway-served portal and Workbench include service analytics with historical metadata and local request/response bodies retained for 24 hours
+at `http://127.0.0.1:8096/analytics`. For future changes, use
+[docs/service-analytics.md](docs/service-analytics.md) as the implementation
+map and contract. It identifies the service wrapper, recorder, portal, installer
+and regression-test owners, and records the privacy, access and request
+compatibility requirements. Keep analytics instrumentation in
+`scripts/jev_service.py`; preserve the existing decision behavior in
+`scripts/jev_gateway.py`. Update the deterministic analytics tests when
+changing the captured metadata, API, storage or UI.
+
+## Agent capability selection
+
+The shared [capability selector](docs/capability-selection.md) recommends native
+skills and tools across Codex, Claude Code, Pi and ZCode through the same Jev
+proxy. It preserves mandatory guidance and normal discovery. Install it with
+`python3 scripts/install_capability_selector.py`.

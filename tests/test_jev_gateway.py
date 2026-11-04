@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 import threading
@@ -13,6 +14,40 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import jev_gateway as gateway
+import typesafe_benchmark
+
+
+class SystemOneProfileTests(unittest.TestCase):
+    def test_only_typesafe_json_supplies_profiles(self):
+        with tempfile.TemporaryDirectory() as directory:
+            secure = Path(directory)
+            row = {"id": "canonical", "name": "Canonical", "base_url": "https://example.invalid/v1/systemone",
+                   "api_key": "test-placeholder", "model": "test-model"}
+            (secure / "typesafe.json").write_text(json.dumps({"configs": [row]}))
+            legacy = dict(row, id="legacy")
+            (secure / "typesafe-config.json").write_text(json.dumps({"configs": [legacy]}))
+            (secure / "env.dev").write_text("Jev_url=https://example.invalid\nJevapi=test-placeholder\n")
+            with patch.object(gateway, "SECURE_DIR", secure), patch.dict(os.environ, {"TYPESAFE_SECURE_DIR": directory}):
+                self.assertEqual([p["id"] for p in gateway.load_profiles()], ["canonical"])
+                self.assertEqual([p["id"] for p in typesafe_benchmark.load_profiles()], ["canonical"])
+                (secure / "typesafe.json").unlink()
+                self.assertEqual(gateway.load_profiles(), [])
+                self.assertEqual(typesafe_benchmark.load_profiles(), [])
+
+    def test_provider_endpoints_preserve_explicit_decision_routes(self):
+        for endpoint in (
+            "http://127.0.0.1:11434/v1/systemone",
+            "https://openrouter.ai/api/alpha/decisions",
+            "https://api.typesafe.ai/v1/systemone",
+        ):
+            with self.subTest(endpoint=endpoint):
+                self.assertEqual(gateway.normalize_endpoint(endpoint + "/"), endpoint)
+                self.assertEqual(typesafe_benchmark.normalize_endpoint(endpoint + "/"), endpoint)
+
+    def test_existing_base_url_expansion(self):
+        self.assertEqual(gateway.normalize_endpoint("https://api.typesafe.ai/v1"),
+                         "https://api.typesafe.ai/v1/systemone")
+        self.assertIsNone(gateway.normalize_endpoint("file:///tmp/profile"))
 
 
 class FakeUpstreamHandler(BaseHTTPRequestHandler):
@@ -436,7 +471,7 @@ class TestJEVGateway(unittest.TestCase):
             "contexts": ["test"],
         })
         self.assertEqual(status, 503)
-        self.assertIn("TypeSafe profile", response["error"])
+        self.assertIn("System One profile", response["error"])
         self.assertEqual(FakeUpstreamHandler.received, [])
 
     def test_apple_backend_forwards_normalized_request_without_inventing_probabilities(self) -> None:

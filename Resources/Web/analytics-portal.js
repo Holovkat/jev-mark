@@ -5,6 +5,9 @@
   link.id = 'jev-analytics-link'; link.href = '/analytics'; link.textContent = 'Service analytics ↗';
   link.style.cssText = 'position:fixed;bottom:16px;right:18px;z-index:1000;padding:10px 16px;border:1px solid #60a5fa80;border-radius:999px;background:#101b2e;color:#e8f0ff;font:600 13px system-ui;text-decoration:none;box-shadow:0 5px 24px #0005';
   document.body.append(link);
+  const benchmarks = link.cloneNode(true);
+  benchmarks.id = "jev-benchmarks-link"; benchmarks.href = "/benchmarks"; benchmarks.textContent = "Benchmarks ↗";
+  benchmarks.style.right = "190px"; document.body.append(benchmarks);
   if (!location.pathname.startsWith('/workbench')) return;
   const original = window.fetch.bind(window);
   window.fetch = (input, init) => {

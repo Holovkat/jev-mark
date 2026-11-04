@@ -26,9 +26,23 @@ mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources/web"
 cp "$build_dir/JevMenuBar" "$app_dir/Contents/MacOS/JevMenuBar"
 cp "$root_dir/Resources/Info.plist" "$app_dir/Contents/Info.plist"
 cp "$root_dir/Resources/AppIcon.icns" "$app_dir/Contents/Resources/AppIcon.icns"
+cp "$root_dir/scripts/jev_images.py" "$app_dir/Contents/Resources/jev_images.py"
+# The installed example library must not import fixtures from the source checkout.
+for fixture in ambiguity_benchmark.py fair_judge_benchmark.py logic_benchmark.py reasoning_benchmark.py jev_judge.py logic_100_questions.json; do
+  cp "$root_dir/scripts/$fixture" "$app_dir/Contents/Resources/$fixture"
+done
 # Keep Swift's launch path stable, with the unchanged decision module alongside it.
 cp "$root_dir/scripts/jev_gateway.py" "$app_dir/Contents/Resources/jev_gateway_core.py"
+cp "$root_dir/scripts/openai_decisions_provider.py" "$app_dir/Contents/Resources/openai_decisions_provider.py"
+# Remove the retired ChatGPT token adapter from an existing installation.
+rm -f "$app_dir/Contents/Resources/openai_chatgpt_provider.py" "$app_dir"/Contents/Resources/__pycache__/openai_chatgpt_provider.*.pyc
 cp "$root_dir/scripts/jev_service.py" "$app_dir/Contents/Resources/jev_gateway.py"
+cp "$root_dir/scripts/jev_benchmark_data.py" "$app_dir/Contents/Resources/jev_benchmark_data.py"
+cp "$root_dir/scripts/setup_benchmarks.py" "$app_dir/Contents/Resources/setup_benchmarks.py"
+cp "$root_dir/scripts/jev_benchmarks.py" "$app_dir/Contents/Resources/jev_benchmarks.py"
+cp "$root_dir/Resources/Web/benchmarks.html" "$app_dir/Contents/Resources/web/benchmarks.html"
+cp "$root_dir/scripts/jev_model_capabilities.py" "$app_dir/Contents/Resources/jev_model_capabilities.py"
+cp "$root_dir/Resources/Web/capability-report.html" "$app_dir/Contents/Resources/web/capability-report.html"
 cp "$root_dir/scripts/jev_analytics.py" "$app_dir/Contents/Resources/jev_analytics.py"
 cp "$root_dir/Resources/Web/analytics.html" "$app_dir/Contents/Resources/web/analytics.html"
 cp "$root_dir/Resources/Web/analytics-portal.js" "$app_dir/Contents/Resources/web/analytics-portal.js"
@@ -43,7 +57,7 @@ secure_target="$HOME/Library/Application Support/JEV Menu Bar/.secure"
 if [[ -d "$secure_source" ]]; then
   mkdir -p "$secure_target"
   chmod 700 "$secure_target"
-  for name in typesafe.json typesafe-config.json typesafe.env env.dev .env; do
+  for name in typesafe.json; do
     source_file="$secure_source/$name"
     target_file="$secure_target/$name"
     if [[ -f "$source_file" && ! -e "$target_file" ]]; then
