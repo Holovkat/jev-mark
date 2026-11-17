@@ -1,0 +1,18 @@
+[
+  {
+    "profile_id": "typesafe-env-dev",
+    "model": "jev-latest",
+    "expected": "blue",
+    "actual": "blue",
+    "passed": true,
+    "elapsed_ms": 288
+  },
+  {
+    "profile_id": "typesafe-jev-1-14",
+    "model": "jev-1.14.0",
+    "expected": "blue",
+    "actual": "blue",
+    "passed": true,
+    "elapsed_ms": 229
+  }
+]

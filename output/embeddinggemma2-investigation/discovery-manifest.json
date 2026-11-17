@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-28",
+  "canonical_checkout": "/Volumes/Seagate/workspace/jev-mark",
+  "head": "960060375e4bb5c74fb8113c1ae1a3306503c86d",
+  "branch": "codex/proxy-batching",
+  "dirty_sources": true,
+  "source_sha256": {
+    "scripts/jev_gateway.py": "7450a697c34d1649086c1f66831ead3a98049753c5aaa5cfe7f467c6bd98e896",
+    "scripts/jev_images.py": "e502a82f8488cb1a1a2b30997cd60e87bd4caf4a0235baf60127dfc7e982416e",
+    "scripts/jev_benchmarks.py": "d7273c061297ea97750c5caebee17ef2c61e82f87f3ac02f1e59b5fdd7d55bb4",
+    "docs/multimodal.md": "0937a30bf122f2a51eb3bd06dec1d724ebc69d52cff354f306b9902fc3cae1f4",
+    "docs/benchmark-portal.md": "24ad143768b0d3eb44adc11a255bcbfe66e9b6f3e47218b95445398ef18e2c21"
+  },
+  "model_revisions": {
+    "google/embeddinggemma-2": "914f7f89142e33e77833254d9c9b90c3cef7303b",
+    "litert-community/embeddinggemma-2-text-vision-440m-litert-lm": "e301f74d5551b0c2641bd5cb4652a76239d5c5f8"
+  },
+  "mediapipe": {
+    "tag": "v1.1.1",
+    "commit": "50505c8312c7eacb1bd411cecdc4cc9fd08d53cb"
+  },
+  "hardware": {
+    "cpu": "Apple M1 Ultra",
+    "memory_bytes": 68719476736
+  },
+  "scope": "research and planning; runtime inference/training not run",
+  "epic": "https://github.com/Holovkat/jev-mark/issues/10",
+  "requirements_readiness": "not_claimed; follow-on feasibility scope remains proposed"
+}

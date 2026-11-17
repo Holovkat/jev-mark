@@ -1,6 +1,6 @@
 # Requirements readiness handoff
 
-The existing `requirements-traceability` skill now has a planning readiness
+The existing `yiddiy:requirements-traceability` skill now has a planning readiness
 mode alongside its implementation/done checks. It runs when requirements or
 planning finishes, and before epic or sprint implementation starts. No Stop
 hook, extension registration, trust setting, or every-turn check is required.
@@ -35,7 +35,7 @@ changes. Re-read live sources after repair before reporting readiness.
 From the Jev repository run:
 
 ```sh
-python3 scripts/install_requirements_skill.py
+bash ~/workspace/agent-skill-distro/scripts/bootstrap-skills.sh
 ```
 
 Optional `--codex-home PATH` and `--pi-agent-dir PATH` select installation roots.
@@ -46,6 +46,6 @@ Invoke `$requirements-traceability` in Codex, or
 `/skill:requirements-traceability` in Pi. Reload skill discovery in an existing
 session if the newly installed skill is not yet listed.
 
-The `plan-feature` and `orchestrate` skill handoffs call this mode. Existing
+The `yiddiy:plan` and `yiddiy:orchestrate` skill handoffs call this mode. Existing
 implementation/done evidence checks remain available. PASS proves this planning
 handoff only; owner acceptance, deployment and release retain their own gates.

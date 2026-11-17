@@ -1,0 +1,10 @@
+{
+  "url": "https://x.com/mmastrac/status/2115098609356284223",
+  "author": "mmastrac",
+  "created_at": "Tue Oct 27 15:09:39 +0000 2026",
+  "text": "It's been a while since I showed any Jev stuff but I've been cooking on a way to use @GoogleDeepMind's EmbeddingGemma2 as an insanely fast real-time /v1/systemone endpoint (20ms on text, 100ms on images).\n\nIt's trainable in real-time, can distill an upstream teacher model, and is multi-modal by default. Hard to believe a @googlegemma model of this size can do so well with the right harness!",
+  "retrieval": "FxTwitter public mirror; direct X fetch returned 403",
+  "retrieved_on": "2026-10-28",
+  "video_url": "https://video.twimg.com/amplify_video/2115097299861082112/vid/avc1/2502x1370/RkHepUnlDTN218Wk.mp4?tag=29",
+  "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2115097299861082112/img/_ESJWL3WgKK4HqGI.jpg"
+}

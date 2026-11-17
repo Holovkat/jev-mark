@@ -1,0 +1,184 @@
+{
+  "model": "d1:3b",
+  "ollama_version": "0.40.5",
+  "image_results": {
+    "results": [
+      {
+        "decision": {
+          "colour": "red",
+          "square": true,
+          "circles": 0.9059519109114844
+        },
+        "fields": {
+          "colour": {
+            "value": "red",
+            "probability": 0.9890543902181045,
+            "probabilities": {
+              "red": 0.9890543902181045,
+              "blue": 0.010945609781895502
+            },
+            "confidence": 0.978108780436209
+          },
+          "square": {
+            "value": true,
+            "noul": 0.9921648148027045,
+            "probability": 0.9921648148027045
+          },
+          "circles": {
+            "value": 0.9059519109114844,
+            "score": 0.9059519109114844,
+            "legend": {
+              "0": "No circles",
+              "1": "One circle",
+              "2": "Two circles"
+            },
+            "probabilities": {
+              "0": 0.10104598835659359,
+              "1": 0.8919561123753285,
+              "2": 0.006997899268077981
+            },
+            "confidence": 0.8379341685629926
+          }
+        },
+        "context_index": 0,
+        "usage": {
+          "input_tokens": 676,
+          "output_tokens": 0
+        }
+      },
+      {
+        "decision": {
+          "colour": "blue",
+          "square": false,
+          "circles": 0.9663861429104604
+        },
+        "fields": {
+          "colour": {
+            "value": "blue",
+            "probability": 0.9851291225998969,
+            "probabilities": {
+              "red": 0.014870877400102967,
+              "blue": 0.9851291225998969
+            },
+            "confidence": 0.9702582451997939
+          },
+          "square": {
+            "value": false,
+            "noul": 0.012674499455503418,
+            "probability": 0.9873255005444965
+          },
+          "circles": {
+            "value": 0.9663861429104604,
+            "score": 0.9663861429104604,
+            "legend": {
+              "0": "No circles",
+              "1": "One circle",
+              "2": "Two circles"
+            },
+            "probabilities": {
+              "0": 0.040514603712043094,
+              "1": 0.9525846496654533,
+              "2": 0.006900746622503576
+            },
+            "confidence": 0.92887697449818
+          }
+        },
+        "context_index": 1,
+        "usage": {
+          "input_tokens": 676,
+          "output_tokens": 0
+        }
+      }
+    ],
+    "usage": {
+      "input_tokens": 1352,
+      "output_tokens": 0
+    },
+    "complete": true,
+    "capacity": {
+      "selected_backend": "remote:ollama-systemone-64313a3362",
+      "image_input": "ollama",
+      "image_formats": [
+        "png",
+        "jpg",
+        "jpeg"
+      ],
+      "shared_question_batching": true,
+      "automatic_question_partitioning": false,
+      "token_accounting": "unavailable",
+      "capacity_status": "unknown",
+      "capacity_validation": "provider",
+      "preflight_verified": false,
+      "global_upstream_workers": 8,
+      "worker_limit_source": "Existing gateway worker bound, shared across callers",
+      "guidance": "Ollama System One accepts at most 64 questions; JSON bodies are limited to 64 KiB without images or 32 MiB with images. This gateway accepts at most 16 MiB. Group questions and reduce shared evidence explicitly; the gateway never partitions or trims requests.",
+      "max_questions_per_request": 64,
+      "max_request_bytes": 65536,
+      "max_image_request_bytes": 33554432,
+      "gateway_max_request_bytes": 16777216,
+      "question_limit_source": "Ollama System One API"
+    }
+  },
+  "image_elapsed_ms": 957,
+  "text_results": {
+    "results": [
+      {
+        "decision": {
+          "team": "billing"
+        },
+        "fields": {
+          "team": {
+            "value": "billing",
+            "probability": 0.9591232993927385,
+            "probabilities": {
+              "billing": 0.9591232993927385,
+              "technical": 0.04087670060726159
+            },
+            "confidence": 0.9182465987854771
+          }
+        },
+        "context_index": 0,
+        "usage": {
+          "input_tokens": 130,
+          "output_tokens": 0
+        }
+      }
+    ],
+    "usage": {
+      "input_tokens": 130,
+      "output_tokens": 0
+    },
+    "complete": true,
+    "capacity": {
+      "selected_backend": "remote:ollama-systemone-64313a3362",
+      "image_input": "ollama",
+      "image_formats": [
+        "png",
+        "jpg",
+        "jpeg"
+      ],
+      "shared_question_batching": true,
+      "automatic_question_partitioning": false,
+      "token_accounting": "unavailable",
+      "capacity_status": "unknown",
+      "capacity_validation": "provider",
+      "preflight_verified": false,
+      "global_upstream_workers": 8,
+      "worker_limit_source": "Existing gateway worker bound, shared across callers",
+      "guidance": "Ollama System One accepts at most 64 questions; JSON bodies are limited to 64 KiB without images or 32 MiB with images. This gateway accepts at most 16 MiB. Group questions and reduce shared evidence explicitly; the gateway never partitions or trims requests.",
+      "max_questions_per_request": 64,
+      "max_request_bytes": 65536,
+      "max_image_request_bytes": 33554432,
+      "gateway_max_request_bytes": 16777216,
+      "question_limit_source": "Ollama System One API"
+    }
+  },
+  "text_elapsed_ms": 90,
+  "checks": {
+    "two_context_image_isolation": true,
+    "choice": true,
+    "positive_negative_noul": true,
+    "score_modal_level": true,
+    "text_regression": true
+  }
+}

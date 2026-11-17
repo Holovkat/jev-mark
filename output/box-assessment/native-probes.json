@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-16",
+  "fixture": "320x320 generated image: red square and blue circle",
+  "typesafe": {
+    "model": "jev-1.14.0",
+    "elapsed_ms": 284,
+    "answers": {
+      "visible": {
+        "type": "noul",
+        "noul": 0.98
+      },
+      "location": {
+        "type": "box",
+        "box": {
+          "top": 0.29,
+          "bottom": 0.65,
+          "left": 0.1,
+          "right": 0.46
+        },
+        "confidence": 0.93
+      }
+    },
+    "usage": {
+      "input_tokens": 617,
+      "output_tokens": 36
+    },
+    "reference_box": {
+      "left": 0.109375,
+      "top": 0.296875,
+      "right": 0.453125,
+      "bottom": 0.640625
+    },
+    "intersection_over_union": 0.9117597415123455
+  },
+  "ollama": {
+    "model": "d1:3b",
+    "version": "0.40.5",
+    "http_status": 400,
+    "error": "questions.location: \"type\" must be one of: choice, score, noul"
+  },
+  "scope": "Direct native provider probes only. No shared gateway Box implementation or installed app change."
+}

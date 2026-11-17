@@ -1,5 +1,20 @@
 # Liquid d1 local test setup
 
+## Current Ollama option — 16 October 2026
+
+Ollama has since been upgraded to 0.40.5, and the newly downloaded `d1:3b`
+reports `decision` and `vision`. Live image checks now work through native
+`/v1/systemone` with an ordered `images` array. JEV's **Image input (Ollama)**
+control enables that format on the existing Ollama model profile while services
+keep using the shared `assets` request. See [image routing and verification](multimodal.md).
+
+The setup below records the earlier separate runtime for the Hugging Face Q8
+model. Its Ollama 0.40.3 rejection and "not tested" observations describe that
+14 October setup; they do not apply to the newly verified Ollama D1 route. The
+separate runtime and profile remain available.
+
+## Earlier standalone installation — 14 October 2026
+
 Installed on 14 October 2026. Select **Liquid D1 local (Q8) — d1-3B-Q8_0**
 under **System One API** in JEV Menu Bar. It was selected during its installation
 smoke test; later checks selected Mercury Decide. Model selection is not fixed

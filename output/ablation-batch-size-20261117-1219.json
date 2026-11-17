@@ -1,0 +1,2841 @@
+{
+ "header": {
+  "generated_at": "2026-11-17T01:19:41Z",
+  "model": "gpt-6-luna",
+  "backend": "remote:openai-decisions-api",
+  "instruction_sha256": "91f805eda96b3b3c",
+  "candidate_count": 64,
+  "sub_size": 10,
+  "shuffles": 3,
+  "baseline_request_id": "d57121999e9345448a3220614242ff26"
+ },
+ "summary": {
+  "candidates": 64,
+  "stable": 64,
+  "unstable": [],
+  "stability_ratio": 1.0,
+  "subset_agreement": 1.0,
+  "order_agreement": 1.0,
+  "reading": "batch composition is safe; keep full-size batches and let the replay cache absorb repeats"
+ },
+ "subset_variants": [
+  {
+   "context": "87e505d7e431",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "f25669d8c104",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "6ed985f29523",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "347ace6646c0",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "ec7884d4bb17",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "93f6db3560c7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "8364a9d7aa59",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "36d371c47856",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "8e2c327c0ee6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "5420c80b452b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-1"
+  },
+  {
+   "context": "6d5095e95ad8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "8dc3d694ec21",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "179f2b296866",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "075c39b20a48",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "c71d99f51e14",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "c0e74979ee86",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "4baf22b84117",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "66ad9bf7506a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "74833bb593db",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "d4b6f7da598d",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-2"
+  },
+  {
+   "context": "7859d5abd618",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "20b313602bf3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "a236592afa7e",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "4ec2e0284561",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "125cba973e2d",
+   "baseline": {
+    "classification": "available_later"
+   },
+   "variant": {
+    "classification": "available_later"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "48502c44131c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "abcc6bb31ec2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "9cbcb448ea6f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "e485339da682",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "0dabec32f947",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-3"
+  },
+  {
+   "context": "1156a13e22d6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "2a665f41aac5",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "3b27d39843cc",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "59f29c75a6ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "4ed97b80f0ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "79081e579ab9",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "c740be61d510",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "827afa6e557c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "fead67b46499",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "fdb6ec8951f4",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-4"
+  },
+  {
+   "context": "8d29c1d2db7b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "275a9df99eb3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "aa184bf3fd9b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "c699c1dd0038",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "fc31215887bf",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "7bf2fb72792e",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "10b27927eea8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "2e4132e26026",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "7f57cc64957f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "76667f5969e6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-5"
+  },
+  {
+   "context": "51cf46b3e969",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "3da0dfdfe30a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "f3d10b1ed74b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "8a42cf3ddaf1",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "306911d84e52",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "144a835781d2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "a9c9ae1b7db7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "e6be725fbf36",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "94ffb3b0b2f6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "057b40bdc580",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-6"
+  },
+  {
+   "context": "fa59d0c5d00c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-7"
+  },
+  {
+   "context": "2e198364e8ec",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-7"
+  },
+  {
+   "context": "af931cfaee51",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-7"
+  },
+  {
+   "context": "0c3222b40388",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "sub-batch-7"
+  }
+ ],
+ "order_variants": [
+  {
+   "context": "76667f5969e6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "7f57cc64957f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "a9c9ae1b7db7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "abcc6bb31ec2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "6ed985f29523",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "4baf22b84117",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "3b27d39843cc",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "2a665f41aac5",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "48502c44131c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "51cf46b3e969",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "8a42cf3ddaf1",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "d4b6f7da598d",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "1156a13e22d6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "a236592afa7e",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "827afa6e557c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "075c39b20a48",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "e6be725fbf36",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "8e2c327c0ee6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "74833bb593db",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "10b27927eea8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "8364a9d7aa59",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "fdb6ec8951f4",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "94ffb3b0b2f6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "4ed97b80f0ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "fead67b46499",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "5420c80b452b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "f3d10b1ed74b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "c699c1dd0038",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "ec7884d4bb17",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "20b313602bf3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "3da0dfdfe30a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "c740be61d510",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "306911d84e52",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "af931cfaee51",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "6d5095e95ad8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "0c3222b40388",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "7859d5abd618",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "2e4132e26026",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "66ad9bf7506a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "c0e74979ee86",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "c71d99f51e14",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "275a9df99eb3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "fc31215887bf",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "f25669d8c104",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "144a835781d2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "87e505d7e431",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "057b40bdc580",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "179f2b296866",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "7bf2fb72792e",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "aa184bf3fd9b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "36d371c47856",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "93f6db3560c7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "347ace6646c0",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "2e198364e8ec",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "9cbcb448ea6f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "8dc3d694ec21",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "8d29c1d2db7b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "4ec2e0284561",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "fa59d0c5d00c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "79081e579ab9",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "59f29c75a6ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "125cba973e2d",
+   "baseline": {
+    "classification": "available_later"
+   },
+   "variant": {
+    "classification": "available_later"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "e485339da682",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "0dabec32f947",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-1"
+  },
+  {
+   "context": "af931cfaee51",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "8364a9d7aa59",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "d4b6f7da598d",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "79081e579ab9",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "74833bb593db",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "7bf2fb72792e",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "36d371c47856",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "fa59d0c5d00c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "20b313602bf3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "f3d10b1ed74b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "4ed97b80f0ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "075c39b20a48",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "3da0dfdfe30a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "fead67b46499",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "a9c9ae1b7db7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "827afa6e557c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "057b40bdc580",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "e485339da682",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "93f6db3560c7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "51cf46b3e969",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "125cba973e2d",
+   "baseline": {
+    "classification": "available_later"
+   },
+   "variant": {
+    "classification": "available_later"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "7859d5abd618",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "c740be61d510",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "c0e74979ee86",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "2e4132e26026",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "8dc3d694ec21",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "179f2b296866",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "fc31215887bf",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "6ed985f29523",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "4baf22b84117",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "1156a13e22d6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "ec7884d4bb17",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "94ffb3b0b2f6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "144a835781d2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "c699c1dd0038",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "3b27d39843cc",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "10b27927eea8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "f25669d8c104",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "76667f5969e6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "a236592afa7e",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "66ad9bf7506a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "59f29c75a6ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "7f57cc64957f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "8a42cf3ddaf1",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "8e2c327c0ee6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "aa184bf3fd9b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "e6be725fbf36",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "0c3222b40388",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "306911d84e52",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "5420c80b452b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "9cbcb448ea6f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "4ec2e0284561",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "0dabec32f947",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "6d5095e95ad8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "2a665f41aac5",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "abcc6bb31ec2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "c71d99f51e14",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "8d29c1d2db7b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "87e505d7e431",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "347ace6646c0",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "48502c44131c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "275a9df99eb3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "fdb6ec8951f4",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "2e198364e8ec",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-2"
+  },
+  {
+   "context": "4ed97b80f0ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "36d371c47856",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "7bf2fb72792e",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "c71d99f51e14",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "4ec2e0284561",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "51cf46b3e969",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "6d5095e95ad8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "20b313602bf3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "9cbcb448ea6f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "f3d10b1ed74b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "347ace6646c0",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "8364a9d7aa59",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "94ffb3b0b2f6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "5420c80b452b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "fc31215887bf",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "fa59d0c5d00c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "6ed985f29523",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "c740be61d510",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "8d29c1d2db7b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "0c3222b40388",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "fead67b46499",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "ec7884d4bb17",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "f25669d8c104",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "af931cfaee51",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "179f2b296866",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "c699c1dd0038",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "10b27927eea8",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "2e198364e8ec",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "48502c44131c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "93f6db3560c7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "057b40bdc580",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "827afa6e557c",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "2e4132e26026",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "d4b6f7da598d",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "87e505d7e431",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "306911d84e52",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "76667f5969e6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "a236592afa7e",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "8a42cf3ddaf1",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "c0e74979ee86",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "e485339da682",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "275a9df99eb3",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "a9c9ae1b7db7",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "0dabec32f947",
+   "baseline": {
+    "classification": "use_now"
+   },
+   "variant": {
+    "classification": "use_now"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "66ad9bf7506a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "075c39b20a48",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "79081e579ab9",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "8e2c327c0ee6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "2a665f41aac5",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "1156a13e22d6",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "abcc6bb31ec2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "e6be725fbf36",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "aa184bf3fd9b",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "144a835781d2",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "59f29c75a6ff",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "125cba973e2d",
+   "baseline": {
+    "classification": "available_later"
+   },
+   "variant": {
+    "classification": "available_later"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "7859d5abd618",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "8dc3d694ec21",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "7f57cc64957f",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "3b27d39843cc",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "3da0dfdfe30a",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "4baf22b84117",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "74833bb593db",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  },
+  {
+   "context": "fdb6ec8951f4",
+   "baseline": {
+    "classification": "not_relevant"
+   },
+   "variant": {
+    "classification": "not_relevant"
+   },
+   "agree": true,
+   "variant_id": "shuffle-3"
+  }
+ ]
+}

@@ -104,6 +104,54 @@ protect known skills. Conditional native project requirements continue to
 bind the agent even when a prompt hook lacks enough stage context to classify
 them deterministically.
 
+## Skill catalogue, bundles and soft selection
+
+The shared distro's `yiddiy:skills-help` skill provides metadata-only lists/search,
+editable subject classifications, saved named bundles and optional Jev help.
+Its CLI reuses this native inventory and selector; it never concatenates skill
+bodies into a prompt. See the distro's
+`/Volumes/Seagate/workspace/agent-skill-distro/plugins/yiddiy/skills/skills-help/references/usage.md` for commands.
+
+The prompt hook reads optional version-1 preferences through
+`scripts/skill_preferences.py`. Session preferences live in
+`~/.local/state/jev-capabilities/skill-selections/` (override with
+`JEV_SKILL_SELECTION_DIR`), keyed by canonical project, harness and native
+session ID. A project default lives at `.jev/skill-selection.json` in the Git
+root. Session preferences take precedence, including an explicit `open` choice.
+Changes apply on the next prompt, including from project subdirectories.
+
+```json
+{
+  "version": 1,
+  "mode": "soft",
+  "skills": [{"name": "plan", "path": "/resolved/skill/SKILL.md"}]
+}
+```
+
+Soft selection narrows advisory skill candidates before classification while
+preserving explicit prompts, configured requirements and known dependencies.
+Tools remain unchanged. The hook tells the agent to load relevant selected
+guidance and explain necessary expansion for native/project requirements.
+Malformed, stale or unresolved preferences retain the full native discovery
+path. This cannot remove already-loaded context or change the host's initial
+skill catalogue, and it grants no execution or delegation permission.
+
+Local verification on 2026-10-17: four preference cases and four distro CLI
+cases passed, covering scope/override/unlock, explicit/required/dependency
+preservation, stale/malformed fallback, aliases, bundles, metadata-only output
+and copied-Pi distro resolution. A live planning query classified seven
+candidates in 548 ms (two `use_now`, two `available_later`, three
+`not_relevant`, zero abstentions). A separate installed-hook smoke used a
+temporary selection and reduced 231 filesystem candidates to one injected
+skill reference, without changing the owner's persistent selection.
+
+The existing selector suite passed seven Python scenarios. Its Pi native-loader
+scenario could not run because the installed Pi package lacked the expected
+`core/extensions/loader.js`; full Pi session behavior remains unverified.
+New checks: `python3 -m unittest discover -s tests -p test_skill_preferences.py -v`
+here, and `python3 -m unittest discover -s scripts/tests -p test_skill_library.py -v`
+in the skill distro. The existing skill validator accepted `yiddiy:skills-help`.
+
 ## Cache and operation
 
 Successful finite decisions are cached under
@@ -126,7 +174,7 @@ python3 scripts/install_capability_selector.py
 ```
 
 The installer preserves unrelated hooks/settings, backs up changed configs
-outside discovery directories, and links one shared `jev-capabilities` skill
+outside discovery directories, and links one shared `yiddiy:jev-capabilities` skill
 into all four harnesses. It adds a Pi extension without replacing existing
 extensions. Re-running is idempotent; unrelated same-name destinations are
 reported before any installation changes.
@@ -160,7 +208,7 @@ destinations and the installed Pi loader/callback. Jev response failures are
 fixtures; they do not claim a full model session in every harness. The native
 installed Codex hook also returned valid context with four skill references
 through the live gateway using the real local catalogue. ZCode's native
-`skills list` discovers `jev-capabilities`. Re-running the real installer made
+`skills list` discovers `yiddiy:jev-capabilities`. Re-running the real installer made
 no changes. Local command/case/source receipts are under ignored
 `logs/capability-selection/20260930/`.
 

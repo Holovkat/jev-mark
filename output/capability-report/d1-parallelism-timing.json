@@ -1,0 +1,50 @@
+[
+  {
+    "mode": "serial_2x32",
+    "elapsed_ms": 19770,
+    "requests": [
+      {
+        "questions": 32,
+        "answers": 32,
+        "start_ms": 0,
+        "finish_ms": 4313
+      },
+      {
+        "questions": 32,
+        "answers": 32,
+        "start_ms": 4313,
+        "finish_ms": 19770
+      }
+    ]
+  },
+  {
+    "mode": "parallel_2x32",
+    "elapsed_ms": 20205,
+    "requests": [
+      {
+        "questions": 32,
+        "answers": 32,
+        "start_ms": 0,
+        "finish_ms": 20204
+      },
+      {
+        "questions": 32,
+        "answers": 32,
+        "start_ms": 1,
+        "finish_ms": 16047
+      }
+    ]
+  },
+  {
+    "mode": "single_64",
+    "elapsed_ms": 19647,
+    "requests": [
+      {
+        "questions": 64,
+        "answers": 64,
+        "start_ms": 0,
+        "finish_ms": 19647
+      }
+    ]
+  }
+]

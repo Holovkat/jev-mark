@@ -1,0 +1,48 @@
+[
+  {
+    "profile_id": "ollama-systemone-64313a3362",
+    "model": "d1:3b",
+    "status": 400,
+    "failed_work": [
+      {
+        "context_index": 0,
+        "fields": [
+          "location",
+          "present"
+        ],
+        "status": 400,
+        "error": "Selected Ollama \u00b7 d1:3b does not accept Box questions. The request was forwarded without a model allowlist; choose another provider or model."
+      }
+    ]
+  },
+  {
+    "profile_id": "typesafe-env-dev",
+    "model": "jev-latest",
+    "status": 400,
+    "failed_work": [
+      {
+        "context_index": 0,
+        "fields": [
+          "location",
+          "present"
+        ],
+        "status": 400,
+        "error": "Selected TypeSafe primary returned HTTP 400. Reduce or regroup shared evidence/questions explicitly; evidence was not trimmed."
+      }
+    ]
+  },
+  {
+    "profile_id": "typesafe-jev-1-14",
+    "model": "jev-1.14.0",
+    "status": 200,
+    "decision": {
+      "location": {
+        "top": 0.3,
+        "bottom": 0.65,
+        "left": 0.1,
+        "right": 0.47
+      },
+      "present": true
+    }
+  }
+]

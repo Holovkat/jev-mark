@@ -2,7 +2,7 @@
 
 JEV provides a macOS menu-bar app, browser Workbench, and one shared
 `POST /v1/decision` endpoint for local and hosted decision models. Callers use
-Choice, Score, and Noul schemas while the gateway adapts the request to the
+Choice, Score, Noul, and image-bound Box schemas while the gateway adapts the request to the
 selected provider. The custom llama.cpp engine loads existing Ollama GGUF blobs;
 System One profiles connect TypeSafe, Ollama decision models, OpenRouter,
 Liquid D1, and the OpenAI adapters.
@@ -11,7 +11,7 @@ Liquid D1, and the OpenAI adapters.
 
 | Area | Delivered behavior and evidence |
 | --- | --- |
-| Image decisions | Shared PNG/JPEG `assets` contract, TypeSafe image opt-in header, and preserved assets in retries. Text-only routes return HTTP 422. The installed Workbench opens **Visual tests → Square colour · image** first, with the image already loaded. [Contract and smoke evidence](docs/multimodal.md). |
+| Image decisions | Shared PNG/JPEG `assets` contract, TypeSafe and Ollama image routes, and preserved assets in retries. Text-only routes return HTTP 422. The installed Workbench opens **Visual tests → Square colour · image** first, with the image already loaded. [Contract and smoke evidence](docs/multimodal.md). |
 | OpenAI | Native Decisions adapter using a project API key and the credited API organization. [Integration status](docs/openai-decision-integration.md). |
 | Benchmarks | Eight prepared datasets, frozen model profiles, identical seeded cohorts, durable jobs, cancel/resume, native metrics, and JSON/CSV exports at `/benchmarks`. Unsupported protocols remain visible. The epic's combined verification and owner acceptance remain open. [Portal guide](docs/benchmark-portal.md). |
 | Analytics | Incoming request and outgoing response bodies in call details for up to 24 hours, with size/storage limits. Historical metadata keeps its separate retention policy. [Analytics contract](docs/service-analytics.md). |
@@ -23,6 +23,31 @@ check was Mercury Decide, whose current adapter rejects images; select TypeSafe
 to run the verified image path. Model selection is operator-controlled.
 See the [documentation index](docs/README.md) for setup, contracts, evidence,
 and the remaining verification boundaries.
+
+## Ollama multimodal update — 16 October 2026
+
+Ollama 0.40.5 and the new `d1:3b` model accept native System One images. In
+**Ollama System One models**, enable the model and its **Image input (Ollama)**
+option, then select that profile under **System One API**. Image controls are
+available only when Ollama reports both decision and vision capabilities.
+Services keep sending the shared `assets` request; the gateway translates it
+into Ollama's ordered `images` array. D1 passed Choice/Score/Noul image checks,
+a reversed-colour check, and a two-image order check with zero output tokens.
+See [the image guide](docs/multimodal.md#menu-bar-ollama-image-option).
+
+## Box and capability report — 16 October 2026
+
+The Workbench visual library now has **Locate the square · Box**, with a Noul
+presence check, bounding-box overlay and reference overlap score. Compatible image
+routes attempt Box and let the provider validate support. TypeSafe Jev 1.14 passed
+a native synthetic probe; Ollama D1 currently rejects the Box type.
+
+The [Capability report](http://127.0.0.1:8096/capability-report) sends a catalog of
+configured models and capability evidence to the selected decision model. Its
+table compares expected support with the judge's classification for reasoning
+mode, native decisions, images, text, Choice, Score, Noul and Box. Unknowns remain
+explicit. This assesses evidence interpretation, not actual model ability.
+See [the report guide](docs/capability-report.md).
 
 ## What this tests
 
@@ -263,6 +288,7 @@ The gateway forwards only relevant assets and retains them in failed-work retrie
 | Selected route | Image behavior |
 | --- | --- |
 | Official TypeSafe System One | Native assets with `TypeSafe-Danger-Zone-Images: true`; verified with `jev-latest`. |
+| Ollama System One | Enable **Image input (Ollama)**; ordered native `images` array, verified with `d1:3b` on Ollama 0.40.5. |
 | Other System One profile | Explicit `"image_input": "systemone"` opt-in when the upstream supports this exact asset contract. |
 | Local finite-decision engine, Apple, CLM, native OpenAI Decisions, other unconfigured routes | HTTP 422 before inference; no image-to-text fallback or model substitution. |
 
@@ -270,8 +296,9 @@ The gateway forwards only relevant assets and retains them in failed-work retrie
 and full image decoding are validated upstream. The gateway accepts JSON only,
 at most 32 images, a 16 MiB total HTTP body, and PNG/JPEG signatures with strict
 base64. Workbench images must be 256–1568 pixels per side and at least 78,400
-pixels overall; images are never resized silently. Audio, video, multipart uploads,
-and Box output are outside this implementation.
+pixels overall; images are never resized silently. Audio, video and multipart uploads
+are outside this implementation. Box output uses the same image contract; see
+[Box support](docs/multimodal.md#box-assessment--16-october-2026).
 
 Select TypeSafe before exercising the installed gateway:
 
@@ -513,16 +540,22 @@ To add a downloaded Ollama decision model without rebuilding:
 2. Expand **Ollama System One models** and check the model.
 3. Select it under **System One API** in the backend picker.
 
-For each checked model, **Questions per batch** (1–64) sets the Workbench
+For each checked model, **Questions per batch** (1–512) sets the Workbench
 grouping size and saves `workbench_question_batch_size` to `typesafe.json`.
-Lower it for models with smaller prompt limits. This is a grouping preference,
-not a promise that arbitrary evidence fits the model's context window.
+Type a value directly or use the stepper. The preference is separate from a
+provider's hard limit: Ollama 0.40.5 still enforces 64 questions per request, so
+Workbench and Capability report clamp the effective request size to 64 while
+retaining the larger preference. Other routes can use the larger value when no
+lower limit is advertised. Token capacity is a separate constraint.
 
 The checkbox records the model in the installed app-support `typesafe.json`
 using Ollama's `/v1/systemone` endpoint. Unchecking removes its Ollama API
 profile. Other provider profiles and keys are preserved. The checkbox declares
 which API the model supports; it does not convert an ordinary chat model into
-a decision model. Use **Test selected provider** to exercise the selected provider.
+a decision model. Use **Test selected provider** to exercise the selected provider. The test sends a small colour question and validates a complete
+bounded response. It checks connectivity and response shape; it does not ask the
+model to assess its own availability or treat a classification answer as a
+transport error.
 
 Use these endpoint/model pairs:
 

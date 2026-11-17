@@ -1,0 +1,67 @@
+{
+  "results": [
+    {
+      "decision": {
+        "location": {
+          "top": 0.3,
+          "bottom": 0.65,
+          "left": 0.11,
+          "right": 0.45
+        },
+        "present": true
+      },
+      "fields": {
+        "location": {
+          "value": {
+            "top": 0.3,
+            "bottom": 0.65,
+            "left": 0.11,
+            "right": 0.45
+          },
+          "box": {
+            "top": 0.3,
+            "bottom": 0.65,
+            "left": 0.11,
+            "right": 0.45
+          },
+          "confidence": 0.96,
+          "image_ref": "box-image-9d13f901"
+        },
+        "present": {
+          "value": true,
+          "noul": 0.99,
+          "probability": 0.99
+        }
+      },
+      "context_index": 0,
+      "usage": {
+        "input_tokens": 1343,
+        "output_tokens": 42
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 1343,
+    "output_tokens": 42
+  },
+  "complete": true,
+  "capacity": {
+    "selected_backend": "remote:typesafe-jev-1-14",
+    "image_input": "systemone",
+    "box_support": "provider_validated",
+    "image_formats": [
+      "png",
+      "jpg",
+      "jpeg"
+    ],
+    "shared_question_batching": true,
+    "automatic_question_partitioning": false,
+    "token_accounting": "unavailable",
+    "capacity_status": "unknown",
+    "capacity_validation": "provider",
+    "preflight_verified": false,
+    "global_upstream_workers": 8,
+    "worker_limit_source": "Existing gateway worker bound, shared across callers",
+    "guidance": "Submit compact shared evidence and independent questions together. The provider validates context capacity; no authoritative local tokenizer or count endpoint is published. On capacity rejection, reduce or regroup evidence explicitly; the gateway never trims evidence or retries automatically."
+  }
+}
