@@ -149,8 +149,9 @@ struct UsagePulseView: View {
 
     private var caption: String {
         guard let snapshot else { return "usage history unavailable" }
-        let live = snapshot.total - snapshot.cached
-        return "Request: \(live)  ·  Cache: \(snapshot.cached)"
+        // Request is the total for the window; Cache is how many of those
+        // total requests the replay cache answered without a live model call.
+        return "Request: \(snapshot.total)  ·  Cache: \(snapshot.cached)"
     }
 
     private var accessibilityText: String {
