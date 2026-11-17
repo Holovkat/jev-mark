@@ -1,8 +1,10 @@
 """Metadata recorder and real HTTP boundary tests. No live model or credentials."""
 import contextvars
 import csv
+import hashlib
 import io
 import json
+import os
 import sqlite3
 import sys
 import tempfile
@@ -21,7 +23,7 @@ from urllib.request import Request
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from jev_analytics import AnalyticsStore, Observation, PAYLOAD_BODY_LIMIT
+from jev_analytics import AnalyticsStore, Observation, PAYLOAD_BODY_LIMIT, decision_cache_key
 from jev_service import ContextExecutor, ObservedResponse, load_gateway, make_handler
 
 PAYLOAD = {'contexts': ['PRIVATE_CONTEXT_456'], 'schema': {'PRIVATE_FIELD_123': {'type': 'choice', 'choices': ['yes', 'no']}}}
@@ -275,6 +277,84 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(self.store.health()['dropped_updates'], 3)
         self.assertEqual(self.store.health()['status'], 'degraded')
 
+    def test_decision_cache_roundtrip_scoped_to_backend(self):
+        key = decision_cache_key(PAYLOAD, 'remote:test')
+        self.assertIsNone(self.store.cache_lookup(key))
+        self.store.cache_store(key, 'remote:test', 'test-model', '{"results":[]}')
+        self.assertEqual(self.store.cache_lookup(key), '{"results":[]}')
+        self.store.cache_touch(key)
+        # A different backend or a changed request hashes to a different key.
+        self.assertIsNone(self.store.cache_lookup(decision_cache_key(PAYLOAD, 'remote:other')))
+        self.assertIsNone(self.store.cache_lookup(decision_cache_key({**PAYLOAD, 'contexts': ['changed']}, 'remote:test')))
+        self.assertIsNone(self.store.cache_lookup('not-a-hash'))
+
+    def test_identical_payload_bodies_dedupe(self):
+        first = self.captured()
+        second = self.captured()
+        self.assertTrue(self.store.flush())
+        with closing(self.store.connect()) as db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM payload_bodies').fetchone()[0], 1)
+        detail = self.store.payload_detail(second.row['request_id'])
+        self.assertEqual(detail['status'], 'available')
+        self.assertIn('private evidence', detail['bodies']['request']['text'])
+
+    def test_decision_cache_ttl_eviction(self):
+        keys = ['%064x' % n for n in range(2)]
+        with closing(sqlite3.connect(self.path)) as db:
+            db.execute("INSERT INTO decision_cache VALUES (?,?,?,?,?,0,'replay')",
+                       (keys[0], 'remote:test', 'test-model', '{}', time.time() - 15 * 86400))
+            db.execute("INSERT INTO decision_cache VALUES (?,?,?,?,?,0,'replay')",
+                       (keys[1], 'remote:test', 'test-model', '{}', time.time()))
+            db.commit()
+        self.store.close()
+        self.store = AnalyticsStore(self.path)
+        record(self.store)  # First writer tick runs the prune pass.
+        with closing(self.store.connect()) as db:
+            remaining = [row[0] for row in db.execute('SELECT request_hash FROM decision_cache')]
+        self.assertEqual(remaining, [keys[1]])
+
+    def test_decision_cache_lru_eviction(self):
+        keys = ['%064x' % n for n in range(12)]
+        with closing(sqlite3.connect(self.path)) as db:
+            now = time.time()
+            for index, key in enumerate(keys):
+                db.execute("INSERT INTO decision_cache VALUES (?,?,?,?,?,0,'replay')",
+                           (key, 'remote:test', 'test-model', '{}', now - (12 - index) * 3600))
+            db.commit()
+        self.store.close()
+        with patch.dict(os.environ, {'JEV_DECISION_CACHE_MAX_ROWS': '10'}):
+            self.store = AnalyticsStore(self.path)
+        record(self.store)
+        with closing(self.store.connect()) as db:
+            remaining = sorted(row[0] for row in db.execute('SELECT request_hash FROM decision_cache'))
+        self.assertEqual(remaining, sorted(keys[2:]))
+
+    def test_startup_vacuum_reclaims_freed_pages(self):
+        # Seed several multi-KiB bodies so that deleting them frees whole pages.
+        with closing(sqlite3.connect(self.path)) as db:
+            now = time.time()
+            for index in range(10):
+                body = json.dumps({"request": {"text": "x" * 8192}, "response": {"text": "y" * 1024}})
+                body_hash = hashlib.sha256(body.encode()).hexdigest()
+                db.execute("INSERT OR IGNORE INTO payload_bodies VALUES (?,?,?,?)",
+                           (body_hash, body, len(body), now - index))
+                db.execute("INSERT INTO payloads VALUES (?,?, '', ?, ?)",
+                           ('%032x' % index, now - index, len(body), body_hash))
+            db.commit()
+            db.execute('DELETE FROM payload_bodies')
+            db.execute('DELETE FROM payloads')
+            db.commit()
+            db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
+        size_before = self.path.stat().st_size
+        self.store.close()
+        with patch.dict(os.environ, {'JEV_ANALYTICS_VACUUM_THRESHOLD_MB': '0'}):
+            self.store = AnalyticsStore(self.path)
+        record(self.store)
+        with closing(self.store.connect()) as db:
+            self.assertEqual(db.execute('PRAGMA freelist_count').fetchone()[0], 0)
+        self.assertIsNotNone(self.store.health()['last_vacuum'])
+        self.assertLess(self.path.stat().st_size, size_before)
+
     def test_full_queue_is_nonblocking(self):
         store = AnalyticsStore(self.path.parent / 'disabled.sqlite3', enabled=False, queue_size=1)
         store.enabled = True
@@ -384,7 +464,10 @@ class HTTPTests(unittest.TestCase):
         root = Path(self.temp.name)
         (root / 'index.html').write_text('<html><body>Workbench</body></html>')
         (root / 'landing.html').write_text('<html><body>Portal</body></html>')
-        self.store = AnalyticsStore(root / 'data' / 'calls.sqlite3')
+        # The replay cache is covered by DecisionCacheTests; these suites reuse
+        # payloads across tests and need every request to reach the backend.
+        with patch.dict(os.environ, {'JEV_DECISION_CACHE': '0'}):
+            self.store = AnalyticsStore(root / 'data' / 'calls.sqlite3')
         self.gateway = fake_gateway(root)
         handler = make_handler(self.gateway, self.store, assets=ROOT / 'Resources/Web')
         class TestServer(ThreadingHTTPServer):
@@ -504,6 +587,8 @@ class HTTPTests(unittest.TestCase):
         self.assertIn(b'/analytics/portal.js', self.http(path='/workbench')[2])
         self.assertIn(b'X-JEV-Client', self.http(path='/analytics/portal.js')[2])
         self.assertIn(b'Service analytics', self.http(path='/analytics')[2])
+        self.assertIn(b'Capability report', self.http(path='/capability-report')[2])
+        self.assertIn(b'/capability-report', self.http(path='/analytics/portal.js')[2])
 
     def test_rebinding_forwarding_and_cross_site_blocked(self):
         for headers in ({'Host': 'attacker.example'}, {'Origin': 'https://attacker.example'}, {'Sec-Fetch-Site': 'cross-site'}, {'X-Forwarded-For': '10.0.0.2'}, {'X-Real-IP': '10.0.0.2'}):
@@ -527,8 +612,18 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.http()[0], 401)
 
     def test_export_and_health_protected(self):
-        for path in ('/api/analytics/health', '/api/analytics/export.csv'):
+        for path in ('/api/analytics/health', '/api/analytics/export.csv', '/api/capability-catalog'):
             self.assertEqual(self.http(path=path, headers={'Host': 'evil.example'})[0], 401)
+
+    def test_capability_catalog_uses_same_access_policy(self):
+        self.gateway.load_profiles = lambda: []
+        status, _, data = self.http(path='/api/capability-catalog')
+        self.assertEqual(status, 200)
+        self.assertEqual(data['models'], [])
+        self.assertEqual(len(data['capabilities']), 8)
+        self.server.RequestHandlerClass = make_handler(self.gateway, self.store, assets=ROOT / 'Resources/Web', token=TOKEN)
+        self.assertEqual(self.http(path='/api/capability-catalog')[0], 401)
+        self.assertEqual(self.http(path='/api/capability-catalog', headers={'Authorization': 'Bearer ' + TOKEN})[0], 200)
 
     def test_security_headers(self):
         headers = self.http()[1]
@@ -555,6 +650,94 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(self.http('POST', '/v1/decision', PAYLOAD)[0], 200)
         self.store.flush()
         self.assertGreater(self.store.health()['dropped_updates'], 0)
+
+
+class DecisionCacheTests(unittest.TestCase):
+    """The decision replay cache: identical request to the same backend is answered
+    locally; errors, bypasses, and storage trouble always reach the live path."""
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        root = Path(self.temp.name)
+        (root / 'index.html').write_text('<html></html>')
+        (root / 'landing.html').write_text('<html></html>')
+        self.store = AnalyticsStore(root / 'data' / 'calls.sqlite3')
+        self.gateway = fake_gateway(root)
+        handler = make_handler(self.gateway, self.store, assets=ROOT / 'Resources/Web')
+        class TestServer(ThreadingHTTPServer):
+            request_queue_size = 32
+        self.server = TestServer(('127.0.0.1', 0), handler)
+        self.server.handle_error = lambda *args: None
+        self.port = self.server.server_port
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+
+    def tearDown(self):
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join()
+        self.gateway._REMOTE_POOL.shutdown(wait=True)
+        self.store.close()
+        self.temp.cleanup()
+
+    def http(self, method='POST', path='/v1/decision', payload=None, headers=None):
+        connection = HTTPConnection('127.0.0.1', self.port, timeout=5)
+        body = json.dumps(payload).encode() if isinstance(payload, dict) else payload
+        connection.request(method, path, body=body, headers=headers or {})
+        response = connection.getresponse()
+        raw, status, result_headers = response.read(), response.status, dict(response.getheaders())
+        connection.close()
+        return status, result_headers, json.loads(raw) if 'json' in result_headers.get('Content-Type', '') else raw
+
+    def latest_rows(self):
+        self.assertTrue(self.store.flush())
+        return self.http('GET', '/api/analytics')[2]['rows']
+
+    def test_identical_request_is_served_from_cache(self):
+        status, headers, response = self.http(payload=PAYLOAD)
+        self.assertEqual((status, response.get('cached', False), headers.get('X-JEV-Cache')), (200, False, None))
+        status, headers, response = self.http(payload=PAYLOAD)
+        self.assertEqual((status, response.get('cached', True), headers.get('X-JEV-Cache')), (200, True, 'hit'))
+        rows = self.latest_rows()
+        self.assertEqual([row['outcome'] for row in rows], ['cache_hit', 'complete'])
+        self.assertEqual((rows[0]['input_tokens'], rows[0]['output_tokens'], rows[0]['attempt_count']), (0, 0, 0))
+        detail = self.http('GET', path='/api/analytics/payloads/' + rows[0]['request_id'])[2]
+        self.assertEqual(detail['status'], 'available')
+        self.assertEqual(json.loads(detail['bodies']['request']['text']), PAYLOAD)
+        self.assertTrue(json.loads(detail['bodies']['response']['text'])['cached'])
+
+    def test_error_responses_are_never_cached(self):
+        self.gateway.mode = 'http_error'
+        self.assertEqual(self.http(payload=PAYLOAD)[0], 429)
+        self.gateway.mode = 'ok'
+        status, _, response = self.http(payload=PAYLOAD)
+        self.assertEqual((status, response.get('cached', False)), (200, False))
+
+    def test_bypass_header_skips_cache_and_does_not_populate_it(self):
+        for _ in range(2):
+            status, headers, response = self.http(payload=PAYLOAD, headers={'X-JEV-No-Cache': '1'})
+            self.assertEqual((status, response.get('cached', False), headers.get('X-JEV-Cache')), (200, False, None))
+        status, _, response = self.http(payload=PAYLOAD)
+        self.assertEqual(response.get('cached', False), False)
+
+    def test_cache_storage_failure_falls_through_to_live(self):
+        with patch.object(self.store, 'cache_lookup', side_effect=sqlite3.OperationalError('locked')):
+            status, _, response = self.http(payload=PAYLOAD)
+        self.assertEqual((status, response.get('cached', False)), (200, False))
+        self.assertEqual(self.latest_rows()[0]['outcome'], 'complete')
+
+    def test_backend_change_rekeys_the_cache(self):
+        self.gateway.backend = 'remote:one'
+        self.http(payload=PAYLOAD)
+        self.gateway.backend = 'remote:two'
+        status, _, response = self.http(payload=PAYLOAD)
+        self.assertEqual((status, response.get('cached', False)), (200, False))
+        status, _, response = self.http(payload=PAYLOAD)
+        self.assertEqual(response.get('cached', False), True)
+
+    def test_malformed_bodies_are_rejected_and_not_cached(self):
+        self.assertEqual(self.http(payload=b'not json')[0], 400)
+        status, _, response = self.http(payload=PAYLOAD)
+        self.assertEqual((status, response.get('cached', False)), (200, False))
 
 
 class HelpersTests(unittest.TestCase):

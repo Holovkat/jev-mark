@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextvars
 import hmac
 import importlib.util
+import io
 import ipaddress
 import json
 import os
@@ -16,7 +17,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlsplit
 
-from jev_analytics import AnalyticsStore, Observation, label
+from jev_analytics import PAYLOAD_BODY_LIMIT, AnalyticsStore, Observation, decision_cache_key, label
 
 CURRENT = contextvars.ContextVar("jev_request_observation", default=None)
 CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
@@ -183,6 +184,7 @@ def make_handler(gateway, store, *, assets=None, token=None):
 
     class AnalyticsHandler(gateway.GatewayHandler):
         _observation = None
+        _cache_candidate = None
 
         def _bytes(self, status, data, content_type="application/json; charset=utf-8", extra=None):
             self.send_response(status)
@@ -247,6 +249,16 @@ def make_handler(gateway, store, *, assets=None, token=None):
         def do_GET(self):
             parsed = urlsplit(self.path)
             path = parsed.path
+            if path in ("/capability-report", "/capability-report/"):
+                self._asset("capability-report.html", "text/html; charset=utf-8")
+                return
+            if path == "/api/capability-catalog":
+                if not self._authorized():
+                    self._json(401, {"error": "Open on localhost or provide the configured analytics access token."})
+                    return
+                from jev_model_capabilities import catalog
+                self._json(200, catalog(gateway))
+                return
             if path in ("/benchmarks", "/benchmarks/"):
                 self._asset("benchmarks.html", "text/html; charset=utf-8")
                 return
@@ -322,7 +334,23 @@ def make_handler(gateway, store, *, assets=None, token=None):
                     observe(self._observation, "capture_body", "response", json.dumps(value, ensure_ascii=False).encode("utf-8"))
                 except Exception:
                     store.lost("payload_capture_failed")
+                self._maybe_cache_response(status, value)
             return super().send_json(status, value, headers)
+
+        def _maybe_cache_response(self, status, value):
+            """Store a complete response before it reaches the client, so an
+            identical follow-up can never race this write."""
+            candidate, self._cache_candidate = self._cache_candidate, None
+            row = self._observation.row if self._observation else {}
+            if not candidate or status != 200 or not isinstance(value, dict) or value.get("complete") is False:
+                return
+            if not row.get("fields_requested") or row.get("fields_completed") != row.get("fields_requested"):
+                return
+            try:
+                store.cache_store(candidate[0], candidate[1], row.get("model"),
+                                  json.dumps(value, ensure_ascii=False))
+            except Exception:
+                pass
 
         def end_headers(self):
             if self._observation:
@@ -384,6 +412,23 @@ def make_handler(gateway, store, *, assets=None, token=None):
                 return self._benchmark_api(urlsplit(self.path).path, mutation=True)
             if urlsplit(self.path).path != "/v1/decision" or not store.enabled:
                 return super().do_POST()
+            # Decision replay cache: an identical request to the same backend is
+            # answered from the local store. Any cache trouble falls through to
+            # the live path and never alters a decision response.
+            request_value = cache_key = cached = preread = cache_backend = None
+            if store.cache_enabled and not self.headers.get("X-JEV-No-Cache"):
+                try:
+                    length = int(self.headers.get("Content-Length", "0") or 0)
+                    if 0 < length <= PAYLOAD_BODY_LIMIT:
+                        preread = self.rfile.read(length)
+                        value = json.loads(preread)
+                        if isinstance(value, dict) and isinstance(value.get("schema"), dict) and isinstance(value.get("contexts"), list):
+                            request_value = value
+                            cache_backend = gateway.selected_backend()
+                            cache_key = decision_cache_key(value, cache_backend)
+                            cached = store.cache_lookup(cache_key)
+                except Exception:
+                    request_value = cache_key = cached = None
             try:
                 observation = Observation(self.headers)
                 observation.report_error = store.lost
@@ -394,9 +439,29 @@ def make_handler(gateway, store, *, assets=None, token=None):
             self._observation = observation
             context_token = CURRENT.set(observation)
             original = self.rfile
-            self.rfile = PayloadReader(original, observation)
+            self.rfile = PayloadReader(io.BytesIO(preread) if preread is not None else original, observation)
             disconnected = unexpected = False
             try:
+                if cached is not None:
+                    if cache_backend:
+                        observation.row["backend"] = label(cache_backend)
+                    if preread is not None:
+                        observe(observation, "capture_body", "request", preread)
+                        if request_value is not None:
+                            observe(observation, "payload", request_value)
+                    value = json.loads(cached)
+                    if isinstance(value, dict) and value.get("cached") is not True:
+                        value["cached"] = True
+                    self.send_json(200, value, headers={"X-JEV-Cache": "hit"})
+                    try:
+                        store.cache_touch(cache_key)
+                    except Exception:
+                        pass
+                    return
+                if cache_key is not None:
+                    # A complete response is cached as it is produced (send_json),
+                    # never after the client may already have read it.
+                    self._cache_candidate = (cache_key, cache_backend)
                 return super().do_POST()
             except (BrokenPipeError, ConnectionResetError):
                 disconnected = True
@@ -408,6 +473,10 @@ def make_handler(gateway, store, *, assets=None, token=None):
                 self.rfile = original
                 CURRENT.reset(context_token)
                 observe(observation, "finish", disconnected=disconnected, unexpected=unexpected)
+                if cached is not None:
+                    observation.row["outcome"] = "cache_hit"
+                    observation.row["input_tokens"] = 0
+                    observation.row["output_tokens"] = 0
                 try:
                     store.enqueue(observation.row, observation.attempts, observation.bodies)
                 except Exception:
@@ -430,7 +499,8 @@ def main():
     path = os.environ.get("JEV_ANALYTICS_DB", str(Path.home() / "Library/Application Support/JEV Menu Bar/analytics/requests.sqlite3"))
     store = AnalyticsStore(path, enabled=os.environ.get("JEV_ANALYTICS_ENABLED", "1") != "0",
                            retention_days=setting("JEV_ANALYTICS_RETENTION_DAYS", 30, 1, 365),
-                           max_rows=setting("JEV_ANALYTICS_MAX_ROWS", 100000, 1, 1000000))
+                           max_rows=setting("JEV_ANALYTICS_MAX_ROWS", 100000, 1, 1000000),
+                           log=gateway.log)
     handler = make_handler(gateway, store, token=os.environ.get("JEV_ANALYTICS_TOKEN"))
     try:
         server = gateway.GatewayServer((gateway.GATEWAY_HOST, gateway.GATEWAY_PORT), handler)

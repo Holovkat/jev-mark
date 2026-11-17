@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import json
 import math
@@ -21,14 +22,28 @@ PAYLOAD_BODY_LIMIT = 2 * 1024 * 1024
 PAYLOAD_QUEUE_LIMIT = 32 * 1024 * 1024
 PAYLOAD_STORAGE_LIMIT = 512 * 1024 * 1024
 PAYLOAD_TTL = 86400
+VACUUM_THRESHOLD_BYTES = 16 * 1024 * 1024
+DECISION_CACHE_VERSION = 1
+DECISION_CACHE_TTL_DAYS = 14
+DECISION_CACHE_MAX_ROWS = 10000
 
 LABEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,95}\Z")
 KINDS = {"enum": "choice", "choice": "choice", "score": "score",
-         "noul": "noul", "bool": "noul", "boolean": "noul"}
-OUTCOMES = {"complete", "partial", "rejected", "failed", "disconnected", "interrupted", "in_progress", "unknown"}
+         "noul": "noul", "bool": "noul", "boolean": "noul", "box": "box"}
+OUTCOMES = {"complete", "partial", "rejected", "failed", "disconnected", "interrupted", "in_progress", "unknown", "cache_hit"}
 COLUMNS = ("request_id started_at finished_at duration_ms caller purpose operation_id backend model kind "
            "contexts fields_requested fields_completed choice_fields score_fields noul_fields "
            "http_status outcome error_category input_tokens output_tokens attempt_count attempts_omitted").split()
+
+
+def decision_cache_key(value, backend, version=DECISION_CACHE_VERSION):
+    """Content-addressed replay-cache key: an identical request to the same backend
+    hashes to the same key, so catalog or task changes naturally miss."""
+    body = {"v": version, "backend": backend if isinstance(backend, str) else "unknown"}
+    if isinstance(value, dict):
+        body.update(value)
+    canonical = json.dumps(body, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def label(value, default="unknown"):
@@ -174,11 +189,27 @@ class Percentile:
 
 
 class AnalyticsStore:
-    def __init__(self, path, *, enabled=True, retention_days=30, max_rows=100000, queue_size=4096):
+    def __init__(self, path, *, enabled=True, retention_days=30, max_rows=100000, queue_size=4096, log=None):
         self.path = Path(path).expanduser()
         self.enabled = enabled
         self.retention_days = max(1, min(int(retention_days), 365))
         self.max_rows = max(1, min(int(max_rows), 1000000))
+        self.log = log if callable(log) else None
+        self.cache_enabled = os.environ.get("JEV_DECISION_CACHE", "1") != "0"
+        try:
+            self.cache_ttl_days = max(1, min(int(os.environ.get("JEV_DECISION_CACHE_TTL_DAYS", DECISION_CACHE_TTL_DAYS)), 365))
+        except ValueError:
+            self.cache_ttl_days = DECISION_CACHE_TTL_DAYS
+        try:
+            self.cache_max_rows = max(10, min(int(os.environ.get("JEV_DECISION_CACHE_MAX_ROWS", DECISION_CACHE_MAX_ROWS)), 1000000))
+        except ValueError:
+            self.cache_max_rows = DECISION_CACHE_MAX_ROWS
+        self.vacuum_enabled = os.environ.get("JEV_ANALYTICS_VACUUM", "1") != "0"
+        try:
+            self.vacuum_threshold = max(0, int(os.environ.get("JEV_ANALYTICS_VACUUM_THRESHOLD_MB", 16))) * 1024 * 1024
+        except ValueError:
+            self.vacuum_threshold = VACUUM_THRESHOLD_BYTES
+        self.last_vacuum = None
         self.queue = queue.Queue(maxsize=queue_size)
         self.stop = threading.Event()
         self.lock = threading.Lock()
@@ -233,6 +264,10 @@ class AnalyticsStore:
             os.close(fd)
             os.chmod(self.path, 0o600)
             db = sqlite3.connect(self.path, timeout=2)
+            # auto_vacuum must be set before the file header is initialized
+            # (journal_mode=WAL writes it); on existing databases a full VACUUM
+            # in the startup pass below activates it instead.
+            db.execute("PRAGMA auto_vacuum=INCREMENTAL")
             db.execute("PRAGMA journal_mode=WAL")
             db.execute("PRAGMA synchronous=NORMAL")
             db.execute("PRAGMA foreign_keys=ON")
@@ -242,6 +277,13 @@ class AnalyticsStore:
                   request_id TEXT PRIMARY KEY REFERENCES requests(request_id) ON DELETE CASCADE,
                   started_at REAL NOT NULL, bodies TEXT NOT NULL, bytes INTEGER NOT NULL);
                 CREATE INDEX IF NOT EXISTS payloads_time ON payloads(started_at);
+                CREATE TABLE IF NOT EXISTS payload_bodies (
+                  body_hash TEXT PRIMARY KEY, body TEXT NOT NULL, bytes INTEGER NOT NULL, first_seen REAL NOT NULL);
+                CREATE INDEX IF NOT EXISTS payload_bodies_first_seen ON payload_bodies(first_seen);
+                CREATE TABLE IF NOT EXISTS decision_cache (
+                  request_hash TEXT PRIMARY KEY, backend TEXT NOT NULL, model TEXT NOT NULL,
+                  response TEXT NOT NULL, created_at REAL NOT NULL, hits INTEGER NOT NULL DEFAULT 0,
+                  admitted_via TEXT NOT NULL DEFAULT 'replay');
                 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS requests (
                   seq INTEGER PRIMARY KEY AUTOINCREMENT, request_id TEXT UNIQUE NOT NULL,
@@ -258,6 +300,9 @@ class AnalyticsStore:
                   ordinal INTEGER, http_status INTEGER, duration_ms REAL, error_category TEXT,
                   PRIMARY KEY(request_id, ordinal));
             ''')
+            if "body_hash" not in {row[1] for row in db.execute("PRAGMA table_info(payloads)")}:
+                db.execute("ALTER TABLE payloads ADD COLUMN body_hash TEXT")
+            db.execute("CREATE INDEX IF NOT EXISTS payloads_body_hash ON payloads(body_hash)")
             db.execute("INSERT OR IGNORE INTO meta VALUES ('collection_started', ?)", (str(self.started),))
             db.execute("INSERT OR IGNORE INTO meta VALUES ('dropped_updates', '0')")
             db.execute("INSERT OR IGNORE INTO meta SELECT 'coverage_start', value FROM meta WHERE key='collection_started'")
@@ -268,6 +313,8 @@ class AnalyticsStore:
             for suffix in ("-wal", "-shm"):
                 if Path(str(self.path) + suffix).exists():
                     os.chmod(str(self.path) + suffix, 0o600)
+            if self.vacuum_enabled:
+                self._reclaim(db, full=True)
             self.ready.set()
             next_prune = 0
             sql = ("INSERT INTO requests (" + ",".join(COLUMNS) + ") VALUES (" + ",".join("?" for _ in COLUMNS) +
@@ -289,8 +336,15 @@ class AnalyticsStore:
                         for row, attempts, payload, payload_bytes in batch:
                             db.execute(sql, [row.get(c) for c in COLUMNS])
                             if payload and row["started_at"] > time.time() - PAYLOAD_TTL:
-                                db.execute("INSERT OR REPLACE INTO payloads VALUES (?, ?, ?, ?)",
-                                           (row["request_id"], row["started_at"], payload, payload_bytes))
+                                # Bodies are content-addressed: identical request/response
+                                # captures are stored once in payload_bodies; the payloads
+                                # row keeps per-request metadata and a hash reference.
+                                body_hash = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+                                db.execute("INSERT OR IGNORE INTO payload_bodies VALUES (?, ?, ?, ?)",
+                                           (body_hash, payload, payload_bytes, row["started_at"]))
+                                db.execute("INSERT OR REPLACE INTO payloads (request_id, started_at, bodies, bytes, body_hash) "
+                                           "VALUES (?, ?, '', ?, ?)",
+                                           (row["request_id"], row["started_at"], payload_bytes, body_hash))
                             for attempt in attempts:
                                 db.execute("INSERT OR REPLACE INTO attempts VALUES (?, ?, ?, ?, ?)",
                                            (row["request_id"], attempt["ordinal"], attempt["http_status"],
@@ -307,15 +361,22 @@ class AnalyticsStore:
                             db.execute("DELETE FROM requests WHERE seq IN (SELECT seq FROM requests WHERE outcome != 'in_progress' "
                                        "ORDER BY started_at DESC, seq DESC LIMIT -1 OFFSET ?)", (self.max_rows,))
                             db.execute("DELETE FROM payloads WHERE started_at <= ?", (time.time() - PAYLOAD_TTL,))
+                            db.execute("DELETE FROM payload_bodies WHERE first_seen <= ?", (time.time() - PAYLOAD_TTL,))
+                            db.execute("DELETE FROM decision_cache WHERE created_at < ?",
+                                       (time.time() - self.cache_ttl_days * 86400,))
+                            db.execute("DELETE FROM decision_cache WHERE request_hash IN (SELECT request_hash FROM decision_cache "
+                                       "ORDER BY created_at DESC, hits DESC LIMIT -1 OFFSET ?)", (self.cache_max_rows,))
                             next_prune = time.time() + 60
-                        if any(item[2] for item in batch) and db.execute("SELECT COALESCE(SUM(bytes),0) FROM payloads").fetchone()[0] > PAYLOAD_STORAGE_LIMIT:
+                        if any(item[2] for item in batch) and db.execute("SELECT COALESCE(SUM(bytes),0) FROM payload_bodies").fetchone()[0] > PAYLOAD_STORAGE_LIMIT:
                             # Keep the newest bodies within the separate disk budget.
-                            db.execute("DELETE FROM payloads WHERE request_id IN (SELECT request_id FROM "
-                                       "(SELECT request_id, SUM(bytes) OVER (ORDER BY started_at DESC, request_id DESC) AS total FROM payloads) "
+                            db.execute("DELETE FROM payload_bodies WHERE body_hash IN (SELECT body_hash FROM "
+                                       "(SELECT body_hash, SUM(bytes) OVER (ORDER BY first_seen DESC, body_hash DESC) AS total FROM payload_bodies) "
                                        "WHERE total > ?)", (PAYLOAD_STORAGE_LIMIT,))
                     if prune_due:
-                        # Release old body pages from the WAL once readers permit it.
+                        # Release old body pages from the WAL once readers permit it,
+                        # then hand freed pages back to the filesystem incrementally.
                         db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                        self._reclaim(db, full=False)
                 except sqlite3.Error:
                     self.lost("sqlite_write_failed", len(batch))
                 finally:
@@ -331,6 +392,57 @@ class AnalyticsStore:
                 db.close()
             if self.file_lock:
                 self.file_lock.close()
+
+    def _reclaim(self, db, full):
+        """Hand freed pages back to the filesystem. A full VACUUM also activates
+        auto_vacuum=INCREMENTAL on databases created before it was enabled; the
+        incremental mode is then maintained by prune ticks."""
+        try:
+            page_size = db.execute("PRAGMA page_size").fetchone()[0]
+            free_pages = db.execute("PRAGMA freelist_count").fetchone()[0]
+            if full and free_pages * page_size < self.vacuum_threshold:
+                return
+            if full:
+                db.execute("VACUUM")
+            else:
+                db.execute("PRAGMA incremental_vacuum(2000)")
+            db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            freed = max(0, (free_pages - db.execute("PRAGMA freelist_count").fetchone()[0]) * page_size)
+            if freed:
+                self.last_vacuum = {"mode": "full" if full else "incremental", "freed_bytes": freed, "at": utc(time.time())}
+                if self.log:
+                    self.log(f"analytics vacuum ({self.last_vacuum['mode']}): reclaimed {freed // 1024} KiB")
+        except sqlite3.Error:
+            pass
+
+    def cache_lookup(self, request_hash):
+        """Return the stored decision response for this exact request, or None.
+        Storage trouble raises so the caller falls through to the live path."""
+        if not self.cache_enabled or not self.collection_started or not re.fullmatch(r"[0-9a-f]{64}", request_hash or ""):
+            return None
+        with closing(sqlite3.connect(self.path, timeout=2)) as db:
+            row = db.execute("SELECT response FROM decision_cache WHERE request_hash=?", (request_hash,)).fetchone()
+            return row[0] if row else None
+
+    def cache_store(self, request_hash, backend, model, response, admitted_via="replay"):
+        if not self.cache_enabled or not self.collection_started or not re.fullmatch(r"[0-9a-f]{64}", request_hash or ""):
+            return
+        with closing(sqlite3.connect(self.path, timeout=2)) as db:
+            db.execute("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via) "
+                       "VALUES (?, ?, ?, ?, ?, 0, ?) ON CONFLICT(request_hash) DO UPDATE SET "
+                       "response=excluded.response, created_at=excluded.created_at, admitted_via=excluded.admitted_via",
+                       (request_hash, label(backend, "unknown"), label(model, "unknown"), response, time.time(), admitted_via))
+            db.commit()
+
+    def cache_touch(self, request_hash):
+        if not self.cache_enabled:
+            return
+        try:
+            with closing(sqlite3.connect(self.path, timeout=2)) as db:
+                db.execute("UPDATE decision_cache SET hits = hits + 1 WHERE request_hash=?", (request_hash,))
+                db.commit()
+        except sqlite3.Error:
+            pass
 
     def close(self):
         self.stop.set()
@@ -351,6 +463,9 @@ class AnalyticsStore:
                 "queued_updates": self.queue.qsize(), "retention_days": self.retention_days, "max_rows": self.max_rows,
                 "payload_retention_hours": 24, "payload_body_limit_bytes": PAYLOAD_BODY_LIMIT,
                 "payload_storage_limit_bytes": PAYLOAD_STORAGE_LIMIT,
+                "last_vacuum": self.last_vacuum,
+                "decision_cache": {"enabled": self.cache_enabled, "ttl_days": self.cache_ttl_days,
+                                   "max_rows": self.cache_max_rows, "version": DECISION_CACHE_VERSION},
                 "collection_scope": "POST /v1/decision through this gateway only"}
 
     def connect(self):
@@ -371,10 +486,15 @@ class AnalyticsStore:
             expires = request["started_at"] + PAYLOAD_TTL
             if time.time() >= expires:
                 return {"status": "expired", "expires_at": utc(expires)}
-            row = db.execute("SELECT bodies FROM payloads WHERE request_id=?", (request_id,)).fetchone()
+            row = db.execute("SELECT p.bodies AS inline, pb.body AS shared FROM payloads p "
+                             "LEFT JOIN payload_bodies pb ON pb.body_hash = p.body_hash WHERE p.request_id=?",
+                             (request_id,)).fetchone()
             if row is None:
                 return {"status": "pending" if request["outcome"] == "in_progress" else "not_captured", "expires_at": utc(expires)}
-            bodies = json.loads(row[0])
+            text = row["inline"] or row["shared"]
+            if not text:
+                return {"status": "pending" if request["outcome"] == "in_progress" else "not_captured", "expires_at": utc(expires)}
+            bodies = json.loads(text)
             return {"status": bodies.get("status", "available"), "expires_at": utc(expires), "bodies": bodies}
 
     @staticmethod

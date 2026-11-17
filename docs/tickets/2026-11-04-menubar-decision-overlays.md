@@ -112,6 +112,13 @@ environment improvement proposals.
 5. **Tool economy (low)**: fold the post-install health check into
    `scripts/install_menubar.sh` as a flag.
 
+### Tracking
+
+Proposals are tracked on GitHub under epic
+[Holovkat/jev-mark#20](https://github.com/Holovkat/jev-mark/issues/20):
+#15 (CI guardrail), #16 (coding standards), #17 (render harness),
+#18 (view split), #19 (install health flag).
+
 ## Verification
 
 - `swift build` and the release build (via `scripts/install_menubar.sh`) pass.
