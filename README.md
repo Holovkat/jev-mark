@@ -3,9 +3,41 @@
 JEV provides a macOS menu-bar app, browser Workbench, and one shared
 `POST /v1/decision` endpoint for local and hosted decision models. Callers use
 Choice, Score, Noul, and image-bound Box schemas while the gateway adapts the request to the
-selected provider. The custom llama.cpp engine loads existing Ollama GGUF blobs;
+selected provider. Identical requests are answered from a local replay cache
+before any provider is called, and the recorder keeps itself vacuumed and
+deduplicated. The custom llama.cpp engine loads existing Ollama GGUF blobs;
 System One profiles connect TypeSafe, Ollama decision models, OpenRouter,
 Liquid D1, and the OpenAI adapters.
+
+## What this is
+
+JEV Menu Bar is a Mac menu-bar service that fronts every decision model on
+this machine — hosted TypeSafe and OpenAI profiles, Ollama models (including
+Liquid D1 and vision models), the on-device Apple Foundation Models adapter,
+and a custom Metal llama.cpp runtime — behind one stable local endpoint,
+`POST /v1/decision` on port 8096. Callers send typed questions (Choice, Score,
+Noul, Box) and get bounded, probability-bearing JSON back; byte-identical
+requests are answered from a local replay cache without touching the provider.
+The menu itself is the control room: provider selection and testing, local
+model start/stop, the benchmark portal, the capability report, request
+analytics with payload capture, and a live 12-hour pulse chart that stacks
+cache hits (green) on live calls (blue).
+
+![JEV Decision Service menu](docs/images/menubar-decision-service.png)
+
+## What's new — 17 November 2026
+
+| Area | Delivered behavior and evidence |
+| --- | --- |
+| Decision replay cache | Byte-identical `/v1/decision` requests are answered from a content-addressed local store (`decision_cache` in the analytics DB) before the backend is called: key = sha256(instructions + schema + contexts) + backend, 14-day TTL, 10k-row LRU cap. Hits return `"cached": true` with an `X-JEV-Cache: hit` header, are recorded as `cache_hit` analytics rows with zero tokens, and errors/disconnects are never cached. `X-JEV-No-Cache: 1` bypasses and does not populate; `JEV_DECISION_CACHE=0` disables. Seeded from 320 captured historical responses at install. |
+| Automatic housekeeping | The recorder sets `auto_vacuum=INCREMENTAL` at creation, runs a one-time full `VACUUM` at startup past a 16 MB free-list threshold, and `incremental_vacuum` on every prune tick — no manual maintenance. Payload bodies are content-addressed (`payload_bodies`): 37% of captured bytes were exact repeats, and the first backfill took the analytics DB from 408 MB to 93 MB. |
+| Batch-composition ablation | `scripts/tools/ablate_batch_size.py` replays a captured 64-candidate capability request as 10-candidate sub-batches and shuffled full batches, then reports per-candidate stability. Measured result: **64/64 candidates stable** — batch size and candidate order do not change this workload's answers, so full-size batches are trusted and single-model evidence is sufficient for cache admission. The report header records model/instruction/catalog fingerprints and warns when the ablation is stale. |
+| Menu-bar cache chart | The 12-hour usage pulse stacks cache hits in green on top of live calls in blue, and the caption reads `Request: N · Cache: M` (Request is the window total; Cache is how many of those the cache answered). |
+
+Tooling lives in `scripts/tools/`: `export_answer_store.py` (bootstrap the cache
+from captured responses), `backfill_payload_bodies.py` (one-time offline dedupe +
+vacuum), and `ablate_batch_size.py` (re-run when the model, rubric, or catalog
+changes — the tool says so itself).
 
 ## Recent changes — 8–15 October 2026
 
@@ -18,9 +50,8 @@ Liquid D1, and the OpenAI adapters.
 | Local engines | Liquid D1 has a separate local System One runtime. Strata's native Nimble comparison retained custom llama.cpp as the baseline. The custom runtime then received upstream hybrid batching while preserving the decision fixes; generic outputs were unchanged, with no new speed claim. [Liquid D1](docs/liquid-d1-local.md), [Strata findings](docs/strata-assessment.md), [runtime update](docs/llama-runtime-update.md). |
 
 The menu-bar app was rebuilt and installed on 15 October. Its gateway on port
-8096 serves the visual library and image adapter. The selected profile at that
-check was Mercury Decide, whose current adapter rejects images; select TypeSafe
-to run the verified image path. Model selection is operator-controlled.
+8096 serves the visual library and image adapter. Model selection is
+operator-controlled.
 See the [documentation index](docs/README.md) for setup, contracts, evidence,
 and the remaining verification boundaries.
 
@@ -403,7 +434,7 @@ Qwen3-8B encoder, projects both through small trained heads, and returns a
 softmax over the options, so it answers Choice, Score, and Noul fields only.
 **Start** launches two processes and **Stop** ends them:
 
-- `llama-server` with the Ollama model `qwen3:8b-q8_0`, `--embeddings --pooling last`
+- `llama-server` with the Ollama model `qwen3:8b-fp16`, `--embeddings --pooling last`
   on port 8099 (log `logs/clm-encoder.log`);
 - `clm-serve` from `.venv-clm` on port 8700 with the head
   `/Volumes/Extreme SSD/3 Resources/LLLM/Ollama/clm/CLM_v0.1-8B.pt` (log `logs/clm-serve.log`).
@@ -562,8 +593,8 @@ Use these endpoint/model pairs:
 | Provider | `base_url` | `model` | Key |
 | --- | --- | --- | --- |
 | TypeSafe | `https://api.typesafe.ai/v1/systemone` | `jev-latest` | TypeSafe key |
-| Ollama | `http://127.0.0.1:11434/v1/systemone` | `nimble:latest` | `ollama` placeholder |
-| OpenRouter | `https://openrouter.ai/api/alpha/decisions` | `inception/mercury-decide:free` | OpenRouter key |
+| Ollama | `http://127.0.0.1:11434/v1/systemone` | `nimble:latest` (not currently installed) | `ollama` placeholder |
+| OpenRouter | `https://openrouter.ai/api/alpha/decisions` | — | OpenRouter key (the example upstream model, `inception/mercury-decide:free`, was discontinued by the vendor) |
 
 Ollama requires version 0.35 or later and an installed Nimble model.
 See the [Ollama model contract](https://ollama.com/library/nimble) and
@@ -734,6 +765,12 @@ compatibility requirements. Keep analytics instrumentation in
 `scripts/jev_service.py`; preserve the existing decision behavior in
 `scripts/jev_gateway.py`. Update the deterministic analytics tests when
 changing the captured metadata, API, storage or UI.
+
+The same store now backs the decision replay cache and maintains itself:
+`decision_cache` serves identical requests locally (visible in the portal as
+`cache_hit` outcomes and on the menu-bar chart), payload bodies are deduplicated
+by content hash, and freed pages are vacuumed automatically. `/api/analytics/health`
+reports the cache configuration, last vacuum, and storage limits.
 
 ## Agent capability selection
 
