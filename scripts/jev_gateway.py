@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import json
-from jev_images import validate_assets, used_assets, request_evidence
+from jev_images import validate_assets, used_assets, request_evidence, ollama_image_request, validate_box
 import hashlib
 import threading
 from datetime import datetime, timezone
@@ -141,14 +141,15 @@ LANDING_DOC_ROUTES = {
 
 
 def example_suites() -> list[dict]:
-    scripts_path = str(ROOT / "scripts")
+    examples_path = Path(__file__).resolve().parent
+    scripts_path = str(examples_path)
     if scripts_path not in sys.path:
         sys.path.insert(0, scripts_path)
     from ambiguity_benchmark import TESTS as ambiguity_tests
     from logic_benchmark import TESTS as logic_tests
     from reasoning_benchmark import TESTS as reasoning_tests
 
-    logic_100_tests = json.loads((ROOT / "scripts" / "logic_100_questions.json").read_text(encoding="utf-8"))
+    logic_100_tests = json.loads((examples_path / "logic_100_questions.json").read_text(encoding="utf-8"))
 
     def choice_case(test: dict, suite_id: str, guidance: str) -> dict:
         return {
@@ -312,6 +313,12 @@ def example_suites() -> list[dict]:
                 "question": "What colour is the square in the image?",
                 "context": "Inspect the supplied image. Answer using only visual evidence.",
                 "choices": ["red", "blue", "green"], "expected": "red",
+            }, {
+                "id": "visual-box", "suite": "visual", "name": "Locate the square · Box",
+                "type": "box", "image_fixture": "visual-shapes",
+                "question": "Locate the red square in the target image.",
+                "context": "Inspect the supplied image and locate the requested object.",
+                "expected_box": {"left": 35 / 320, "top": 95 / 320, "right": 145 / 320, "bottom": 205 / 320},
             }],
         },
         {
@@ -642,10 +649,10 @@ def profile(raw: dict, fallback_id: str) -> dict | None:
     identifier = str(raw.get("id") or fallback_id).strip()
     batch_size = raw.get("workbench_question_batch_size")
     workbench_options = ({"workbench_question_batch_size": batch_size}
-                         if type(batch_size) is int and 1 <= batch_size <= 64 else {})
+                         if type(batch_size) is int and 1 <= batch_size <= 512 else {})
     return {
         **workbench_options,
-        **({"image_input": "systemone"} if raw.get("image_input") == "systemone" else {}),
+        **({"image_input": raw["image_input"]} if raw.get("image_input") in ("systemone", "ollama") else {}),
         **({"protocol": "openai_decisions", **{key: raw[key] for key in ("organization_id", "project_id")
                                                 if raw.get(key) is not None}} if decisions_api else {}),
         "id": identifier,
@@ -782,11 +789,19 @@ def image_assets(payload: dict) -> dict:
         raise GatewayError(400, str(error)) from None
 
 
+def is_ollama_profile(config):
+    endpoint = urlparse(config["endpoint"])
+    return (endpoint.hostname in {"127.0.0.1", "localhost", "::1"}
+            and endpoint.port == 11434 and endpoint.path == "/v1/systemone")
+
+
 def image_capability(config=None) -> str:
     if not config:
         return "unsupported"
     if config.get("protocol") == "openai_decisions":
         return "unsupported"
+    if config.get("image_input") == "ollama":
+        return "ollama" if is_ollama_profile(config) else "unsupported"
     endpoint = urlparse(config["endpoint"])
     if endpoint.hostname == "api.typesafe.ai" or config.get("image_input") == "systemone":
         return "systemone"
@@ -796,6 +811,17 @@ def image_capability(config=None) -> str:
 def reject_images(payload):
     if image_assets(payload):
         raise GatewayError(422, "Selected model route does not support images. Select a vision-capable profile; image evidence was not discarded.")
+
+
+def box_image_ref(name, definition, assets):
+    if "criteria" in definition:
+        raise GatewayError(400, f"Box field '{name}' does not accept criteria.")
+    ref = definition.get("image_ref")
+    if ref is None and len(assets) == 1:
+        ref = next(iter(assets))
+    if not isinstance(ref, str) or ref not in assets:
+        raise GatewayError(400, f"Box field '{name}' needs an attached image; set image_ref when multiple images are supplied.")
+    return ref
 
 
 def apple_payload(payload: dict) -> dict:
@@ -928,7 +954,7 @@ def _float_or_none(value) -> float | None:
         return None
     try:
         parsed = float(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
     return parsed if math.isfinite(parsed) else None
 
@@ -1060,6 +1086,7 @@ def remote_capabilities(config: dict | None = None) -> dict:
     capabilities = {
         "selected_backend": f"remote:{config['id']}" if config and config.get("id") else backend,
         "image_input": image_capability(config),
+        "box_support": "provider_validated" if image_capability(config) != "unsupported" else "unsupported_image_route",
         "image_formats": ["png", "jpg", "jpeg"],
         "shared_question_batching": True,
         "automatic_question_partitioning": False,
@@ -1082,13 +1109,14 @@ def remote_capabilities(config: dict | None = None) -> dict:
                                  "probability_source": "native_decisions"})
         if "workbench_question_batch_size" in config:
             capabilities["workbench_question_batch_size"] = config["workbench_question_batch_size"]
-        endpoint = urlparse(config["endpoint"])
-        if (endpoint.hostname in {"127.0.0.1", "localhost", "::1"}
-                and endpoint.port == 11434 and endpoint.path == "/v1/systemone"):
+        if is_ollama_profile(config):
             capabilities.update({
                 "max_questions_per_request": 64,
                 "max_request_bytes": 65536,
-                "guidance": ("Ollama System One accepts at most 64 questions and a 64 KiB JSON body per request. "
+                "max_image_request_bytes": 32 * 1024 * 1024,
+                "gateway_max_request_bytes": MAX_BODY,
+                "guidance": ("Ollama System One accepts at most 64 questions; JSON bodies are limited to 64 KiB without images "
+                             "or 32 MiB with images. This gateway accepts at most 16 MiB. "
                              "Group questions and reduce shared evidence explicitly; the gateway never partitions or trims requests."),
                 "question_limit_source": "Ollama System One API",
             })
@@ -1179,6 +1207,12 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                 "criteria": criteria,
             }
             names_by_question[question_id] = (name, {"type": "score", "criteria": criteria})
+        elif field_type == "box":
+            ref = box_image_ref(name, definition, assets)
+            instructions = _question_instructions(name, definition, caller_instructions)
+            instructions["target_image"] = ref
+            questions[question_id] = {"type": "box", "instructions": instructions}
+            names_by_question[question_id] = (name, {"type": "box", "image_ref": ref})
         elif field_type in {"noul", "boolean", "bool"}:
             questions[question_id] = {
                 "type": "noul",
@@ -1189,7 +1223,7 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                 questions[question_id]["criteria"] = criteria
             names_by_question[question_id] = (name, {"type": "noul"})
         else:
-            raise GatewayError(422, f"{who} routing does not support schema field '{name}' of type '{field_type or 'unknown'}'. Use choice, score, or noul.")
+            raise GatewayError(422, f"{who} routing does not support schema field '{name}' of type '{field_type or 'unknown'}'. Use choice, score, noul, or box.")
 
     rate_limited = threading.Event()
 
@@ -1200,15 +1234,20 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             if rate_limited.is_set():
                 raise GatewayError(429, "This request encountered provider rate limiting; retry only unfinished work.")
         context_assets = used_assets(assets, [context, questions])
-        body = json.dumps({"state": context, "model": config["model"], "questions": questions,
-                           **({"assets": context_assets} if context_assets else {})}).encode("utf-8")
+        wire = {"state": context, "questions": questions}
+        if context_assets:
+            if image_capability(config) == "ollama":
+                wire = ollama_image_request(context, questions, context_assets)
+            else:
+                wire["assets"] = context_assets
+        body = json.dumps({"model": config["model"], **wire}).encode("utf-8")
         request = Request(
             config["endpoint"],
             data=body,
             headers={
                 "Authorization": f"Bearer {config['api_key']}",
                 "Content-Type": "application/json",
-                **({"TypeSafe-Danger-Zone-Images": "true"} if context_assets else {}),
+                **({"TypeSafe-Danger-Zone-Images": "true"} if "assets" in wire else {}),
             },
         )
         try:
@@ -1221,10 +1260,12 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             status = error.code
             retry_after = error.headers.get("Retry-After") if error.headers else None
             token_rejection = None
+            box_rejection = False
             if status == 400 and not clm and "max_request_bytes" in remote_capabilities(config):
                 try:
                     provider_error = json.loads(error.read(4096)).get("error")
                     if isinstance(provider_error, str):
+                        box_rejection = any(field.get("type") == "box" for field in schema.values() if isinstance(field, dict)) and '"type" must be one of:' in provider_error
                         token_rejection = re.fullmatch(
                             r"prompt (\d+) has (\d+) tokens; expected 1(?:-|–)(\d+) \(input is never truncated\)",
                             provider_error.strip(), re.IGNORECASE,
@@ -1232,6 +1273,8 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                 except (OSError, ValueError, AttributeError):
                     pass
             error.close()
+            if box_rejection:
+                raise GatewayError(status, f"Selected {who} does not accept Box questions. The request was forwarded without a model allowlist; choose another provider or model.") from None
             if clm:
                 raise GatewayError(502, f"Selected {who} returned HTTP {status}.") from None
             if retry_after is not None and any(char in retry_after for char in "\r\n"):
@@ -1247,7 +1290,7 @@ def call_typesafe(config: dict, payload: dict) -> dict:
             else:
                 guidance = " Retry only unfinished work; automatic retries are disabled."
             if status in {400, 413, 422} and "max_request_bytes" in remote_capabilities(config):
-                guidance += " Ollama System One requires at most 64 questions and a 64 KiB JSON body per request."
+                guidance += " " + remote_capabilities(config)["guidance"]
             if token_rejection:
                 prompt_index, token_count, token_limit = token_rejection.groups()
                 guidance += (f" Ollama prompt {prompt_index} has {token_count} tokens; the model accepts at most {token_limit}. "
@@ -1308,6 +1351,19 @@ def call_typesafe(config: dict, payload: dict) -> dict:
                 }
                 field_result["confidence"] = _required_confidence(answer, name)
                 value = score
+            elif definition["type"] == "box":
+                try:
+                    box = validate_box(answer.get("box"))
+                except ValueError as error:
+                    raise GatewayError(502, f"Selected {who} returned invalid Box geometry for '{name}': {error}") from None
+                if answer.get("type") != "box":
+                    raise GatewayError(502, f"Selected {who} returned the wrong answer type for Box field '{name}'.")
+                if isinstance(answer.get("confidence"), bool) or not isinstance(answer.get("confidence"), (int, float)):
+                    raise GatewayError(502, f"Selected {who} returned invalid Box confidence for '{name}'.")
+                confidence = _required_confidence(answer, name)
+                value = box
+                field_result = {"value": box, "box": box, "confidence": confidence,
+                                "image_ref": definition["image_ref"]}
             else:
                 score = _float_or_none(answer.get("noul"))
                 if score is None or not 0.0 <= score <= 1.0:

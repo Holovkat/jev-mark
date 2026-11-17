@@ -10,7 +10,7 @@ from urllib.error import HTTPError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import jev_gateway as gateway
-from jev_images import validate_assets
+from jev_images import validate_assets, ollama_image_request
 
 from image_smoke import shape_png
 IMAGE = {'type': 'image', 'format': 'png', 'data_base64': base64.b64encode(shape_png()).decode()}
@@ -105,6 +105,47 @@ class ImageTests(unittest.TestCase):
         self.assertEqual(len(retry), 1)
         self.assertEqual(retry[0]['request']['assets'], p['assets'])
         self.assertEqual(retry[0]['context_index'], 0)
+
+    def test_ollama_translation_preserves_order_values_and_source_packet(self):
+        blue = dict(IMAGE, data_base64=base64.b64encode(shape_png((0, 0, 255))).decode())
+        assets = {REF: IMAGE, 'second-picture': blue}
+        questions = {REF: {'instructions': {'example': 'Compare second-picture with ' + REF}}}
+        original = copy.deepcopy([assets, questions])
+        wire = ollama_image_request('Inspect ' + REF, questions, assets)
+        self.assertEqual(wire['images'], [IMAGE['data_base64'], blue['data_base64']])
+        self.assertIn('Inspect Image 1', wire['state'])
+        self.assertEqual(wire['questions'][REF]['instructions']['example'], 'Compare Image 2 with Image 1')
+        self.assertEqual([assets, questions], original)
+
+    def test_ollama_images_use_native_array_without_typesafe_header(self):
+        c = dict(config(), endpoint='http://127.0.0.1:11434/v1/systemone', image_input='ollama')
+        requests = []
+        def transport(req, **kwargs):
+            requests.append(req)
+            return io.BytesIO(b'{"answers":{"jev_field_0":{"noul":0.9}}}')
+        with patch.object(gateway, 'urlopen', side_effect=transport):
+            result = gateway.call_typesafe(c, packet())
+        body = json.loads(requests[0].data)
+        self.assertEqual(body['images'], [IMAGE['data_base64']])
+        self.assertNotIn('assets', body)
+        self.assertIsNone(requests[0].get_header('Typesafe-danger-zone-images'))
+        self.assertTrue(result['complete'])
+        self.assertEqual(result['capacity']['image_input'], 'ollama')
+        self.assertEqual(result['capacity']['max_request_bytes'], 65536)
+        self.assertEqual(result['capacity']['max_image_request_bytes'], 32 * 1024 * 1024)
+        self.assertEqual(result['capacity']['gateway_max_request_bytes'], gateway.MAX_BODY)
+        self.assertEqual(gateway.profile(c, 'x')['image_input'], 'ollama')
+
+    def test_ollama_retry_keeps_original_assets_and_context(self):
+        c = dict(config(), endpoint='http://127.0.0.1:11434/v1/systemone', image_input='ollama')
+        with patch.object(gateway, 'urlopen', side_effect=HTTPError(c['endpoint'], 422, 'rejected', {}, io.BytesIO())):
+            with self.assertRaises(gateway.GatewayError) as caught:
+                gateway.call_typesafe(c, packet())
+        retry = caught.exception.details['retry_requests'][0]['request']
+        self.assertEqual(retry['assets'], packet()['assets'])
+        self.assertEqual(retry['contexts'], packet()['contexts'])
+        self.assertNotIn('images', retry)
+        self.assertEqual(gateway.image_capability(dict(c, endpoint='https://example.invalid/v1/systemone')), 'unsupported')
 
 if __name__ == '__main__':
     unittest.main()

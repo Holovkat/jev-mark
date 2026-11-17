@@ -122,24 +122,12 @@ class HandoffScenarios(unittest.TestCase):
             tasks, parent = gate.tracker_read(self.packet["tracker"])
         self.assertEqual(set(tasks), {"11", "12"})
 
-    def test_shared_install_backup_collision_and_private_output(self):
+    def test_retired_installer_does_not_recreate_skills_and_private_output(self):
         codex, pi = self.cwd / "codex", self.cwd / "pi"
-        old = codex / "skills/requirements-traceability"
-        old.mkdir(parents=True)
-        (old / "SKILL.md").write_text("---\nname: requirements-traceability\n---\nOriginal")
-        (old / "local-note.txt").write_text("Preserve")
-        initial = installer.install(codex, pi)
-        self.assertTrue(all(row["changed"] for row in initial["installations"]))
-        backup = Path(initial["installations"][0]["backup"])
-        self.assertEqual((backup / "local-note.txt").read_text(), "Preserve")
-        self.assertFalse(any(row["changed"] for row in installer.install(codex, pi)["installations"]))
-        self.assertEqual((pi / "skills/requirements-traceability").resolve(), (codex / "skills/requirements-traceability").resolve())
-        foreign = self.cwd / "foreign/skills/requirements-traceability"
-        foreign.mkdir(parents=True)
-        (foreign / "SKILL.md").write_text("---\nname: another-skill\n---")
-        with self.assertRaises(ValueError):
-            installer.install(self.cwd / "empty", self.cwd / "foreign")
-        self.assertFalse((self.cwd / "empty/skills").exists())
+        with self.assertRaisesRegex(ValueError, "Yiddiy package"):
+            installer.install(codex, pi)
+        self.assertFalse(codex.exists())
+        self.assertFalse(pi.exists())
         output = self.cwd / "result.json"
         gate.write_private(output, self.evaluate())
         self.assertEqual(output.stat().st_mode & 0o777, 0o600)

@@ -32,6 +32,13 @@ class Response:
 
 
 class TestRemoteBatching(unittest.TestCase):
+    def test_profile_batch_preference_512_does_not_override_ollama_limit(self):
+        profile=gateway.profile({'id':'wide','base_url':'http://127.0.0.1:11434/v1/systemone','api_key':'fixture','model':'d1:3b','workbench_question_batch_size':512},'wide')
+        self.assertEqual(profile['workbench_question_batch_size'],512)
+        caps=gateway.remote_capabilities(profile)
+        self.assertEqual(caps['workbench_question_batch_size'],512)
+        self.assertEqual(caps['max_questions_per_request'],64)
+
     def setUp(self):
         with gateway._BACKPRESSURE_LOCK:
             gateway._BACKPRESSURE.clear()

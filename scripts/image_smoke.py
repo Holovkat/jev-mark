@@ -11,7 +11,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 
-def shape_png():
+def shape_png(square_colour=(255, 0, 0), circle_colour=(0, 0, 255)):
     """320px white image, red square and blue circle; no external dependencies."""
     def chunk(kind, data):
         return struct.pack('!I', len(data)) + kind + data + struct.pack('!I', zlib.crc32(kind + data))
@@ -19,8 +19,8 @@ def shape_png():
     for y in range(320):
         row = bytearray([0])
         for x in range(320):
-            colour = (255, 0, 0) if 35 <= x < 145 and 95 <= y < 205 else (
-                (0, 0, 255) if (x - 235)**2 + (y - 150)**2 <= 55**2 else (255, 255, 255))
+            colour = square_colour if 35 <= x < 145 and 95 <= y < 205 else (
+                circle_colour if (x - 235)**2 + (y - 150)**2 <= 55**2 else (255, 255, 255))
             row.extend(colour)
         rows.append(bytes(row))
     return (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('!IIBBBBB', 320, 320, 8, 2, 0, 0, 0))

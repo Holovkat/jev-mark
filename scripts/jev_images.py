@@ -1,6 +1,8 @@
 """Shared inline-image contract. No filesystem paths or remote URLs are fetched."""
 import base64
 import binascii
+import math
+import re
 
 MAX_IMAGE_BYTES = 16 * 1024 * 1024
 MAX_ASSETS = 32
@@ -26,7 +28,7 @@ def request_evidence(payload):
     schema = payload.get('schema')
     fields = schema.values() if isinstance(schema, dict) else []
     return [payload.get('contexts'), payload.get('instructions'),
-                [{key: field[key] for key in ('instructions', 'description', 'criteria') if key in field}
+                [{key: field[key] for key in ('instructions', 'description', 'criteria', 'image_ref') if key in field}
                  for field in fields if isinstance(field, dict)]]
 
 
@@ -56,3 +58,39 @@ def validate_assets(payload):
     if len(used_assets(assets, evidence)) != len(assets):
         raise ValueError('Every image asset must be referenced in context, instructions or criteria.')
     return assets
+
+
+def ollama_image_request(state, questions, assets):
+    """Ollama shares ordered images across questions rather than expanding assets."""
+    if not assets:
+        return {'state': state, 'questions': questions}
+    references = {ref: f'Image {index + 1}' for index, ref in enumerate(assets)}
+    pattern = re.compile('|'.join(re.escape(ref) for ref in sorted(references, key=len, reverse=True)))
+
+    def replace(value):
+        if isinstance(value, str):
+            if value in references:
+                return references[value]
+            return pattern.sub(lambda match: references[match.group()], value)
+        if isinstance(value, dict):
+            return {key: replace(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [replace(item) for item in value]
+        return value
+
+    return {'state': 'Attached images are numbered Image 1, Image 2, and so on, in request order.\n' + replace(state),
+            'questions': replace(questions),
+            'images': [asset['data_base64'] for asset in assets.values()]}
+
+
+def validate_box(value):
+    """Validate normalized native geometry without inventing or clamping edges."""
+    edges = {'top', 'bottom', 'left', 'right'}
+    if not isinstance(value, dict) or set(value) != edges:
+        raise ValueError('Box must contain exactly top, bottom, left and right.')
+    if any(isinstance(edge, bool) or not isinstance(edge, (int, float))
+           or not 0 <= edge <= 1 or not math.isfinite(edge) for edge in value.values()):
+        raise ValueError('Box edges must be finite numbers between 0 and 1.')
+    if value['left'] >= value['right'] or value['top'] >= value['bottom']:
+        raise ValueError('Box requires left < right and top < bottom.')
+    return dict(value)

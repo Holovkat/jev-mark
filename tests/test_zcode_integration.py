@@ -144,8 +144,10 @@ class ZCodeScenarios(unittest.TestCase):
         self.assertIn(foreign, updated['hooks']['events']['Stop'])
         self.assertEqual(json.loads(Path(first['config_backup']).read_text()), original)
         self.assertEqual(config_path.stat().st_mode & 0o777, 0o600)
-        for name in ('requirements-traceability', 'jev-retention', 'jev-decision'):
+        for name in ('jev-retention',):
             self.assertTrue((home / 'skills' / name / 'SKILL.md').is_file())
+        self.assertFalse((home / 'skills/requirements-traceability').exists())
+        self.assertFalse((home / 'skills/jev-decision').exists())
         second = install_zcode.install(home, codex, ROOT)
         self.assertFalse(second['config_changed'])
         self.assertEqual(second['skills_changed'], [])
