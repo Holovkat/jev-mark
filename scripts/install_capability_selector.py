@@ -55,8 +55,7 @@ def install(home=None, repository_root=None):
     root = Path(repository_root or Path(__file__).resolve().parents[1]).resolve()
     adapter = root / 'integrations/capabilities/hook.py'
     extension = root / 'integrations/pi/jev-capabilities.ts'
-    skill = root / 'integrations/skills/jev-capabilities'
-    for source in (adapter, extension, skill / 'SKILL.md'):
+    for source in (adapter, extension):
         if not source.is_file():
             raise ValueError(f'Integration source is missing: {source}')
     configs, links = [], []
@@ -84,8 +83,6 @@ def install(home=None, repository_root=None):
             raise ValueError(f'Hook events must be an object of arrays: {path}')
         events['UserPromptSubmit'] = upsert(events.get('UserPromptSubmit', []), handler, adapter, harness)
         configs.append((path, original, updated))
-    for relative in ('.codex/skills', '.claude/skills', '.pi/agent/skills', '.zcode/skills'):
-        links.append((home / relative / 'jev-capabilities', skill))
     links.append((home / '.pi/agent/extensions/jev-capabilities.ts', extension))
     # Validate every destination before mutating any of the four harnesses.
     for path, source in links:

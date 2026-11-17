@@ -487,7 +487,7 @@
           <label class="field type-picker" for="primitive">
             <span class="field-label">JEV primitive</span>
             <select id="primitive" name="primitive">
-              <option value="choice">Choice</option><option value="score">Score</option><option value="noul">Noul · yes/no</option><option value="parallel">Parallel batch</option>
+              <option value="choice">Choice</option><option value="score">Score</option><option value="noul">Noul · yes/no</option><option value="box">Box · locate in image</option><option value="parallel">Parallel batch</option>
             </select>
           </label>
           <label class="field" for="question">
@@ -516,6 +516,10 @@
             <label class="field" for="trueCriteria"><span class="field-label">True means</span><input id="trueCriteria" type="text" placeholder="The evidence supports the claim."></label>
             <label class="field" for="falseCriteria"><span class="field-label">False means</span><input id="falseCriteria" type="text" placeholder="The evidence does not support the claim."></label>
           </div>
+        </div>
+        <div id="boxControls" class="type-controls" hidden>
+          <label class="field" for="boxImage"><span class="field-label">Target image</span><select id="boxImage"></select></label>
+          <p class="field-hint">A companion Noul checks whether the target is visible. This demo draws the box only when that probability is at least 0.5; tune presence policy for your own application. Provider support is checked by trying the request.</p>
         </div>
         <div id="parallelControls" class="type-controls" hidden>
           <label class="field" for="parallelSchema">
@@ -1060,7 +1064,7 @@
         state.provider = health;
         state.profiles = profiles.providers || [];
         const imageProfile = state.profiles.find((profile) => health.selected_backend === `remote:${profile.id}`);
-        $("imageRoute").textContent = ["systemone", "responses"].includes(imageProfile?.image_input)
+        $("imageRoute").textContent = ["systemone", "responses", "ollama"].includes(imageProfile?.image_input)
           ? "Selected route accepts image evidence; the provider validates model support."
           : "Selected route: vision unsupported. Image requests return an explicit error.";
         $("providerName").textContent = displayName(health.selected_backend);
@@ -1152,6 +1156,7 @@
       $("scoreControls").hidden = kind !== "score";
       $("noulControls").hidden = kind !== "noul";
       $("parallelControls").hidden = kind !== "parallel";
+      $("boxControls").hidden = kind !== "box";
       $("questionLabel").textContent = kind === "parallel" ? "Workflow instructions" : "Decision question";
       $("questionHint").textContent = kind === "parallel" ? "shared across fields" : "sent as field guidance";
       markEdited();
@@ -1232,8 +1237,10 @@
           if (!Array.isArray(definition.criteria) || definition.criteria.length < 2 || definition.criteria.length > 10) {
             throw new Error(`Score field '${name}' needs 2–10 ordered criteria.`);
           }
+        } else if (definition.type === "box") {
+          if ("criteria" in definition) throw new Error(`Box field '${name}' cannot have criteria.`);
         } else if (definition.type !== "noul") {
-          throw new Error(`Field '${name}' must use Choice, Score, or Noul.`);
+          throw new Error(`Field '${name}' must use Choice, Score, Noul, or Box.`);
         }
       }
       return schema;
@@ -1249,15 +1256,44 @@
         else if (value && typeof value === "object") Object.values(value).forEach(visit);
       };
       const fields = Object.values(payload.schema || {}).map((field) =>
-        field && typeof field === "object" ? [field.instructions, field.description, field.criteria] : []);
+        field && typeof field === "object" ? [field.instructions, field.description, field.criteria, field.image_ref] : []);
       visit([payload.contexts, payload.instructions, fields]);
       payload.assets = Object.fromEntries(Object.entries(payload.assets).filter(([ref]) => texts.some((text) => text.includes(ref))));
       if (!Object.keys(payload.assets).length) delete payload.assets;
       return payload;
     }
+    function validBox(box) {
+      return box && typeof box === "object" && ["left", "right", "top", "bottom"].every((edge) =>
+        typeof box[edge] === "number" && Number.isFinite(box[edge]) && box[edge] >= 0 && box[edge] <= 1)
+        && box.left < box.right && box.top < box.bottom;
+    }
+
+    function boxIntersectionOverUnion(box, reference) {
+      if (!validBox(box) || !validBox(reference)) return null;
+      const area = (b) => (b.right - b.left) * (b.bottom - b.top);
+      const intersection = Math.max(0, Math.min(box.right, reference.right) - Math.max(box.left, reference.left))
+        * Math.max(0, Math.min(box.bottom, reference.bottom) - Math.max(box.top, reference.top));
+      return intersection / (area(box) + area(reference) - intersection);
+    }
+
+    function boxPresence(definition, fields) {
+      const threshold = definition.presence_threshold ?? 0.5;
+      if (!definition.presence_field) return { draw: true, note: "Presence is not checked. This box is a candidate location, not proof the target exists." };
+      const probability = fields[definition.presence_field]?.noul;
+      if (typeof probability !== "number" || !Number.isFinite(probability)) return { draw: false, note: "Presence check is missing; the box is not applied." };
+      return { draw: probability >= threshold, note: `Presence ${(probability * 100).toFixed(1)}% · demo threshold ${(threshold * 100).toFixed(0)}%. ${probability >= threshold ? "Box shown." : "Target not supported as present; box not applied."}` };
+    }
+
     // IMAGE-REQUEST-CORE-END
 
     function renderImages() {
+      const selection = $("boxImage").value;
+      $("boxImage").replaceChildren();
+      for (const image of state.images) {
+        const option = document.createElement("option"); option.value = image.ref; option.textContent = image.name;
+        $("boxImage").append(option);
+      }
+      if (state.images.some((image) => image.ref === selection)) $("boxImage").value = selection;
       const list = $("imageAttachments");
       list.replaceChildren();
       for (const image of state.images) {
@@ -1318,6 +1354,8 @@
         asset: { type: "image", format: "png", data_base64: canvas.toDataURL("image/png").split(",")[1] } }];
     }
 
+    $("boxImage").addEventListener("change", markEdited);
+
     function buildRequest() {
       const type = $("primitive").value;
       const question = $("question").value.trim();
@@ -1332,6 +1370,11 @@
         if (choices.length < 2 || new Set(choices).size !== choices.length) throw new Error("Choice tests need at least two distinct options, one per line.");
         schema.answer = { type: "choice", choices, instructions: question };
         schema.confidence = { type: "choice", choices: ["high", "medium", "low"], instructions: "How clear is the best-supported answer from the supplied facts? Choose low when material information is missing or ambiguous." };
+      } else if (type === "box") {
+        const ref = $("boxImage").value;
+        if (!state.images.some((image) => image.ref === ref)) throw new Error("Attach and choose the image containing the target.");
+        schema.answer = { type: "box", instructions: question, image_ref: ref, presence_field: "present", presence_threshold: 0.5 };
+        schema.present = { type: "noul", instructions: { target_description: question, target_image: ref, question: "Is this target visible in the target image?" } };
       } else if (type === "score") {
         const criteria = $("scoreCriteria").value.split("\n").map((item) => item.trim()).filter(Boolean);
         if (criteria.length < 2 || criteria.length > 10) throw new Error("Score tests need 2–10 ordered levels, one per line.");
@@ -1576,6 +1619,37 @@
       };
     }
 
+    function renderBox(target, field, definition, request, fields) {
+      const box = field.box ?? field.value;
+      if (!validBox(box)) return;
+      const ref = field.image_ref || definition.image_ref;
+      const asset = request.assets?.[ref];
+      const note = document.createElement("p"); note.className = "no-distribution";
+      if (!asset) { note.textContent = "The bound image is unavailable; coordinates were retained."; target.append(note); return; }
+      const presence = boxPresence(definition, fields);
+      note.textContent = presence.note;
+      const surface = document.createElement("div"); surface.style.cssText = "position:relative;margin:10px 0";
+      const img = document.createElement("img");
+      img.src = `data:image/${asset.format === "png" ? "png" : "jpeg"};base64,${asset.data_base64}`;
+      img.alt = "Target image with normalized Box result";
+      img.style.cssText = "display:block;width:100%;height:auto";
+      surface.append(img);
+      const draw = (edges, colour, dashed) => {
+        const overlay = document.createElement("div");
+        overlay.style.cssText = `position:absolute;left:${edges.left * 100}%;top:${edges.top * 100}%;width:${(edges.right - edges.left) * 100}%;height:${(edges.bottom - edges.top) * 100}%;border:3px ${dashed ? "dashed" : "solid"} ${colour};pointer-events:none`;
+        overlay.setAttribute("aria-label", dashed ? "Reference rectangle" : "Provider rectangle"); surface.append(overlay);
+      };
+      if (presence.draw) {
+        draw(box, "#f5a700", false);
+        const reference = !state.edited ? state.selected?.expected_box : null;
+        if (validBox(reference)) {
+          draw(reference, "#70d6ff", true);
+          note.textContent += ` Overlap (IoU): ${(boxIntersectionOverUnion(box, reference) * 100).toFixed(1)}%. Solid yellow: provider; dashed blue: reference.`;
+        }
+      }
+      target.append(surface, note);
+    }
+
     function renderResult(data, request, elapsed) {
       const result = data.results?.[0];
       if (!result || typeof result !== "object") throw new Error("JEV returned no decision result.");
@@ -1649,7 +1723,9 @@
       const providerValue = state.provider?.selected_backend || "";
       const providerHasDistribution = primaryField.probabilities && Object.keys(primaryField.probabilities).length;
       $("resultGuidance").className = "result-guidance";
-      $("resultGuidance").textContent = providerHasDistribution
+      $("resultGuidance").textContent = names.some((name) => request.schema[name]?.type === "box")
+        ? "Box edges are fractions of the bound image. A box alone does not establish that the target is present."
+        : providerHasDistribution
         ? "The bars show the returned decision distribution for each field."
         : providerValue === "apple:foundation-models"
           ? "Apple Foundation Models returned structured values but does not expose choice probabilities or calibrated confidence."
@@ -1700,7 +1776,10 @@
           : prettyValue(value);
         head.append(label, valueLabel);
         card.append(head);
-        if (!field.error) addDistribution(card, field, definition, value);
+        if (!field.error) {
+          if (definition.type === "box") renderBox(card, field, definition, request, fields);
+          else addDistribution(card, field, definition, value);
+        }
         if (field.error) {
           const errorNote = document.createElement("div");
           errorNote.className = "no-distribution";

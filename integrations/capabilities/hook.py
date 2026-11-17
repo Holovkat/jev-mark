@@ -261,10 +261,11 @@ def build_packet(event, harness):
         if isinstance(item, dict) and item.get('name'):
             tools.append({k: item[k] for k in ('id', 'name', 'description', 'available', 'required') if k in item})
             tools[-1].setdefault('id', item['name'])
-    return {'version': 1, 'harness': harness,
+    from skill_preferences import apply_selection
+    return apply_selection({'version': 1, 'harness': harness,
             'session_id': str(event.get('session_id') or event.get('sessionId') or 'unknown'),
             'project': str(cwd), 'task': task, 'skills': skills, 'tools': tools,
-            'catalogue_complete': bool(event.get('catalogue_complete', complete)), 'catalogue_warnings': warnings}
+            'catalogue_complete': bool(event.get('catalogue_complete', complete)), 'catalogue_warnings': warnings})
 
 
 def main():
@@ -292,6 +293,8 @@ def main():
                 state_dir.mkdir(mode=0o700, exist_ok=True)
                 state_dir.chmod(0o700)
                 context = render(select(packet, base_url=args.base_url, timeout=timeout, state_dir=state_dir))
+            from skill_preferences import selection_context
+            context = '\n'.join(filter(None, (context, selection_context(packet))))
             if context:
                 output = {'hookSpecificOutput': {'hookEventName': 'UserPromptSubmit', 'additionalContext': context}}
     except Exception:

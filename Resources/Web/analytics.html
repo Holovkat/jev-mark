@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="shell">
-<header class="topbar"><div class="brand">JEV MARK <span>/ Service analytics</span></div><nav class="nav" aria-label="Portal"><a href="/">Portal</a><a href="/workbench">Workbench ↗</a></nav></header>
+<header class="topbar"><div class="brand">JEV MARK <span>/ Service analytics</span></div><nav class="nav" aria-label="Portal"><a href="/">Portal</a><a href="/workbench">Workbench ↗</a><a href="/capability-report">Capabilities</a></nav></header>
 <section class="intro"><div><div class="eyebrow">Gateway activity</div><h1>Service analytics</h1><p>Usage, decision workload and performance across your service.</p></div><div id="status" class="status" role="status">Connecting</div></section>
 <form id="filters" class="filters">
 <div class="control"><label for="period">Date range</label><select id="period"><option value="today">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="custom">Custom</option></select></div>
@@ -17,7 +17,7 @@
 <div class="control custom" id="to-control" hidden><label for="to">Until (local time)</label><input type="datetime-local" id="to"></div>
 <div class="control"><label for="caller">Caller</label><input id="caller" list="callers" placeholder="All callers" maxlength="96"><datalist id="callers"></datalist></div>
 <div class="control"><label for="backend">Provider / backend</label><input id="backend" list="backends" placeholder="All backends" maxlength="96"><datalist id="backends"></datalist></div>
-<div class="control"><label for="kind">Request type</label><select id="kind"><option value="">All types</option><option>choice</option><option>score</option><option>noul</option><option>mixed</option><option>other</option><option>unknown</option></select></div>
+<div class="control"><label for="kind">Request type</label><select id="kind"><option value="">All types</option><option>choice</option><option>score</option><option>noul</option><option>box</option><option>mixed</option><option>other</option><option>unknown</option></select></div>
 <div class="control"><label for="outcome">Outcome</label><select id="outcome"><option value="">All outcomes</option><option>complete</option><option>partial</option><option>rejected</option><option>failed</option><option>disconnected</option><option>interrupted</option><option>unknown</option><option value="in_progress">In progress</option></select></div>
 <button class="primary" type="submit">Apply filters</button><button type="button" id="reset">Reset</button>
 </form>
@@ -100,7 +100,7 @@ function render() {
  notice(notes.join(' '));
  $('coverage').textContent='Collection began '+date(health.collection_started_at); $('retention').textContent='Retention: '+health.retention_days+' days · '+number(health.max_rows)+' completed-request limit · Bodies: 24 hours, up to 512 MiB';
  $('outcomes').replaceChildren(); for (const [key,n] of Object.entries(s.outcomes)) if(n) $('outcomes').append(el('span',key.replaceAll('_',' ')+' '+number(n),'badge '+key));
- $('types').textContent='Requested fields: Choice '+number(s.choice_fields)+' · Score '+number(s.score_fields)+' · Noul '+number(s.noul_fields)+'. A mixed request can contain more than one field type.';
+ $('types').textContent='Requested fields: Choice '+number(s.choice_fields)+' · Score '+number(s.score_fields)+' · Noul '+number(s.noul_fields)+'. Box fields contribute to total fields; Box-only calls can be filtered by request type. A mixed request can contain more than one field type.';
  for (const [key,list] of [['caller','callers'],['backend','backends']]) {$(list).replaceChildren(); for(const row of data.breakdowns[key]) {const option=el('option'); option.value=row.label || 'unknown'; $(list).append(option);}}
  chart(); breakdown(); history();
 }

@@ -17,8 +17,7 @@ def install(zcode_home: Path, codex_home: Path = None, repository_root: Path = N
     root = (repository_root or Path(__file__).resolve().parents[1]).resolve()
     codex_home = codex_home or Path.home() / '.codex'
     adapter = root / 'integrations/zcode/jev_hook.py'
-    sources = {name: root / 'integrations/skills' / name for name in ('requirements-traceability', 'jev-retention')}
-    sources['jev-decision'] = codex_home / 'skills/jev-decision'
+    sources = {'jev-retention': root / 'integrations/skills/jev-retention'}
     if not adapter.is_file():
         raise ValueError('ZCode adapter is missing')
     for name, source in sources.items():
