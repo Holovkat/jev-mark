@@ -283,7 +283,9 @@ class AnalyticsStore:
                 CREATE TABLE IF NOT EXISTS decision_cache (
                   request_hash TEXT PRIMARY KEY, backend TEXT NOT NULL, model TEXT NOT NULL,
                   response TEXT NOT NULL, created_at REAL NOT NULL, hits INTEGER NOT NULL DEFAULT 0,
-                  admitted_via TEXT NOT NULL DEFAULT 'replay');
+                  admitted_via TEXT NOT NULL DEFAULT 'replay',
+                  input_tokens INTEGER NOT NULL DEFAULT 0, output_tokens INTEGER NOT NULL DEFAULT 0,
+                  duration_ms REAL NOT NULL DEFAULT 0);
                 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS requests (
                   seq INTEGER PRIMARY KEY AUTOINCREMENT, request_id TEXT UNIQUE NOT NULL,
@@ -303,6 +305,11 @@ class AnalyticsStore:
             if "body_hash" not in {row[1] for row in db.execute("PRAGMA table_info(payloads)")}:
                 db.execute("ALTER TABLE payloads ADD COLUMN body_hash TEXT")
             db.execute("CREATE INDEX IF NOT EXISTS payloads_body_hash ON payloads(body_hash)")
+            for column, decl in (("input_tokens", "INTEGER NOT NULL DEFAULT 0"),
+                                 ("output_tokens", "INTEGER NOT NULL DEFAULT 0"),
+                                 ("duration_ms", "REAL NOT NULL DEFAULT 0")):
+                if column not in {row[1] for row in db.execute("PRAGMA table_info(decision_cache)")}:
+                    db.execute(f"ALTER TABLE decision_cache ADD COLUMN {column} {decl}")
             db.execute("INSERT OR IGNORE INTO meta VALUES ('collection_started', ?)", (str(self.started),))
             db.execute("INSERT OR IGNORE INTO meta VALUES ('dropped_updates', '0')")
             db.execute("INSERT OR IGNORE INTO meta SELECT 'coverage_start', value FROM meta WHERE key='collection_started'")
@@ -416,22 +423,29 @@ class AnalyticsStore:
             pass
 
     def cache_lookup(self, request_hash):
-        """Return the stored decision response for this exact request, or None.
+        """Return the stored decision for this exact request as
+        (response, model, input_tokens, output_tokens, duration_ms) — the token
+        counts and duration are the avoided provider cost/time — or None.
         Storage trouble raises so the caller falls through to the live path."""
         if not self.cache_enabled or not self.collection_started or not re.fullmatch(r"[0-9a-f]{64}", request_hash or ""):
             return None
         with closing(sqlite3.connect(self.path, timeout=2)) as db:
-            row = db.execute("SELECT response FROM decision_cache WHERE request_hash=?", (request_hash,)).fetchone()
-            return row[0] if row else None
+            row = db.execute("SELECT response, model, input_tokens, output_tokens, duration_ms "
+                             "FROM decision_cache WHERE request_hash=?", (request_hash,)).fetchone()
+            return (row[0], row[1], row[2] or 0, row[3] or 0, row[4] or 0.0) if row else None
 
-    def cache_store(self, request_hash, backend, model, response, admitted_via="replay"):
+    def cache_store(self, request_hash, backend, model, response, admitted_via="replay",
+                    input_tokens=0, output_tokens=0, duration_ms=0.0):
         if not self.cache_enabled or not self.collection_started or not re.fullmatch(r"[0-9a-f]{64}", request_hash or ""):
             return
         with closing(sqlite3.connect(self.path, timeout=2)) as db:
-            db.execute("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via) "
-                       "VALUES (?, ?, ?, ?, ?, 0, ?) ON CONFLICT(request_hash) DO UPDATE SET "
-                       "response=excluded.response, created_at=excluded.created_at, admitted_via=excluded.admitted_via",
-                       (request_hash, label(backend, "unknown"), label(model, "unknown"), response, time.time(), admitted_via))
+            db.execute("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via, "
+                       "input_tokens, output_tokens, duration_ms) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?) "
+                       "ON CONFLICT(request_hash) DO UPDATE SET response=excluded.response, created_at=excluded.created_at, "
+                       "admitted_via=excluded.admitted_via, model=excluded.model, input_tokens=excluded.input_tokens, "
+                       "output_tokens=excluded.output_tokens, duration_ms=excluded.duration_ms",
+                       (request_hash, label(backend, "unknown"), label(model, "unknown"), response, time.time(),
+                        admitted_via, input_tokens, output_tokens, duration_ms))
             db.commit()
 
     def cache_touch(self, request_hash):

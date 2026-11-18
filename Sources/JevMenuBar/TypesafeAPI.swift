@@ -214,4 +214,78 @@ enum OllamaSystemOneStore {
             }
         }
     }
+
+    /// Rows that target hosted providers rather than loopback Ollama — the
+    /// service models shown with editable rate cards in the Models panel.
+    static func serviceModelRows(in directory: URL) throws -> [ServiceModelRow] {
+        let (_, rows) = try load(directory)
+        return rows.filter { !isOllama($0) }.compactMap { row in
+            guard let model = row["model"] as? String, !model.isEmpty else { return nil }
+            let id = String(describing: row["id"] ?? model).trimmingCharacters(in: .whitespacesAndNewlines)
+            let name = (row["name"] as? String) ?? model
+            return ServiceModelRow(id: id, name: name, model: model)
+        }
+    }
+}
+
+/// Per-model token pricing used by the menu's cache-savings figures. Stored
+/// beside settings.json rather than in .secure: rates are editable
+/// preferences, not credentials.
+struct ModelRate: Equatable, Sendable {
+    var inputPerMTok: Double
+    var outputPerMTok: Double
+}
+
+enum RateCardStore {
+    static var fileURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Application Support/JEV Menu Bar/rates.json")
+    }
+
+    /// Reference prices for models with published rates; every entry stays
+    /// editable in the Models panel.
+    static let seedRates: [String: ModelRate] = [
+        "gpt-6-luna": ModelRate(inputPerMTok: 0.10, outputPerMTok: 0.50),
+        "jev-latest": ModelRate(inputPerMTok: 0.042, outputPerMTok: 0.042),
+        "jev-1.14.0": ModelRate(inputPerMTok: 0.042, outputPerMTok: 0.042),
+    ]
+
+    static func load() -> [String: ModelRate] {
+        var rates: [String: ModelRate] = [:]
+        if let data = try? Data(contentsOf: fileURL),
+           let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let entries = root["rates"] as? [String: Any] {
+            for (model, value) in entries {
+                guard let row = value as? [String: Any] else { continue }
+                rates[model] = ModelRate(
+                    inputPerMTok: (row["input_per_mtok"] as? NSNumber)?.doubleValue ?? 0,
+                    outputPerMTok: (row["output_per_mtok"] as? NSNumber)?.doubleValue ?? 0)
+            }
+        }
+        if rates.isEmpty {
+            rates = seedRates
+            try? save(rates)
+        }
+        return rates
+    }
+
+    static func save(_ rates: [String: ModelRate]) throws {
+        let manager = FileManager.default
+        let directory = fileURL.deletingLastPathComponent()
+        try manager.createDirectory(at: directory, withIntermediateDirectories: true,
+                                    attributes: [.posixPermissions: 0o700])
+        var entries: [String: Any] = [:]
+        for (model, rate) in rates {
+            entries[model] = ["input_per_mtok": rate.inputPerMTok, "output_per_mtok": rate.outputPerMTok]
+        }
+        let data = try JSONSerialization.data(withJSONObject: ["rates": entries],
+                                              options: [.prettyPrinted, .sortedKeys])
+        let temporary = directory.appendingPathComponent(".rates-" + UUID().uuidString + ".tmp")
+        defer { try? manager.removeItem(at: temporary) }
+        guard manager.createFile(atPath: temporary.path, contents: nil, attributes: [.posixPermissions: 0o600]) else {
+            throw OllamaSystemOneStore.StoreError.writeFailed
+        }
+        try data.write(to: temporary)
+        guard rename(temporary.path, fileURL.path) == 0 else { throw OllamaSystemOneStore.StoreError.writeFailed }
+    }
 }

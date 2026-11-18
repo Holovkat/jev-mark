@@ -10,6 +10,13 @@ struct UsageSnapshot: Sendable, Equatable {
     let cachedBuckets: [Int]
     let total: Int
     let cached: Int
+    /// Tokens the cache hits avoided (the original live calls' usage, stored per
+    /// cache entry), the provider time they avoided, and the rate-card value of
+    /// those avoided tokens.
+    let savedInputTokens: Int
+    let savedOutputTokens: Int
+    let savedMs: Double
+    let savedCost: Double
     let latestActivity: Date?
     /// Right edge of the window at snapshot time; hour markers align against it.
     let windowEnd: Date
@@ -29,8 +36,9 @@ enum UsageHistory {
             .appendingPathComponent("Library/Application Support/JEV Menu Bar/analytics/requests.sqlite3")
     }
 
-    /// Synchronous, blocking read; run from a background task.
-    static func snapshot(now: Date = Date()) -> UsageSnapshot? {
+    /// Synchronous, blocking read; run from a background task. `rates` prices the
+    /// avoided tokens on cache-hit rows (keyed by model, dollars per million).
+    static func snapshot(now: Date = Date(), rates: [String: ModelRate] = [:]) -> UsageSnapshot? {
         var database: OpaquePointer?
         guard sqlite3_open_v2(databaseURL.path, &database, SQLITE_OPEN_READONLY, nil) == SQLITE_OK,
               database != nil else {
@@ -39,7 +47,8 @@ enum UsageHistory {
         }
         defer { sqlite3_close_v2(database) }
         var statement: OpaquePointer?
-        guard sqlite3_prepare_v2(database, "SELECT started_at, outcome FROM requests WHERE started_at >= ?", -1, &statement, nil) == SQLITE_OK,
+        let query = "SELECT started_at, outcome, model, input_tokens, output_tokens, duration_ms FROM requests WHERE started_at >= ?"
+        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK,
               statement != nil else {
             return nil
         }
@@ -49,6 +58,10 @@ enum UsageHistory {
         var cachedBuckets = [Int](repeating: 0, count: bucketCount)
         var total = 0
         var cached = 0
+        var savedInputTokens = 0
+        var savedOutputTokens = 0
+        var savedMs = 0.0
+        var savedCost = 0.0
         var latestActivity: Date?
         let windowStart = now.addingTimeInterval(-window)
         while sqlite3_step(statement) == SQLITE_ROW {
@@ -57,15 +70,31 @@ enum UsageHistory {
             let clamped = min(max(slot, 0), bucketCount - 1)
             buckets[clamped] += 1
             total += 1
-            if let column = sqlite3_column_text(statement, 1),
-               String(cString: column) == "cache_hit" {
+            var isCacheHit = false
+            if let column = sqlite3_column_text(statement, 1) {
+                isCacheHit = String(cString: column) == "cache_hit"
+            }
+            if isCacheHit {
                 cachedBuckets[clamped] += 1
                 cached += 1
+                let input = Int(sqlite3_column_int(statement, 3))
+                let output = Int(sqlite3_column_int(statement, 4))
+                let duration = sqlite3_column_double(statement, 5)
+                savedInputTokens += input
+                savedOutputTokens += output
+                savedMs += duration
+                var model: String?
+                if let column = sqlite3_column_text(statement, 2) { model = String(cString: column) }
+                if let rate = model.flatMap({ rates[$0] }) {
+                    savedCost += (Double(input) * rate.inputPerMTok + Double(output) * rate.outputPerMTok) / 1_000_000
+                }
             }
             latestActivity = started
         }
-        return UsageSnapshot(buckets: buckets, cachedBuckets: cachedBuckets, total: total,
-                             cached: cached, latestActivity: latestActivity, windowEnd: now)
+        return UsageSnapshot(buckets: buckets, cachedBuckets: cachedBuckets, total: total, cached: cached,
+                             savedInputTokens: savedInputTokens, savedOutputTokens: savedOutputTokens,
+                             savedMs: savedMs, savedCost: savedCost,
+                             latestActivity: latestActivity, windowEnd: now)
     }
 }
 
@@ -114,6 +143,11 @@ struct UsagePulseView: View {
                 Spacer()
                 Text(caption).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
             }
+            HStack {
+                Text("Savings").font(.caption2).foregroundStyle(.secondary)
+                Spacer()
+                Text(savingsCaption).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+            }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
@@ -154,8 +188,19 @@ struct UsagePulseView: View {
         return "Request: \(snapshot.total)  ·  Cache: \(snapshot.cached)"
     }
 
+    /// Cache-hit savings over the window: the provider spend the hits avoided
+    /// (rate-card priced) and the model time they avoided, as H:MM:SS.
+    private var savingsCaption: String {
+        guard let snapshot else { return "" }
+        let seconds = Int(snapshot.savedMs / 1000)
+        let time = String(format: "%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, seconds % 60)
+        return "Cost: \(String(format: "$%.3f", snapshot.savedCost))  ·  Time: \(time)"
+    }
+
     private var accessibilityText: String {
         guard let snapshot else { return "Usage history unavailable" }
-        return "Usage in the last 12 hours: \(snapshot.total) requests, \(snapshot.cached) served from cache"
+        return "Usage in the last 12 hours: \(snapshot.total) requests, \(snapshot.cached) served from cache, "
+            + String(format: "saving $%.3f and ", snapshot.savedCost)
+            + "\(Int(snapshot.savedMs / 1000)) seconds of model time"
     }
 }

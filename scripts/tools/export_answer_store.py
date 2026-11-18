@@ -38,7 +38,7 @@ def main() -> int:
     with closing(sqlite3.connect("file:" + db_path.resolve().as_uri().removeprefix("file:") + "?mode=ro", uri=True)) as src:
         src.row_factory = sqlite3.Row
         rows = src.execute("SELECT p.request_id, COALESCE(NULLIF(p.bodies, ''), pb.body) AS bodies, "
-                           "r.backend, r.model FROM payloads p "
+                           "r.backend, r.model, r.input_tokens, r.output_tokens, r.duration_ms FROM payloads p "
                            "LEFT JOIN payload_bodies pb ON pb.body_hash = p.body_hash "
                            "JOIN requests r ON r.request_id = p.request_id "
                            "ORDER BY p.started_at DESC LIMIT 5000").fetchall()
@@ -62,7 +62,8 @@ def main() -> int:
         if key in unique:
             duplicate += 1
             continue
-        unique[key] = (key, backend, row["model"] or "unknown", response, time.time(), "bootstrap-luna")
+        unique[key] = (key, backend, row["model"] or "unknown", response, time.time(), "bootstrap-luna",
+                       row["input_tokens"] or 0, row["output_tokens"] or 0, row["duration_ms"] or 0.0)
 
     print(f"captured payloads scanned: {len(rows)}")
     print(f"  usable (known backend, complete bodies): {len(unique) + duplicate}")
@@ -74,8 +75,11 @@ def main() -> int:
         return 0
     with closing(sqlite3.connect(db_path, timeout=5)) as db:
         db.execute("BEGIN")
-        db.executemany("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via) "
-                       "VALUES (?, ?, ?, ?, ?, 0, ?) ON CONFLICT(request_hash) DO NOTHING", list(unique.values()))
+        db.executemany("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via, "
+                       "input_tokens, output_tokens, duration_ms) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?) "
+                       "ON CONFLICT(request_hash) DO UPDATE SET input_tokens=excluded.input_tokens, "
+                       "output_tokens=excluded.output_tokens, duration_ms=excluded.duration_ms, "
+                       "model=excluded.model, backend=excluded.backend", list(unique.values()))
         db.commit()
     print(f"seeded {len(unique)} bootstrap entries into decision_cache")
     return 0

@@ -46,12 +46,20 @@ struct OllamaModel: Identifiable, Equatable, Sendable {
     let blobPath: String
 }
 
+/// A hosted (non-Ollama) profile from typesafe.json, shown with an editable
+/// rate card in the Models panel.
+struct ServiceModelRow: Identifiable, Equatable, Sendable {
+    let id: String
+    let name: String
+    let model: String
+}
+
 /// Contrastive Language Model: a Qwen3-8B last-token embedding server (llama.cpp) plus
 /// `clm-serve`, which scores candidates with the CLM projection heads.
 enum CLMRuntime {
     static let backendID = "clm:v0.1-8b"
     static let displayName = "CLM v0.1 8B"
-    static let encoderOllamaModel = "qwen3:8b-q8_0"
+    static let encoderOllamaModel = "qwen3:8b-fp16"
     static let encoderPort = 8099
     static let serverPort = 8700
     static let headPath = "/Volumes/Extreme SSD/3 Resources/LLLM/Ollama/clm/CLM_v0.1-8B.pt"
@@ -148,6 +156,8 @@ final class ServiceController: NSObject, ObservableObject {
     @Published private(set) var imageEnabledModels: Set<String> = []
     @Published private(set) var providerConfigurationError: String?
     @Published private(set) var apiConfigs: [TypesafeAPIProfile] = []
+    @Published private(set) var rateCard: [String: ModelRate] = [:]
+    @Published private(set) var serviceModels: [ServiceModelRow] = []
     @Published private(set) var isLoadingProviders = false
     @Published private(set) var isStarting = false
     @Published private(set) var usage: UsageSnapshot?
@@ -243,6 +253,7 @@ final class ServiceController: NSObject, ObservableObject {
             object: nil
         )
         launchAtLogin = LoginItem.isEnabled
+        rateCard = RateCardStore.load()
         persistGatewaySelection()
         appleProviderServer.start()
         startGateway()
@@ -261,8 +272,23 @@ final class ServiceController: NSObject, ObservableObject {
     }
 
     private func loadUsage() async {
-        let snapshot = await Task.detached(priority: .utility) { UsageHistory.snapshot() }.value
+        let rates = rateCard
+        let snapshot = await Task.detached(priority: .utility) { UsageHistory.snapshot(now: Date(), rates: rates) }.value
         usage = snapshot
+    }
+
+    /// Persists an edited token rate for a service model; the rate card backs
+    /// the cache-savings cost figure on the usage chart.
+    func setRate(_ model: String, inputPerMTok: Double, outputPerMTok: Double) {
+        var rates = rateCard
+        rates[model] = ModelRate(inputPerMTok: max(0, inputPerMTok), outputPerMTok: max(0, outputPerMTok))
+        do {
+            try RateCardStore.save(rates)
+            rateCard = rates
+            providerConfigurationError = nil
+        } catch {
+            providerConfigurationError = "Could not save model rates. Check rates.json and its permissions."
+        }
     }
 
     func selectBackend(_ id: String) {
@@ -304,6 +330,7 @@ final class ServiceController: NSObject, ObservableObject {
                     self.systemOneModels = try OllamaSystemOneStore.checkedModels(in: self.secureDirectoryURL)
                     self.questionBatchSizes = try OllamaSystemOneStore.questionBatchSizes(in: self.secureDirectoryURL)
                     self.imageEnabledModels = try OllamaSystemOneStore.imageEnabledModels(in: self.secureDirectoryURL)
+                    self.serviceModels = (try? OllamaSystemOneStore.serviceModelRows(in: self.secureDirectoryURL)) ?? []
                     self.providerConfigurationError = nil
                 } catch {
                     self.providerConfigurationError = "Could not read System One model settings. Check typesafe.json."
@@ -327,7 +354,10 @@ final class ServiceController: NSObject, ObservableObject {
     func refreshProviderProfiles() {
         Task.detached {
             let remote = await GatewayProviderDiscovery.profiles()
-            await MainActor.run { self.apiConfigs = remote }
+            await MainActor.run {
+                self.apiConfigs = remote
+                self.serviceModels = (try? OllamaSystemOneStore.serviceModelRows(in: self.secureDirectoryURL)) ?? []
+            }
         }
     }
 
@@ -993,7 +1023,7 @@ struct ContentView: View {
                     controller.toggleOverlay(.ollama)
                 } label: {
                     HStack(spacing: 3) {
-                        Text("Ollama models")
+                        Text("Models")
                             .font(.caption2)
                             .foregroundColor(.primary)
                         Image(systemName: "chevron.down")
@@ -1139,80 +1169,104 @@ struct BackendListPanel: View {
     }
 }
 
-/// Configuration dialog for Ollama System One models: model selection, image input
-/// and question batch size, formerly the popover's DisclosureGroup content.
+/// Configuration dialog for decision models: Ollama rows carry model selection,
+/// image input and batch size; hosted service-model rows carry the editable
+/// token rate card that backs the cache-savings figures on the usage chart.
 struct OllamaModelsPanel: View {
     @ObservedObject var controller: ServiceController
 
     private static let batchColumnWidth: CGFloat = 72
     private static let imageColumnWidth: CGFloat = 64
+    private static let rateColumnWidth: CGFloat = 76
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if controller.downloadedOllamaModels.isEmpty {
-                Text("No downloaded Ollama models found. Start Ollama and refresh.")
+            if controller.downloadedOllamaModels.isEmpty && controller.serviceModels.isEmpty {
+                Text("No decision models found. Start Ollama or add a System One profile, then refresh.")
                     .font(.caption).foregroundStyle(.secondary)
             } else {
-                HStack {
-                    Text("Model")
-                        .font(.caption2).foregroundStyle(.secondary)
-                    Spacer()
-                    Text("Batch")
-                        .font(.caption2).foregroundStyle(.secondary)
-                        .frame(width: Self.batchColumnWidth)
-                    Text("Image Input")
-                        .font(.caption2).foregroundStyle(.secondary)
-                        .frame(width: Self.imageColumnWidth)
-                }
                 ScrollView {
                     VStack(alignment: .leading, spacing: 8) {
-                        ForEach(controller.downloadedOllamaModels, id: \.self) { model in
-                            HStack(spacing: 8) {
-                                Toggle(model, isOn: Binding(
-                                    get: { controller.systemOneModels.contains(model) },
-                                    set: { controller.setSystemOneModel(model, enabled: $0) }
-                                ))
-                                .toggleStyle(.checkbox)
-                                .disabled(controller.isLoadingProviders)
-                                Spacer(minLength: 8)
-                                Group {
-                                    if controller.systemOneModels.contains(model) {
-                                        let questionBatchSize = Binding(
-                                            get: { controller.questionBatchSizes[model] ?? 64 },
-                                            set: { controller.setQuestionBatchSize($0, for: model) }
-                                        )
-                                        HStack(spacing: 2) {
-                                            TextField("Questions", value: questionBatchSize, format: .number)
-                                                .textFieldStyle(.roundedBorder)
-                                                .frame(width: 44)
-                                                .multilineTextAlignment(.center)
-                                                .disabled(controller.isLoadingProviders)
-                                            Stepper("", value: questionBatchSize,
-                                                    in: 1...OllamaSystemOneStore.maximumQuestionBatchSize)
-                                                .labelsHidden()
-                                                .disabled(controller.isLoadingProviders)
+                        if !controller.downloadedOllamaModels.isEmpty {
+                            sectionHeader("Ollama", trailing: "Free")
+                            HStack {
+                                Text("Model").font(.caption2).foregroundStyle(.secondary)
+                                Spacer()
+                                Text("Batch").font(.caption2).foregroundStyle(.secondary)
+                                    .frame(width: Self.batchColumnWidth)
+                                Text("Image Input").font(.caption2).foregroundStyle(.secondary)
+                                    .frame(width: Self.imageColumnWidth)
+                            }
+                            ForEach(controller.downloadedOllamaModels, id: \.self) { model in
+                                HStack(spacing: 8) {
+                                    Toggle(model, isOn: Binding(
+                                        get: { controller.systemOneModels.contains(model) },
+                                        set: { controller.setSystemOneModel(model, enabled: $0) }
+                                    ))
+                                    .toggleStyle(.checkbox)
+                                    .disabled(controller.isLoadingProviders)
+                                    Spacer(minLength: 8)
+                                    Group {
+                                        if controller.systemOneModels.contains(model) {
+                                            let questionBatchSize = Binding(
+                                                get: { controller.questionBatchSizes[model] ?? 64 },
+                                                set: { controller.setQuestionBatchSize($0, for: model) }
+                                            )
+                                            HStack(spacing: 2) {
+                                                TextField("Questions", value: questionBatchSize, format: .number)
+                                                    .textFieldStyle(.roundedBorder)
+                                                    .frame(width: 44)
+                                                    .multilineTextAlignment(.center)
+                                                    .disabled(controller.isLoadingProviders)
+                                                Stepper("", value: questionBatchSize,
+                                                        in: 1...OllamaSystemOneStore.maximumQuestionBatchSize)
+                                                    .labelsHidden()
+                                                    .disabled(controller.isLoadingProviders)
+                                            }
+                                        } else {
+                                            Text("\(controller.questionBatchSizes[model] ?? 64)")
+                                                .font(.caption).foregroundStyle(.secondary)
                                         }
-                                    } else {
-                                        Text("\(controller.questionBatchSizes[model] ?? 64)")
-                                            .font(.caption).foregroundStyle(.secondary)
                                     }
-                                }
-                                .frame(width: Self.batchColumnWidth)
-                                // The border lives in a ZStack (not a conditional Group) so it
-                                // renders for every row; the tick appears only for selected
-                                // models that Ollama reports as image-capable.
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 3.5)
-                                        .stroke(Color.secondary.opacity(0.45), lineWidth: 1)
-                                    if controller.systemOneModels.contains(model),
-                                       controller.visionDecisionModels.contains(model) {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(size: 8, weight: .semibold))
-                                            .foregroundColor(.primary)
+                                    .frame(width: Self.batchColumnWidth)
+                                    // The border lives in a ZStack (not a conditional Group) so it
+                                    // renders for every row; the tick appears only for selected
+                                    // models that Ollama reports as image-capable.
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 3.5)
+                                            .stroke(Color.secondary.opacity(0.45), lineWidth: 1)
+                                        if controller.systemOneModels.contains(model),
+                                           controller.visionDecisionModels.contains(model) {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(size: 8, weight: .semibold))
+                                                .foregroundColor(.primary)
+                                        }
                                     }
+                                    .frame(width: 16, height: 16)
+                                    .frame(width: Self.imageColumnWidth)
                                 }
-                                .frame(width: 16, height: 16)
-                                .frame(width: Self.imageColumnWidth)
+                            }
+                        }
+                        if !controller.serviceModels.isEmpty {
+                            sectionHeader("Service models", trailing: nil)
+                            HStack {
+                                Text("Model").font(.caption2).foregroundStyle(.secondary)
+                                Spacer()
+                                Text("In $/M").font(.caption2).foregroundStyle(.secondary)
+                                    .frame(width: Self.rateColumnWidth)
+                                Text("Out $/M").font(.caption2).foregroundStyle(.secondary)
+                                    .frame(width: Self.rateColumnWidth)
+                            }
+                            ForEach(controller.serviceModels) { entry in
+                                HStack(spacing: 8) {
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text(entry.model).font(.caption)
+                                        Text(entry.name).font(.caption2).foregroundStyle(.secondary)
+                                    }
+                                    Spacer(minLength: 8)
+                                    rateField(model: entry.model, keyPath: \.inputPerMTok, placeholder: "In")
+                                    rateField(model: entry.model, keyPath: \.outputPerMTok, placeholder: "Out")
+                                }
                             }
                         }
                     }.frame(maxWidth: .infinity, alignment: .leading)
@@ -1232,7 +1286,34 @@ struct OllamaModelsPanel: View {
             }
         }
         .padding(14)
-        .frame(width: 420, height: 440)
+        .frame(width: 560, height: 480)
+    }
+
+    private func sectionHeader(_ title: String, trailing: String?) -> some View {
+        HStack {
+            Text(title).font(.caption2.weight(.semibold)).foregroundColor(.accentColor)
+            Spacer()
+            if let trailing {
+                Text(trailing).font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func rateField(model: String, keyPath: WritableKeyPath<ModelRate, Double>,
+                           placeholder: String) -> some View {
+        let rate = Binding(
+            get: { controller.rateCard[model]?[keyPath: keyPath] ?? 0 },
+            set: {
+                var updated = controller.rateCard[model] ?? ModelRate(inputPerMTok: 0, outputPerMTok: 0)
+                updated[keyPath: keyPath] = max(0, $0)
+                controller.setRate(model, inputPerMTok: updated.inputPerMTok, outputPerMTok: updated.outputPerMTok)
+            }
+        )
+        return TextField(placeholder, value: rate, format: .number)
+            .textFieldStyle(.roundedBorder)
+            .frame(width: Self.rateColumnWidth)
+            .multilineTextAlignment(.center)
+            .font(.caption)
     }
 }
 

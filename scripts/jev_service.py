@@ -347,8 +347,14 @@ def make_handler(gateway, store, *, assets=None, token=None):
             if not row.get("fields_requested") or row.get("fields_completed") != row.get("fields_requested"):
                 return
             try:
+                # Remember what the live call cost (tokens, provider time) so
+                # each future cache hit can report the avoided spend.
+                avoided_ms = sum(a.get("duration_ms") or 0 for a in self._observation.attempts)
                 store.cache_store(candidate[0], candidate[1], row.get("model"),
-                                  json.dumps(value, ensure_ascii=False))
+                                  json.dumps(value, ensure_ascii=False),
+                                  input_tokens=row.get("input_tokens") or 0,
+                                  output_tokens=row.get("output_tokens") or 0,
+                                  duration_ms=avoided_ms)
             except Exception:
                 pass
 
@@ -443,13 +449,16 @@ def make_handler(gateway, store, *, assets=None, token=None):
             disconnected = unexpected = False
             try:
                 if cached is not None:
+                    cached_response, cached_model, avoided_in, avoided_out, avoided_ms = cached
                     if cache_backend:
                         observation.row["backend"] = label(cache_backend)
+                    if cached_model and cached_model != "unknown":
+                        observation.row["model"] = label(cached_model)
                     if preread is not None:
                         observe(observation, "capture_body", "request", preread)
                         if request_value is not None:
                             observe(observation, "payload", request_value)
-                    value = json.loads(cached)
+                    value = json.loads(cached_response)
                     if isinstance(value, dict) and value.get("cached") is not True:
                         value["cached"] = True
                     self.send_json(200, value, headers={"X-JEV-Cache": "hit"})
@@ -474,9 +483,14 @@ def make_handler(gateway, store, *, assets=None, token=None):
                 CURRENT.reset(context_token)
                 observe(observation, "finish", disconnected=disconnected, unexpected=unexpected)
                 if cached is not None:
+                    # A cache hit row records the avoided spend: the tokens and
+                    # provider time the original live call needed, not the
+                    # near-zero cost of serving the stored answer.
                     observation.row["outcome"] = "cache_hit"
-                    observation.row["input_tokens"] = 0
-                    observation.row["output_tokens"] = 0
+                    observation.row["model"] = label(cached_model) if cached_model and cached_model != "unknown" else observation.row["model"]
+                    observation.row["input_tokens"] = avoided_in
+                    observation.row["output_tokens"] = avoided_out
+                    observation.row["duration_ms"] = round(avoided_ms, 3)
                 try:
                     store.enqueue(observation.row, observation.attempts, observation.bodies)
                 except Exception:

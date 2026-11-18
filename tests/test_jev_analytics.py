@@ -280,9 +280,15 @@ class StoreTests(unittest.TestCase):
     def test_decision_cache_roundtrip_scoped_to_backend(self):
         key = decision_cache_key(PAYLOAD, 'remote:test')
         self.assertIsNone(self.store.cache_lookup(key))
-        self.store.cache_store(key, 'remote:test', 'test-model', '{"results":[]}')
-        self.assertEqual(self.store.cache_lookup(key), '{"results":[]}')
+        self.store.cache_store(key, 'remote:test', 'test-model', '{"results":[]}',
+                               input_tokens=1234, output_tokens=42, duration_ms=1530.5)
+        self.assertEqual(self.store.cache_lookup(key),
+                         ('{"results":[]}', 'test-model', 1234, 42, 1530.5))
         self.store.cache_touch(key)
+        # A re-store refreshes the avoided-cost metrics.
+        self.store.cache_store(key, 'remote:test', 'test-model', '{"results":[]}',
+                               input_tokens=2000, output_tokens=60, duration_ms=2100.0)
+        self.assertEqual(self.store.cache_lookup(key)[2:], (2000, 60, 2100.0))
         # A different backend or a changed request hashes to a different key.
         self.assertIsNone(self.store.cache_lookup(decision_cache_key(PAYLOAD, 'remote:other')))
         self.assertIsNone(self.store.cache_lookup(decision_cache_key({**PAYLOAD, 'contexts': ['changed']}, 'remote:test')))
@@ -301,10 +307,11 @@ class StoreTests(unittest.TestCase):
     def test_decision_cache_ttl_eviction(self):
         keys = ['%064x' % n for n in range(2)]
         with closing(sqlite3.connect(self.path)) as db:
-            db.execute("INSERT INTO decision_cache VALUES (?,?,?,?,?,0,'replay')",
-                       (keys[0], 'remote:test', 'test-model', '{}', time.time() - 15 * 86400))
-            db.execute("INSERT INTO decision_cache VALUES (?,?,?,?,?,0,'replay')",
-                       (keys[1], 'remote:test', 'test-model', '{}', time.time()))
+            db.execute("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via) "
+                       "VALUES (?, 'remote:test', 'test-model', '{}', ?, 0, 'replay')",
+                       (keys[0], time.time() - 15 * 86400))
+            db.execute("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via) "
+                       "VALUES (?, 'remote:test', 'test-model', '{}', ?, 0, 'replay')", (keys[1], time.time()))
             db.commit()
         self.store.close()
         self.store = AnalyticsStore(self.path)
@@ -318,8 +325,9 @@ class StoreTests(unittest.TestCase):
         with closing(sqlite3.connect(self.path)) as db:
             now = time.time()
             for index, key in enumerate(keys):
-                db.execute("INSERT INTO decision_cache VALUES (?,?,?,?,?,0,'replay')",
-                           (key, 'remote:test', 'test-model', '{}', now - (12 - index) * 3600))
+                db.execute("INSERT INTO decision_cache (request_hash, backend, model, response, created_at, hits, admitted_via) "
+                           "VALUES (?, 'remote:test', 'test-model', '{}', ?, 0, 'replay')",
+                           (key, now - (12 - index) * 3600))
             db.commit()
         self.store.close()
         with patch.dict(os.environ, {'JEV_DECISION_CACHE_MAX_ROWS': '10'}):
@@ -699,7 +707,10 @@ class DecisionCacheTests(unittest.TestCase):
         self.assertEqual((status, response.get('cached', True), headers.get('X-JEV-Cache')), (200, True, 'hit'))
         rows = self.latest_rows()
         self.assertEqual([row['outcome'] for row in rows], ['cache_hit', 'complete'])
-        self.assertEqual((rows[0]['input_tokens'], rows[0]['output_tokens'], rows[0]['attempt_count']), (0, 0, 0))
+        # The hit row records the avoided spend: the model and token counts of
+        # the original live call (zero here — the fixture response carries no usage).
+        self.assertEqual((rows[0]['model'], rows[0]['input_tokens'], rows[0]['output_tokens'], rows[0]['attempt_count']),
+                         ('test-model', 0, 0, 0))
         detail = self.http('GET', path='/api/analytics/payloads/' + rows[0]['request_id'])[2]
         self.assertEqual(detail['status'], 'available')
         self.assertEqual(json.loads(detail['bodies']['request']['text']), PAYLOAD)
