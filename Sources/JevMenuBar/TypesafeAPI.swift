@@ -243,9 +243,11 @@ enum RateCardStore {
     }
 
     /// Reference prices for models with published rates; every entry stays
-    /// editable in the Models panel.
+    /// editable in the Models panel. gpt-6-luna rides the Decisions API, which
+    /// bills input tokens only (no output-token charges) — unlike the
+    /// Responses API's $0.10/$0.50 card.
     static let seedRates: [String: ModelRate] = [
-        "gpt-6-luna": ModelRate(inputPerMTok: 0.10, outputPerMTok: 0.50),
+        "gpt-6-luna": ModelRate(inputPerMTok: 0.10, outputPerMTok: 0.0),
         "jev-latest": ModelRate(inputPerMTok: 0.042, outputPerMTok: 0.042),
         "jev-1.14.0": ModelRate(inputPerMTok: 0.042, outputPerMTok: 0.042),
     ]
