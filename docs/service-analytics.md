@@ -236,11 +236,37 @@ pre-change SQLite online backup if needed.
 ## Menu bar usage pulse
 
 The menu bar app is a read-only consumer of this store: it reads
-`requests.started_at` for the last 12 hours (one row per decision call) and
-draws the pulse graph in the popover, refreshing every two minutes. It opens
-the database read-only, never writes recording state, and shows "usage history
-unavailable" when the store is missing or `JEV_ANALYTICS_ENABLED` is 0.
-Retention and row caps continue to govern what the pulse can show.
+`started_at`, `outcome`, `model`, token counts and `duration_ms` for the last
+12 hours (one row per decision call), draws the pulse graph in the popover —
+cache hits stacked in green on live calls in blue — and reports the window's
+`Request / Cache` counts plus a `Savings` line pricing the avoided tokens with
+the editable rate card (`~/Library/Application Support/JEV Menu Bar/rates.json`,
+dollars per million tokens). It refreshes every two minutes, opens the database
+read-only, never writes recording state, and shows "usage history unavailable"
+when the store is missing or `JEV_ANALYTICS_ENABLED` is 0. Retention and row
+caps continue to govern what the pulse can show.
+
+## Decision replay cache and savings metrics
+
+The service layer intercepts `/v1/decision` before the gateway core:
+byte-identical requests (key = sha256 of the canonical instructions, schema and
+contexts + selected backend + cache version) are answered from the
+`decision_cache` table without a provider call. Entries carry the avoided
+spend of the originating live call — `input_tokens`, `output_tokens`,
+`duration_ms` — plus `hits` and `admitted_via` provenance (`replay`,
+`bootstrap-luna`). Every cache hit writes a `requests` row with
+`outcome='cache_hit'` carrying the real model and those avoided metrics, so
+savings are summable from the requests table alone; `estimated=1` marks rows
+priced from request size (~4 bytes per token) rather than recorded usage.
+Errors, disconnects and incomplete responses are never cached, cache trouble
+always falls through to the live path, `X-JEV-No-Cache: 1` bypasses, and
+`JEV_DECISION_CACHE=0` disables the feature. Entries expire after 14 days or
+beyond 10,000 rows (LRU). The per-model prices live in `rates.json`, edited in
+the menu-bar Models panel; the recorded token counts are exact for entries
+created after 18 November 2026 and byte-size estimates for earlier ones.
+`scripts/tools/backfill_savings_estimates.py` repairs legacy entries and hit
+rows (gateway stopped); `export_answer_store.py` seeds and refreshes entries
+from captured payloads.
 
 ## Portal and API
 

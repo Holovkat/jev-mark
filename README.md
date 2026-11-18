@@ -25,18 +25,22 @@ cache hits (green) on live calls (blue).
 
 ![JEV Decision Service menu](docs/images/menubar-decision-service.png)
 
-## What's new — 17 November 2026
+## What's new — 17–18 November 2026
 
 | Area | Delivered behavior and evidence |
 | --- | --- |
-| Decision replay cache | Byte-identical `/v1/decision` requests are answered from a content-addressed local store (`decision_cache` in the analytics DB) before the backend is called: key = sha256(instructions + schema + contexts) + backend, 14-day TTL, 10k-row LRU cap. Hits return `"cached": true` with an `X-JEV-Cache: hit` header, are recorded as `cache_hit` analytics rows with zero tokens, and errors/disconnects are never cached. `X-JEV-No-Cache: 1` bypasses and does not populate; `JEV_DECISION_CACHE=0` disables. Seeded from 320 captured historical responses at install. |
+| Decision replay cache | Byte-identical `/v1/decision` requests are answered from a content-addressed local store (`decision_cache` in the analytics DB) before the backend is called: key = sha256(instructions + schema + contexts) + backend, 14-day TTL, 10k-row LRU cap. Hits return `"cached": true` with an `X-JEV-Cache: hit` header, are recorded as `cache_hit` analytics rows, and errors/disconnects are never cached. `X-JEV-No-Cache: 1` bypasses and does not populate; `JEV_DECISION_CACHE=0` disables. Seeded from captured historical responses at install. |
+| Avoided-cost metrics | Each cache entry stores what the originating live call spent (input/output tokens, provider duration); every `cache_hit` analytics row carries those metrics plus the real model name, so savings are summable from the `requests` table alone. Rows whose metrics are byte-size estimates carry `estimated=1`. |
 | Automatic housekeeping | The recorder sets `auto_vacuum=INCREMENTAL` at creation, runs a one-time full `VACUUM` at startup past a 16 MB free-list threshold, and `incremental_vacuum` on every prune tick — no manual maintenance. Payload bodies are content-addressed (`payload_bodies`): 37% of captured bytes were exact repeats, and the first backfill took the analytics DB from 408 MB to 93 MB. |
 | Batch-composition ablation | `scripts/tools/ablate_batch_size.py` replays a captured 64-candidate capability request as 10-candidate sub-batches and shuffled full batches, then reports per-candidate stability. Measured result: **64/64 candidates stable** — batch size and candidate order do not change this workload's answers, so full-size batches are trusted and single-model evidence is sufficient for cache admission. The report header records model/instruction/catalog fingerprints and warns when the ablation is stale. |
-| Menu-bar cache chart | The 12-hour usage pulse stacks cache hits in green on top of live calls in blue, and the caption reads `Request: N · Cache: M` (Request is the window total; Cache is how many of those the cache answered). |
+| Savings line and rate card | The menu usage chart stacks cache hits (green) on live calls (blue) and reports the 12-hour savings under the request counts: `Savings  Cost: $0.712 · Time: 0:03:49` (first 24 h: 171 hits avoided 7.1M input tokens ≈ a third of live spend). The **Models** panel (renamed from "Ollama models") groups Ollama rows (free, unchanged) and **Service models** with editable In/Out $-per-MTok fields persisted to `rates.json`; seeds use published prices — gpt-6-luna bills **input only** on the Decisions API ($0.10/MTok, no output charges), TypeSafe models at the $0.042 reference. |
 
-Tooling lives in `scripts/tools/`: `export_answer_store.py` (bootstrap the cache
-from captured responses), `backfill_payload_bodies.py` (one-time offline dedupe +
-vacuum), and `ablate_batch_size.py` (re-run when the model, rubric, or catalog
+![Models panel with rate card](docs/images/models-panel.png)
+
+Tooling lives in `scripts/tools/`: `export_answer_store.py` (bootstrap/refresh
+cache entries from captured responses), `backfill_payload_bodies.py` (one-time
+dedupe + vacuum), `backfill_savings_estimates.py` (repair legacy entries and
+hit rows), and `ablate_batch_size.py` (re-run when the model, rubric, or catalog
 changes — the tool says so itself).
 
 ## Recent changes — 8–15 October 2026
@@ -769,8 +773,15 @@ changing the captured metadata, API, storage or UI.
 The same store now backs the decision replay cache and maintains itself:
 `decision_cache` serves identical requests locally (visible in the portal as
 `cache_hit` outcomes and on the menu-bar chart), payload bodies are deduplicated
-by content hash, and freed pages are vacuumed automatically. `/api/analytics/health`
-reports the cache configuration, last vacuum, and storage limits.
+by content hash, and freed pages are vacuumed automatically. `cache_hit` rows
+record the **avoided** spend — the model, token counts and provider duration of
+the original live call — with `estimated=1` marking byte-size estimates; the
+per-model prices behind the savings figures live in the editable
+`~/Library/Application Support/JEV Menu Bar/rates.json`.
+`/api/analytics/health` reports the cache configuration, last vacuum, and
+storage limits. See the
+[18 November change ticket](docs/tickets/2026-11-18-decision-cache-savings-and-rate-card.md)
+for the full contract, backfill tools, and verification record.
 
 ## Agent capability selection
 

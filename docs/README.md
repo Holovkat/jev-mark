@@ -20,6 +20,7 @@ changes from 8–15 October.
 | Ticket | Use it for |
 | --- | --- |
 | [Menu bar overlays and usage pulse](tickets/2026-11-04-menubar-decision-overlays.md) | 4 November 2026 popover rework: usage pulse, overlay selectors, services toggle, Ollama selection pruning, with retro and verification. |
+| [Decision cache, savings and rate card](tickets/2026-11-18-decision-cache-savings-and-rate-card.md) | 17–18 November 2026: replay cache with avoided-cost metrics, automatic vacuum and payload dedup, editable model rate card, and the menu savings line, with backfill tools and verification. |
 
 The installed gateway is `http://127.0.0.1:8096`; its main pages are `/workbench`,
 `/benchmarks`, and `/analytics`. Any temporary development port shown in an older
