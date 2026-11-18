@@ -310,6 +310,8 @@ class AnalyticsStore:
                                  ("duration_ms", "REAL NOT NULL DEFAULT 0")):
                 if column not in {row[1] for row in db.execute("PRAGMA table_info(decision_cache)")}:
                     db.execute(f"ALTER TABLE decision_cache ADD COLUMN {column} {decl}")
+            if "estimated" not in {row[1] for row in db.execute("PRAGMA table_info(requests)")}:
+                db.execute("ALTER TABLE requests ADD COLUMN estimated INTEGER NOT NULL DEFAULT 0")
             db.execute("INSERT OR IGNORE INTO meta VALUES ('collection_started', ?)", (str(self.started),))
             db.execute("INSERT OR IGNORE INTO meta VALUES ('dropped_updates', '0')")
             db.execute("INSERT OR IGNORE INTO meta SELECT 'coverage_start', value FROM meta WHERE key='collection_started'")
@@ -342,6 +344,9 @@ class AnalyticsStore:
                     with db:
                         for row, attempts, payload, payload_bytes in batch:
                             db.execute(sql, [row.get(c) for c in COLUMNS])
+                            if row.get("estimated"):
+                                db.execute("UPDATE requests SET estimated=1 WHERE request_id=?",
+                                           (row["request_id"],))
                             if payload and row["started_at"] > time.time() - PAYLOAD_TTL:
                                 # Bodies are content-addressed: identical request/response
                                 # captures are stored once in payload_bodies; the payloads

@@ -189,12 +189,16 @@ struct UsagePulseView: View {
     }
 
     /// Cache-hit savings over the window: the provider spend the hits avoided
-    /// (rate-card priced) and the model time they avoided, as H:MM:SS.
+    /// (rate-card priced) and the model time they avoided, as H:MM:SS. Small
+    /// amounts gain decimals instead of rounding to $0.000.
     private var savingsCaption: String {
         guard let snapshot else { return "" }
         let seconds = Int(snapshot.savedMs / 1000)
         let time = String(format: "%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, seconds % 60)
-        return "Cost: \(String(format: "$%.3f", snapshot.savedCost))  ·  Time: \(time)"
+        let cost = snapshot.savedCost >= 0.01
+            ? String(format: "$%.3f", snapshot.savedCost)
+            : String(format: "$%.5f", snapshot.savedCost)
+        return "Cost: \(cost)  ·  Time: \(time)"
     }
 
     private var accessibilityText: String {

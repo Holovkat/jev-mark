@@ -458,6 +458,12 @@ def make_handler(gateway, store, *, assets=None, token=None):
                         observe(observation, "capture_body", "request", preread)
                         if request_value is not None:
                             observe(observation, "payload", request_value)
+                    if avoided_in == 0 and avoided_out == 0 and preread is not None:
+                        # Entries created before avoided-cost metrics existed carry
+                        # none; estimate from the request itself, which is exactly
+                        # what the live call would have sent (~4 bytes per token).
+                        avoided_in = len(preread) // 4
+                        observation.row["estimated"] = 1
                     value = json.loads(cached_response)
                     if isinstance(value, dict) and value.get("cached") is not True:
                         value["cached"] = True
@@ -485,12 +491,15 @@ def make_handler(gateway, store, *, assets=None, token=None):
                 if cached is not None:
                     # A cache hit row records the avoided spend: the tokens and
                     # provider time the original live call needed, not the
-                    # near-zero cost of serving the stored answer.
+                    # near-zero cost of serving the stored answer. Legacy
+                    # entries without stored metrics keep the byte-estimate
+                    # (estimated=1) and their actual serve latency.
                     observation.row["outcome"] = "cache_hit"
                     observation.row["model"] = label(cached_model) if cached_model and cached_model != "unknown" else observation.row["model"]
                     observation.row["input_tokens"] = avoided_in
                     observation.row["output_tokens"] = avoided_out
-                    observation.row["duration_ms"] = round(avoided_ms, 3)
+                    if avoided_ms > 0:
+                        observation.row["duration_ms"] = round(avoided_ms, 3)
                 try:
                     store.enqueue(observation.row, observation.attempts, observation.bodies)
                 except Exception:

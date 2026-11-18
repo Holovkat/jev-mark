@@ -708,9 +708,14 @@ class DecisionCacheTests(unittest.TestCase):
         rows = self.latest_rows()
         self.assertEqual([row['outcome'] for row in rows], ['cache_hit', 'complete'])
         # The hit row records the avoided spend: the model and token counts of
-        # the original live call (zero here — the fixture response carries no usage).
-        self.assertEqual((rows[0]['model'], rows[0]['input_tokens'], rows[0]['output_tokens'], rows[0]['attempt_count']),
-                         ('test-model', 0, 0, 0))
+        # the original live call. The fixture response carries no usage, so the
+        # entry has no stored metrics and the hit estimates from the request
+        # size, marked estimated=1.
+        self.assertEqual(rows[0]['model'], 'test-model')
+        self.assertGreater(rows[0]['input_tokens'], 0)
+        with closing(self.store.connect()) as db:
+            self.assertEqual(db.execute('SELECT estimated FROM requests WHERE request_id=?',
+                                        (rows[0]['request_id'],)).fetchone()[0], 1)
         detail = self.http('GET', path='/api/analytics/payloads/' + rows[0]['request_id'])[2]
         self.assertEqual(detail['status'], 'available')
         self.assertEqual(json.loads(detail['bodies']['request']['text']), PAYLOAD)
