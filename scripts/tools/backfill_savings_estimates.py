@@ -19,9 +19,13 @@ only needed to repair history.
 from __future__ import annotations
 
 import argparse
+import json
 import sqlite3
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from jev_analytics import decision_cache_key
 
 
 def main() -> int:
@@ -57,6 +61,29 @@ def main() -> int:
                 db.execute(f"ALTER TABLE decision_cache ADD COLUMN {column} {decl}")
         db.commit()
 
+        # Part A2: metric-less entries can still be priced — their backend maps
+        # to exactly one model in typesafe.json, and that is the model whose
+        # rate their hits must carry. Tokens stay 0 (hit-time estimation covers
+        # them); duration stays untouched.
+        profile_models = {}
+        typesafe = Path.home() / "Library/Application Support/JEV Menu Bar/.secure/typesafe.json"
+        if typesafe.is_file():
+            try:
+                root = json.loads(typesafe.read_text())
+                rows = root.get("configs", []) if isinstance(root, dict) else root
+                for row in rows:
+                    profile_id, model = row.get("id"), row.get("model")
+                    if profile_id and model and not str(row.get("base_url") or row.get("endpoint") or "").startswith(
+                            ("http://127.0.0.1:11434", "http://localhost:11434")):
+                        profile_models["remote:" + str(profile_id)] = model
+            except (ValueError, AttributeError):
+                pass
+        entry_model_fixed = 0
+        for profile_backend, model in profile_models.items():
+            cursor = db.execute("UPDATE decision_cache SET model=? WHERE backend=? AND model='unknown'",
+                                (model, profile_backend))
+            entry_model_fixed += cursor.rowcount
+
         # Part A: entries whose originating live call is uniquely recoverable.
         entry_total = entry_fixed = 0
         for entry in db.execute("SELECT request_hash, backend, model, created_at FROM decision_cache "
@@ -73,25 +100,50 @@ def main() -> int:
                         origin["duration_ms"] or 0, entry["request_hash"]))
             entry_fixed += 1
 
-        # Part B: legacy hit rows — estimated tokens from captured request size,
-        # estimated duration from the backend's mean complete-call duration.
+        # Part B: legacy hit rows — recover the model and exact metrics from
+        # the matched cache entry (key recomputed from the captured request),
+        # falling back to a byte estimate when the entry is gone or itself
+        # metric-less. Repaired rows without exact metrics are estimated=1.
         hit_total = hit_fixed = 0
         means = {row["backend"]: row["ms"] for row in db.execute(
             "SELECT backend, AVG(duration_ms) AS ms FROM requests WHERE outcome='complete' AND duration_ms > 0 "
             "GROUP BY backend").fetchall()}
-        for hit in db.execute("SELECT r.request_id, r.backend, COALESCE(pb.bytes, LENGTH(p.bodies)) AS bytes "
+        for hit in db.execute("SELECT r.request_id, r.backend, COALESCE(pb.body, p.bodies) AS body, "
+                              "COALESCE(pb.bytes, LENGTH(p.bodies)) AS bytes "
                               "FROM requests r LEFT JOIN payloads p ON p.request_id = r.request_id "
                               "LEFT JOIN payload_bodies pb ON pb.body_hash = p.body_hash "
-                              "WHERE r.outcome='cache_hit' AND COALESCE(r.input_tokens, 0) = 0").fetchall():
+                              "WHERE r.outcome='cache_hit' AND (COALESCE(r.input_tokens, 0) = 0 OR r.model='unknown')").fetchall():
             hit_total += 1
             size = hit["bytes"] or 0
-            if size <= 0:
+            model, tokens, duration, exact = None, 0, 0.0, False
+            if hit["body"]:
+                try:
+                    body = json.loads(hit["body"])
+                    request = json.loads(body["request"]["text"])
+                    entry = db.execute("SELECT model, input_tokens, output_tokens, duration_ms FROM decision_cache "
+                                       "WHERE request_hash=?",
+                                       (decision_cache_key(request, hit["backend"]),)).fetchone()
+                    if entry is not None:
+                        if entry["model"] and entry["model"] != "unknown":
+                            model = entry["model"]
+                        if (entry["input_tokens"] or 0) > 0:
+                            tokens = entry["input_tokens"]
+                            duration = entry["duration_ms"] or 0.0
+                            exact = True
+                except (KeyError, TypeError, ValueError):
+                    pass
+            if tokens == 0 and size > 0:
+                tokens = size // 4  # ~4 bytes per input token
+            if tokens == 0 and model is None:
                 continue
-            db.execute("UPDATE requests SET input_tokens=?, duration_ms=COALESCE(?, duration_ms), estimated=1 WHERE request_id=?",
-                       (size // 4, means.get(hit["backend"]), hit["request_id"]))
+            db.execute("UPDATE requests SET input_tokens=?, duration_ms=COALESCE(?, duration_ms), model=COALESCE(?, model), "
+                       "estimated=? WHERE request_id=?",
+                       (tokens, duration if exact else means.get(hit["backend"]),
+                        model, 0 if exact else 1, hit["request_id"]))
             hit_fixed += 1
         db.commit()
         print(f"entries: {entry_total} lacked metrics, {entry_fixed} recovered from unique originating calls")
+        print(f"entry models: {entry_model_fixed} priced from their backend profile")
         print(f"hit rows: {hit_total} lacked tokens, {hit_fixed} backfilled with estimates (estimated=1)")
         db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
     except sqlite3.Error as error:
